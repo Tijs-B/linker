@@ -1,0 +1,7 @@
+simulation-data/
+frontend/node_modules/
+frontend/dist/
+.idea/
+backend/.env
+celerybeat-schedule
+.DS_Store

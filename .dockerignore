@@ -1,0 +1,13 @@
+simulation-data/
+**/node_modules/
+**/dist/
+
+Dockerfile
+docker-compose.*
+.git
+.gitignore
+.README.md
+.idea/
+.github/
+.cache/
+celerybeat-schedule

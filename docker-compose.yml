@@ -1,0 +1,66 @@
+version: "3.4"
+
+services:
+  linker:
+    build:
+      context: .
+      target: backend
+    command: python manage.py runserver 0.0.0.0:8060
+    depends_on:
+      - postgis
+      - redis
+    volumes:
+      - ./simulation-data:/simulation-data:ro
+      - ./backend:/app
+    environment:
+      - ALLOWED_HOSTS=*
+      - DATABASE_URL=postgis://root:pass@postgis:5432/linker
+      - CACHE_URL=redis://redis:6379
+      - SIMULATION_PATH=/simulation-data
+      - DEBUG=True
+    ports:
+      - "8060:8060"
+
+  linker_celery:
+    build:
+      context: .
+      target: backend
+    command: celery -A linker worker -B -l INFO
+    depends_on:
+      - postgis
+      - redis
+    volumes:
+      - ./simulation-data:/simulation-data:ro
+      - ./backend:/app
+    environment:
+      - ALLOWED_HOSTS=*
+      - DATABASE_URL=postgis://root:pass@postgis:5432/linker
+      - CACHE_URL=redis://redis:6379
+      - SIMULATION_PATH=/simulation-data
+      - DEBUG=True
+
+  postgis:
+    image: kartoza/postgis:14-3.3
+    environment:
+      - POSTGRES_DB=linker
+      - POSTGRES_USER=root
+      - POSTGRES_PASS=pass
+
+  redis:
+    image: redis:6
+
+  frontend:
+    build:
+      context: .
+      target: frontend
+    command: npm run dev -- --port 8061 --host 0.0.0.0
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules/
+    environment:
+      - BACKEND_URL=http://linker:8060
+    ports:
+      - "8061:8061"
+
+volumes:
+  postgres_data:
