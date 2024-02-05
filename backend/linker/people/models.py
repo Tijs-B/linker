@@ -17,7 +17,7 @@ class ContactPerson(models.Model):
     team = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='contact_persons')
 
     def __str__(self):
-        return f"{self.team.direction.value}{self.team.number:02d} {self.name}"
+        return f'{self.team.direction.value}{self.team.number:02d} {self.name}'
 
 
 class OrganizationMember(models.Model):
@@ -35,11 +35,11 @@ class OrganizationMember(models.Model):
             return None
 
     def __str__(self):
-        return f"{self.member_type.value.title()} - {self.name}"
+        return f'{self.member_type.value.title()} - {self.name}'
 
 
 def group_picture_path(instance, filename):
-    return f"G{instance.number:02d}_{filename}"
+    return f'G{instance.number:02d}_{filename}'
 
 
 class Team(models.Model):
@@ -63,7 +63,7 @@ class Team(models.Model):
             return None
 
     def __str__(self):
-        return f"{self.direction.value}{self.number:02d} {self.name}"
+        return f'{self.direction.value}{self.number:02d} {self.name}'
 
 
 class TeamNote(models.Model):

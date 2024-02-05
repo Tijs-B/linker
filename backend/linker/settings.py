@@ -91,13 +91,9 @@ WSGI_APPLICATION = 'linker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': env.db('DATABASE_URL', default='sqlite://:memory:')
-}
+DATABASES = {'default': env.db('DATABASE_URL', default='sqlite://:memory:')}
 
-CACHES = {
-    'default': env.cache('CACHE_URL')
-}
+CACHES = {'default': env.cache('CACHE_URL')}
 
 
 # Password validation

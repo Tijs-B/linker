@@ -11,3 +11,4 @@ docker-compose.*
 .github/
 .cache/
 celerybeat-schedule
+.env

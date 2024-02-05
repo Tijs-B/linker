@@ -12,7 +12,5 @@ class ContactPersonInline(admin.TabularInline):
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    inlines = [
-        ContactPersonInline
-    ]
+    inlines = [ContactPersonInline]
     ordering = ('number',)

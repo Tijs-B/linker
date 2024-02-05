@@ -18,7 +18,7 @@ class TrackerViewSet(viewsets.ModelViewSet):
     def track(self, request, pk=None):
         tracker = self.get_object()
         skip_basis = hasattr(tracker, 'team')
-        track = loads(tracker.get_track(skip_jumps=False, skip_basis=skip_basis).json)
+        track = loads(tracker.get_track(skip_basis=skip_basis).json)
         return Response(track)
 
     @action(detail=True, methods=['get'])

@@ -1,10 +1,11 @@
-from django.contrib.gis.geos import MultiLineString, Point, LineString
+from django.contrib.gis.db.models import MakeLine
+from django.contrib.gis.geos import Point, LineString
 from django.contrib.gis.db import models
-from geopy.distance import distance
+from django.contrib.gis.measure import D
 
 
 class Tracker(models.Model):
-    tracker_id = models.CharField(max_length=50, db_index=True)
+    tracker_id = models.CharField(max_length=50, db_index=True, unique=True)
     tracker_code = models.CharField(max_length=50, blank=True, null=True)
 
     last_log = models.OneToOneField('TrackerLog', on_delete=models.SET_NULL, blank=True, null=True, related_name='+')
@@ -15,28 +16,12 @@ class Tracker(models.Model):
         else:
             return self.tracker_id
 
-    def get_track(self, skip_jumps: bool = False, skip_basis: bool = False) -> MultiLineString:
-        points = self.tracker_logs.order_by('gps_datetime').values_list('point', flat=True)
-        if len(points) <= 1:
-            return MultiLineString()
-
-        # TODO: haal basis uit database
-        basis = Point(5.920033, 50.354934)
+    def get_track(self, skip_basis: bool = False) -> LineString:
+        queryset = self.tracker_logs.order_by('gps_datetime')
         if skip_basis:
-            first_point_index = next(i for i in range(len(points)) if distance(points[i], basis) > 0.2)
-        else:
-            first_point_index = 0
-
-        lines = [[points[first_point_index]]]
-        for point in points[first_point_index + 1:]:
-            if skip_basis and distance(basis, point).km < 0.2:
-                continue
-            if skip_jumps and distance(lines[-1][-1], point).km > 1:
-                lines.append([point])
-            else:
-                lines[-1].append(point)
-
-        return MultiLineString([LineString(line) for line in lines if len(line) > 1])
+            basis = Point(5.920033, 50.354934)
+            queryset = queryset.filter(point__distance_gt=(basis, D(m=100)))
+        return queryset.aggregate(MakeLine('point'))['point__makeline']
 
 
 class TrackerLog(models.Model):
@@ -62,7 +47,8 @@ class TrackerLog(models.Model):
     name = models.CharField(max_length=30, blank=True, null=True)
     code = models.CharField(max_length=30, blank=True, null=True)
 
+    class Meta:
+        unique_together = [['tracker', 'gps_datetime']]
+
     def __str__(self):
-        return f"{self.tracker} {self.gps_datetime}"
-
-
+        return f'{self.tracker} {self.gps_datetime}'

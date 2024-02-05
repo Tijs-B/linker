@@ -15,7 +15,7 @@ from django.utils.timezone import now
 from openpyxl.reader.excel import load_workbook
 
 from .constants import SETTING_SIMULATION_START
-from .geodynamics import import_geodynamics_data
+from .geodynamics import import_geodynamics_data_batch
 from .models import TrackerLog, Tracker
 from ..config.models import Setting
 from ..map.models import Tocht, Weide, Fiche, Zijweg
@@ -37,8 +37,9 @@ def restart_simulation():
 
 
 def _get_timestamp_from_file_name(file: Path) -> datetime.datetime:
-    return (datetime.datetime(1970, 1, 1, tzinfo=zoneinfo.ZoneInfo('UTC'))
-            + datetime.timedelta(seconds=(int(file.name.replace('.json.gz', '')))))
+    return datetime.datetime(1970, 1, 1, tzinfo=zoneinfo.ZoneInfo('UTC')) + datetime.timedelta(
+        seconds=(int(file.name.replace('.json.gz', '')))
+    )
 
 
 def simulate_download_tracker_data(until: Optional[datetime.datetime] = None):
@@ -50,38 +51,42 @@ def simulate_download_tracker_data(until: Optional[datetime.datetime] = None):
         except KeyError:
             until = SIMULATION_START
 
-    files_to_do = list((Path(settings.SIMULATION_PATH) / 'geodynamics').glob("*.json.gz"))
+    files_to_do = list((Path(settings.SIMULATION_PATH) / 'geodynamics').glob('*.json.gz'))
     try:
         latest_datetime = TrackerLog.objects.latest('fetch_datetime').fetch_datetime
         files_to_do = [
-            filename
-            for filename in files_to_do
-            if latest_datetime < _get_timestamp_from_file_name(filename)
+            filename for filename in files_to_do if latest_datetime < _get_timestamp_from_file_name(filename)
         ]
     except TrackerLog.DoesNotExist:
         pass
 
-    files_to_do = [filename for filename in files_to_do
-                   if _get_timestamp_from_file_name(filename) <= until]
+    files_to_do = [filename for filename in files_to_do if _get_timestamp_from_file_name(filename) <= until]
     files_to_do.sort(key=lambda filename: filename.name)
 
-    for filename in files_to_do:
-        with gzip.open(filename, 'rb') as file:
-            data = json.load(file)
+    batch_size = 100
 
-        print(f"Importing file {filename.name}")
-        import_geodynamics_data(data, update_metadata=True,
-                                fetch_datetime=_get_timestamp_from_file_name(filename))
+    for index in range(0, len(files_to_do), batch_size):
+        all_data = []
+        print(_get_timestamp_from_file_name(files_to_do[index]))
+        for filename in files_to_do[index : index + batch_size]:
+            with gzip.open(filename, 'rb') as file:
+                all_data.append((_get_timestamp_from_file_name(filename), json.load(file)))
+
+        import_geodynamics_data_batch(all_data)
+
+    for tracker in Tracker.objects.all():
+        tracker.last_log = tracker.tracker_logs.order_by('-gps_datetime').first()
+        tracker.save()
 
 
 def couple_trackers():
     for tracker in Tracker.objects.all():
-        if hasattr(tracker, "team"):
+        if hasattr(tracker, 'team'):
             continue
         code = tracker.last_log.code
-        if code.startswith("RK"):
+        if code.startswith('RK'):
             continue
-        if not code[0] == "R" and not code[0] == "B":
+        if not code[0] == 'R' and not code[0] == 'B':
             continue
         team_id = int(code[1:])
         team = Team.objects.get(number=team_id)
@@ -89,7 +94,7 @@ def couple_trackers():
         team.save()
 
     for tracker in Tracker.objects.all():
-        if hasattr(tracker, "team"):
+        if hasattr(tracker, 'team'):
             continue
         code = tracker.last_log.code
         if len(code) == 0 or not code.isnumeric():
@@ -114,8 +119,11 @@ def import_gpkg(filename: Path):
 
     for feature in ds['Tocht']:
         identifier = str(feature['name'])[0].upper()
-        Tocht.objects.update_or_create(identifier=identifier, order=ord(identifier) - ord('A'),
-                                       defaults=dict(route=GEOSGeometry(feature.geom[0].ewkt)))
+        Tocht.objects.update_or_create(
+            identifier=identifier,
+            order=ord(identifier) - ord('A'),
+            defaults=dict(route=GEOSGeometry(feature.geom[0].ewkt)),
+        )
 
     for feature in ds['Weides']:
         name = str(feature['name'])
@@ -130,27 +138,31 @@ def import_gpkg(filename: Path):
         name = str(feature['name'])
         tocht = Tocht.objects.get(identifier=name[0].upper())
         order = int(name[1:])
-        Fiche.objects.update_or_create(tocht=tocht, order=order, defaults=dict(point=GEOSGeometry(feature.geom.ewkt)))
+        Fiche.objects.update_or_create(
+            tocht=tocht,
+            order=order,
+            defaults=dict(point=GEOSGeometry(feature.geom.ewkt)),
+        )
 
     Zijweg.objects.all().delete()
     for feature in ds['Zijwegen']:
         try:
             Zijweg.objects.create(geom=feature.geom[0].ewkt)
-        except GDALException as e:
+        except GDALException:
             pass
 
 
 def import_groepen_en_deelnemers(filename: Path):
     wb = load_workbook(str(filename), read_only=True, data_only=True)
 
-    teams = wb["LIJST Inschrijvingen groepen"]
+    teams = wb['LIJST Inschrijvingen groepen']
 
-    first_row = [cell.value for cell in teams["1"]]
-    id_col = first_row.index("G_ID")
-    name_col = first_row.index("Teamnaam")
-    chiro_col = first_row.index("Chirogroep")
-    weide_col = first_row.index("StartWei")
-    richting_col = first_row.index("Richting")
+    first_row = [cell.value for cell in teams['1']]
+    id_col = first_row.index('G_ID')
+    name_col = first_row.index('Teamnaam')
+    chiro_col = first_row.index('Chirogroep')
+    weide_col = first_row.index('StartWei')
+    richting_col = first_row.index('Richting')
 
     for row in teams.iter_rows(min_row=2):
         id = int(row[id_col].value)
@@ -164,22 +176,20 @@ def import_groepen_en_deelnemers(filename: Path):
         weide = Weide.objects.get(tocht__identifier=row[weide_col].value[0].upper())
         richting = Direction(row[richting_col].value)
 
-        Team.objects.update_or_create(number=id,
-                                      defaults=dict(
-                                          direction=richting,
-                                          name=name,
-                                          chiro=chiro,
-                                          start_weide_1=weide))
+        Team.objects.update_or_create(
+            number=id,
+            defaults=dict(direction=richting, name=name, chiro=chiro, start_weide_1=weide),
+        )
 
-    personen = wb["LIJST Inschrijvingen personen"]
+    personen = wb['LIJST Inschrijvingen personen']
 
-    first_row = [cell.value for cell in personen["1"]]
-    id_col = first_row.index("G_ID")
-    volgnr_col = first_row.index("Volgnr")
-    name_col = first_row.index("Naam")
-    email_col = first_row.index("e-mail")
-    phone_col = first_row.index("GSM")
-    team_col = first_row.index("Teamnaam")
+    first_row = [cell.value for cell in personen['1']]
+    id_col = first_row.index('G_ID')
+    volgnr_col = first_row.index('Volgnr')
+    name_col = first_row.index('Naam')
+    email_col = first_row.index('e-mail')
+    phone_col = first_row.index('GSM')
+    team_col = first_row.index('Teamnaam')
 
     for row in personen.iter_rows(min_row=2):
         id = int(row[id_col].value)
@@ -189,7 +199,7 @@ def import_groepen_en_deelnemers(filename: Path):
             continue
         name = str(row[name_col].value.title())
         email = str(row[email_col].value)
-        phone = ''.join(c for c in str(row[phone_col].value) if c.isdigit() or c == "+")
+        phone = ''.join(c for c in str(row[phone_col].value) if c.isdigit() or c == '+')
         is_leader = int(row[volgnr_col].value) == 1
 
         if len(email) <= 1:
@@ -197,16 +207,22 @@ def import_groepen_en_deelnemers(filename: Path):
         if len(phone) <= 1:
             phone = None
 
-        if phone is not None and phone.startswith("4"):
-            phone = "+32" + phone
-        if phone is not None and phone.startswith("032"):
-            phone = "+" + phone[1:]
+        if phone is not None and phone.startswith('4'):
+            phone = '+32' + phone
+        if phone is not None and phone.startswith('032'):
+            phone = '+' + phone[1:]
 
-        if phone is not None and not re.match(r"(\+?32|0032|0)4\d{8}", phone):
-            print(f"Warning: phone number not correct: {phone} from {name}")
+        if phone is not None and not re.match(r'(\+?32|0032|0)4\d{8}', phone):
+            print(f'Warning: phone number not correct: {phone} from {name}')
 
         team = Team.objects.get(number=id)
-        ContactPerson.objects.create(name=name, phone_number=phone, email_address=email, team=team, is_leader=is_leader)
+        ContactPerson.objects.create(
+            name=name,
+            phone_number=phone,
+            email_address=email,
+            team=team,
+            is_leader=is_leader,
+        )
 
 
 def import_organization_members(filename: Path):

@@ -45,9 +45,13 @@ services:
       - POSTGRES_DB=linker
       - POSTGRES_USER=root
       - POSTGRES_PASS=pass
+    ports:
+      - "8062:5432"
 
   redis:
     image: redis:6
+    ports:
+      - "8063:6379"
 
   frontend:
     build:

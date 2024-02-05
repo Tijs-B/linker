@@ -32,5 +32,3 @@ class MapNoteSerializer(serializers.ModelSerializer):
         model = MapNote
         fields = ['id', 'created', 'updated', 'content', 'point']
         read_only_fields = ['created', 'updated']
-
-

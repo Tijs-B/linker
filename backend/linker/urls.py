@@ -18,7 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from linker.map.views import TochtViewSet, FicheViewSet, WeideViewSet, ZijwegViewSet, MapNoteViewSet
+from linker.map.views import (
+    TochtViewSet,
+    FicheViewSet,
+    WeideViewSet,
+    ZijwegViewSet,
+    MapNoteViewSet,
+)
 from linker.people.views import TeamViewSet, OrganizationMemberViewSet, TeamNoteViewSet
 from linker.tracing.views import CheckpointLogViewSet
 from linker.trackers.views import TrackerViewSet
@@ -42,5 +48,5 @@ router.register('trackers', TrackerViewSet)
 urlpatterns = [
     path('api/', include(router.urls)),
     path('admin/', admin.site.urls),
-    path("__debug__/", include("debug_toolbar.urls")),
+    path('__debug__/', include('debug_toolbar.urls')),
 ]

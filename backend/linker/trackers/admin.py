@@ -11,25 +11,47 @@ class TrackerAdmin(admin.ModelAdmin):
 @admin.register(TrackerLog)
 class TrackerLogAdmin(admin.GISModelAdmin):
     fieldsets = [
-        (
-            None,
-            {
-                'fields': ['tracker', 'gps_datetime', 'point']
-            }
-        ),
+        (None, {'fields': ['tracker', 'gps_datetime', 'point']}),
         (
             'Details',
             {
                 'classes': ['collapse'],
                 'fields': (
-                    'satellites', 'input_acc', 'voltage', 'analog_input', 'tracker_type', 'heading', 'speed',
+                    'fetch_datetime',
+                    'local_datetime',
+                    'satellites',
+                    'input_acc',
+                    'voltage',
+                    'analog_input',
+                    'tracker_type',
+                    'heading',
+                    'speed',
                     'is_online',
-                    'has_gps', 'has_power', 'is_online_threshold', 'name', 'code'
+                    'has_gps',
+                    'has_power',
+                    'is_online_threshold',
+                    'name',
+                    'code',
                 ),
-            }
+            },
         ),
     ]
     readonly_fields = (
-        'tracker', 'gps_datetime', 'satellites', 'input_acc', 'voltage', 'analog_input', 'tracker_type', 'heading',
-        'speed', 'is_online', 'has_gps', 'has_power', 'is_online_threshold', 'name', 'code'
+        'tracker',
+        'gps_datetime',
+        'fetch_datetime',
+        'local_datetime',
+        'satellites',
+        'input_acc',
+        'voltage',
+        'analog_input',
+        'tracker_type',
+        'heading',
+        'speed',
+        'is_online',
+        'has_gps',
+        'has_power',
+        'is_online_threshold',
+        'name',
+        'code',
     )
