@@ -12,15 +12,16 @@ dependencies = [
     "openpyxl>=3.1.2",
     "geopy>=2.4.1",
     "Pillow>=10.2.0",
+    "djangorestframework-gis>=1.0",
 ]
 
 [tool.rye]
 managed = true
 virtual = true
 dev-dependencies = [
-    "django-debug-toolbar>=4.3.0",
     "ruff>=0.2.0",
     "watchdog>=3.0.0",
+    "django-debug-toolbar>=4.3.0",
 ]
 
 [tool.ruff]

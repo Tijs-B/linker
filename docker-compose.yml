@@ -4,7 +4,7 @@ services:
   linker:
     build:
       context: .
-      target: backend
+      target: dev
     command: python manage.py runserver 0.0.0.0:8060
     depends_on:
       - postgis
@@ -24,8 +24,8 @@ services:
   linker_celery:
     build:
       context: .
-      target: backend
-    command: celery -A linker worker -B -l INFO
+      target: dev
+    command: watchmedo auto-restart --directory=/app --pattern=*.py --recursive -- celery -A linker worker -B -l INFO
     depends_on:
       - postgis
       - redis
@@ -65,6 +65,3 @@ services:
       - BACKEND_URL=http://linker:8060
     ports:
       - "8061:8061"
-
-volumes:
-  postgres_data:

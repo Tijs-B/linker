@@ -20,6 +20,7 @@ django-debug-toolbar==4.3.0
 django-enumfields==2.1.1
 django-environ==0.11.2
 djangorestframework==3.14.0
+djangorestframework-gis==1.0
 et-xmlfile==1.1.0
 geographiclib==2.0
 geopy==2.4.1

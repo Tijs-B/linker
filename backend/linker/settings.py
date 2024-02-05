@@ -93,7 +93,7 @@ WSGI_APPLICATION = 'linker.wsgi.application'
 
 DATABASES = {'default': env.db('DATABASE_URL', default='sqlite://:memory:')}
 
-CACHES = {'default': env.cache('CACHE_URL')}
+CACHES = {'default': env.cache('CACHE_URL', default='dummycache://')}
 
 
 # Password validation

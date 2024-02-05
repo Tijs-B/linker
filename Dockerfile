@@ -34,21 +34,31 @@ ENV PYTHONBUFFERED 1 \
     DJANGO_SETTINGS_MODULE linker.settings
 
 
-COPY backend/requirements.txt .
+COPY backend/requirements.lock .
 
-RUN pip install -r requirements.txt
-
-COPY backend .
+RUN pip install -r requirements.lock
 
 COPY --chmod=0755 backend/docker-entrypoint.sh ./docker-entrypoint.sh
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
+
+###########
+### DEV ###
+###########
+FROM backend AS dev
+
+COPY backend/requirements-dev.lock .
+
+RUN pip install -r requirements-dev.lock
+
+COPY backend .
 
 ##################
 ### PRODUCTION ###
 ##################
 FROM backend AS production
 
+COPY backend .
 COPY --from=frontend_builder /app/dist/ ./static
 
 RUN python manage.py collectstatic --noinput

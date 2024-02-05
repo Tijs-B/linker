@@ -105,7 +105,6 @@ def couple_trackers():
             team.tracker = tracker
             team.save()
 
-    OrganizationMember.objects.all().delete()
     for tracker in Tracker.objects.all():
         code = tracker.last_log.code
         member = OrganizationMember.objects.filter(code=code).first()
