@@ -18,7 +18,7 @@ from .constants import SETTING_SIMULATION_START
 from .geodynamics import import_geodynamics_data_batch
 from .models import TrackerLog, Tracker
 from ..config.models import Setting
-from ..map.models import Tocht, Weide, Fiche, Zijweg
+from ..map.models import Tocht, Weide, Fiche, Zijweg, Basis
 from ..people.constants import MemberType, Direction
 from ..people.models import Team, OrganizationMember, ContactPerson
 from ..tracing.models import CheckpointLog
@@ -126,12 +126,18 @@ def import_gpkg(filename: Path):
 
     for feature in ds['Weides']:
         name = str(feature['name'])
+        geometry = GEOSGeometry(feature.geom[0].ewkt)
 
         if name.lower() == 'basis':
-            continue
+            basis = Basis.objects.first()
+            if basis is None:
+                Basis.objects.create(point=geometry.centroid)
+            else:
+                basis.point = geometry.centroid
+                basis.save()
 
         tocht = Tocht.objects.get(identifier=name[0].upper())
-        Weide.objects.update_or_create(tocht=tocht, defaults=dict(polygon=GEOSGeometry(feature.geom[0].ewkt)))
+        Weide.objects.update_or_create(tocht=tocht, defaults=dict(polygon=geometry))
 
     for feature in ds['Fiches']:
         name = str(feature['name'])
@@ -199,7 +205,7 @@ def import_groepen_en_deelnemers(filename: Path):
         name = str(row[name_col].value.title())
         email = str(row[email_col].value)
         phone = ''.join(c for c in str(row[phone_col].value) if c.isdigit() or c == '+')
-        is_leader = int(row[volgnr_col].value) == 1
+        is_favorite = int(row[volgnr_col].value) == 1
 
         if len(email) <= 1:
             email = None
@@ -220,7 +226,7 @@ def import_groepen_en_deelnemers(filename: Path):
             phone_number=phone,
             email_address=email,
             team=team,
-            is_leader=is_leader,
+            is_favorite=is_favorite
         )
 
 

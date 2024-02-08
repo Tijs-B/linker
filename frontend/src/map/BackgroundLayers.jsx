@@ -1,40 +1,44 @@
 import {Layer, Source} from 'react-map-gl/maplibre';
 
 import {grey} from '@mui/material/colors';
-import {useGetFichesQuery, useGetTochtenQuery, useGetZijwegenQuery} from "../services/linker.js";
+import {useGetFichesQuery, useGetTochtenQuery, useGetZijwegenQuery} from '../services/linker.js';
+import {feature, featureCollection} from '@turf/helpers';
+import {memo, useMemo} from 'react';
 
-export default function BackgroundLayers({showHeatmap}) {
+export default memo(function BackgroundLayers({showHeatmap}) {
     const {data: tochten} = useGetTochtenQuery();
     const {data: fiches} = useGetFichesQuery();
     const {data: zijwegen} = useGetZijwegenQuery();
 
-    const tochtenData = {
-        type: 'FeatureCollection',
-        features: tochten ? Object.values(tochten.entities).map((tocht) => ({
-            type: 'Feature',
-            geometry: tocht.route,
-            id: tocht.id,
-        })) : [],
-    };
+    const tochtenData = useMemo(() => {
+        if (!tochten) {
+            return null;
+        }
+        return featureCollection(Object.values(tochten.entities).map((tocht) => feature(tocht.route, {}, {id: tocht.id})))
+    }, [tochten]);
 
-    const fichesData = {
-        type: 'FeatureCollection',
-        features: fiches ? Object.values(fiches.entities).map((fiche) => ({
-            type: 'Feature',
-            geometry: fiche.point,
-            properties: {name: `${tochten?.entities[fiche.tocht]?.identifier}${fiche.order}`},
-            id: fiche.id,
-        })) : [],
-    };
 
-    const zijwegenData = {
-        type: 'FeatureCollection',
-        features: zijwegen ? Object.values(zijwegen.entities).map((zijweg) => ({
-            type: 'Feature',
-            geometry: zijweg.geom,
-            id: zijweg.id,
-        })) : [],
-    };
+    const fichesData = useMemo(() => {
+        if (!tochten || !fiches) {
+            return null;
+        }
+        return featureCollection(
+            Object.values(fiches.entities).map((fiche) =>
+                feature(
+                    fiche.point,
+                    {name: `${tochten.entities[fiche.tocht].identifier}${fiche.order}`},
+                    {id: fiche.id},
+                ),
+            )
+        )
+    }, [fiches, tochten]);
+
+    const zijwegenData = useMemo(() => {
+        if (!zijwegen) {
+            return null;
+        }
+        return featureCollection(Object.values(zijwegen.entities).map((zijweg) => feature(zijweg.geom, {}, {id: zijweg.id})))
+    }, [zijwegen]);
 
     const tochtenLayer = {
         id: 'tochten',
@@ -90,7 +94,7 @@ export default function BackgroundLayers({showHeatmap}) {
             'text-opacity': showHeatmap ? 0 : 1,
             'text-color': grey[800],
         },
-        minzoom: 14,
+        minzoom: 13,
     };
 
     const fichesCircleLayer = {
@@ -103,7 +107,7 @@ export default function BackgroundLayers({showHeatmap}) {
             'circle-stroke-color': grey[800],
             'circle-stroke-width': 1.5,
         },
-        minzoom: 14,
+        minzoom: 13,
     };
 
     return (
@@ -116,11 +120,7 @@ export default function BackgroundLayers({showHeatmap}) {
                 tileSize={256}
                 tiles={['/api/heatmap/{z}/{x}/{y}.png']}
             >
-                <Layer
-                    id="heatmap"
-                    type="raster"
-                    layout={{visibility: showHeatmap ? 'visible' : 'none'}}
-                />
+                <Layer id="heatmap" type="raster" layout={{visibility: showHeatmap ? 'visible' : 'none'}}/>
             </Source>
 
             <Source type="geojson" data={fichesData}>
@@ -133,11 +133,8 @@ export default function BackgroundLayers({showHeatmap}) {
             </Source>
             <Source type="geojson" data={zijwegenData}>
                 <Layer layout={{visibility: showHeatmap ? 'none' : 'visible'}} {...zijwegenLayer} />
-                <Layer
-                    layout={{visibility: showHeatmap ? 'none' : 'visible'}}
-                    {...zijwegenOutlineLayer}
-                />
+                <Layer layout={{visibility: showHeatmap ? 'none' : 'visible'}} {...zijwegenOutlineLayer} />
             </Source>
         </>
     );
-}
+})

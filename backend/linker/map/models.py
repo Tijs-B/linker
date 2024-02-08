@@ -2,13 +2,11 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos import MultiLineString
 from django.core.validators import MinValueValidator
 
-from linker.people.models import OrganizationMember
-
 
 class Tocht(models.Model):
     identifier = models.CharField(max_length=1, unique=True)
     order = models.PositiveIntegerField(unique=True)
-    leads = models.ManyToManyField(OrganizationMember)
+    leads = models.ManyToManyField('people.OrganizationMember')
 
     route = models.LineStringField()
 
@@ -31,6 +29,10 @@ class Weide(models.Model):
 
     def __str__(self):
         return self.tocht.identifier
+
+
+class Basis(models.Model):
+    point = models.PointField()
 
 
 class Fiche(models.Model):

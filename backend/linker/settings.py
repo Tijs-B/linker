@@ -150,6 +150,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'linker.trackers.tasks.download_tracker_data',
         'schedule': datetime.timedelta(seconds=5),
     },
+    'trace-teams': {
+        'task': 'linker.tracing.tasks.trace_teams',
+        'schedule': datetime.timedelta(minutes=1),
+    },
     'update-heatmap': {
         'task': 'linker.trackers.tasks.update_heatmap',
         'schedule': datetime.timedelta(minutes=10),
@@ -157,3 +161,8 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 INTERNAL_IPS = ['127.0.0.1']
+
+if DEBUG:
+    import socket  # only if you haven't already imported this
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]

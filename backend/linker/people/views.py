@@ -1,10 +1,10 @@
 from rest_framework import viewsets
 
-from .models import Team, OrganizationMember, TeamNote
+from .models import Team, OrganizationMember, TeamNote, ContactPerson
 from .serializers import (
     TeamSerializer,
     OrganizationMemberSerializer,
-    TeamNoteSerializer,
+    TeamNoteSerializer, ContactPersonSerializer,
 )
 
 
@@ -21,3 +21,8 @@ class OrganizationMemberViewSet(viewsets.ModelViewSet):
 class TeamNoteViewSet(viewsets.ModelViewSet):
     queryset = TeamNote.objects.all()
     serializer_class = TeamNoteSerializer
+
+
+class ContactPersonViewSet(viewsets.ModelViewSet):
+    queryset = ContactPerson.objects.all()
+    serializer_class = ContactPersonSerializer

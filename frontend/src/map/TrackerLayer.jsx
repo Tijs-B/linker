@@ -1,4 +1,4 @@
-import {useEffect, useMemo} from 'react';
+import {memo, useEffect, useMemo} from 'react';
 import {Layer, Source, useMap} from 'react-map-gl/maplibre';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -6,8 +6,9 @@ import {trackersActions} from '../store';
 import {itemColor} from '../theme/colors.js';
 import {useGetOrganizationMembersQuery, useGetTeamsQuery, useGetTrackersQuery} from "../services/linker.js";
 import {generateTracker, generateTrackerOutline} from "../utils/icons.js";
+import {feature, featureCollection} from "@turf/helpers";
 
-export default function TrackerLayer({visible}) {
+export default memo(function TrackerLayer({visible, trackers}) {
     const dispatch = useDispatch();
     const selectedId = useSelector((state) => state.trackers.selectedId);
     const showHistory = useSelector((state) => state.trackers.showHistory);
@@ -16,8 +17,10 @@ export default function TrackerLayer({visible}) {
 
     const {data: teams} = useGetTeamsQuery();
     const {data: organizationMembers} = useGetOrganizationMembersQuery();
-    const {data: trackers} = useGetTrackersQuery();
-
+    const {data: allTrackers} = useGetTrackersQuery({
+        pollingInterval: 10_000,
+        skipPollingIfUnfocused: true,
+    });
 
     const {mainMap} = useMap();
 
@@ -59,66 +62,33 @@ export default function TrackerLayer({visible}) {
         };
     }, [mainMap, dispatch]);
 
-    const allFeatures = useMemo(() => {
-        if (!trackers) {
-            return [];
-        }
-        return (teams ? Object.values(teams.entities) : [])
-            .concat((organizationMembers ? Object.values(organizationMembers.entities) : []))
-            .flatMap((item) => {
-                const last_log = trackers.entities[item.tracker]?.last_log;
-                if (last_log) {
-                    const code = 'number' in item ? item.number.toString().padStart(2, '0') : item.code;
-                    return [
-                        {
-                            type: 'Feature',
-                            geometry: last_log.point,
-                            id: item.tracker,
-                            properties: {
-                                image: `trackermarker-${code}-${itemColor(item)}`,
-                                sortKey: selectedId === item.tracker ? 100 : 100 - last_log.point.coordinates[1],
-                            },
-                        },
-                    ];
-                } else {
-                    return [];
-                }
-            });
-    }, [teams, organizationMembers, trackers, selectedId]);
+    const trackerIds = historyLog && selectedId ? [selectedId] : trackers;
 
-    const historyFeature = useMemo(() => {
-        if (historyLog) {
-            const team = Object.values(teams.entities).find((t) => t.tracker === selectedId);
-            const member = Object.values(organizationMembers.entities).find((m) => m.tracker === selectedId);
+    const geoJsonData = useMemo(() => {
+        let features = trackerIds.flatMap((trackerId) => {
+            const lastLog = allTrackers?.entities[trackerId]?.last_log;
+            if (!lastLog) {
+                return [];
+            }
+            const team = Object.values(teams.entities).find((t) => t.tracker === trackerId);
+            const member = Object.values(organizationMembers.entities).find((m) => m.tracker === trackerId);
             const item = team || member;
             const code = team ? team.number.toString().padStart(2, '0') : member.code;
-            return {
-                type: 'Feature',
-                geometry: historyLog.point,
-                id: item.tracker.id,
-                properties: {
-                    image: `trackermarker-${code}-${itemColor(item)}`,
-                    sortKey: 0,
-                },
+            const point = historyLog ? historyLog.point : lastLog.point;
+            const props = {
+                image: `trackermarker-${code}-${itemColor(item)}`,
+                sortKey: selectedId === item.tracker ? 100 : 100 - point.coordinates[1],
             };
-        } else {
-            return null;
-        }
-    }, [teams, organizationMembers, selectedId, historyLog]);
-
-    const geojsonData = {
-        type: 'FeatureCollection',
-        features: showHistory && historyFeature ? [historyFeature] : allFeatures,
-    };
+            return [feature(point, props, {id: item.tracker})];
+        });
+        return featureCollection(features);
+    }, [teams, organizationMembers, allTrackers, trackerIds, selectedId, historyLog])
 
     const selectedData = useMemo(() => {
-        if (!showHistory && selectedId && trackers.entities[selectedId]?.last_log) {
-            return {
-                type: 'FeatureCollection',
-                features: [{type: 'Feature', geometry: trackers.entities[selectedId].last_log.point}],
-            };
+        if (!showHistory && selectedId && allTrackers.entities[selectedId]?.last_log) {
+            return featureCollection([feature(allTrackers.entities[selectedId].last_log.point)])
         } else {
-            return {type: 'FeatureCollection', features: []};
+            return featureCollection([]);
         }
     }, [trackers, selectedId, showHistory]);
 
@@ -139,7 +109,7 @@ export default function TrackerLayer({visible}) {
                     }}
                 />
             </Source>
-            <Source type="geojson" data={geojsonData}>
+            <Source type="geojson" data={geoJsonData}>
                 <Layer
                     type="symbol"
                     id="trackers"
@@ -157,4 +127,4 @@ export default function TrackerLayer({visible}) {
             </Source>
         </>
     );
-}
+})

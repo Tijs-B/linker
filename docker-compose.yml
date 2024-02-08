@@ -47,21 +47,26 @@ services:
       - POSTGRES_PASS=pass
     ports:
       - "8062:5432"
+    volumes:
+      - postgis-data:/var/lib/postgresql
 
   redis:
     image: redis:6
     ports:
       - "8063:6379"
 
-  frontend:
-    build:
-      context: .
-      target: frontend
-    command: npm run dev -- --port 8061 --host 0.0.0.0
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules/
-    environment:
-      - BACKEND_URL=http://linker:8060
-    ports:
-      - "8061:8061"
+#  frontend:
+#    build:
+#      context: .
+#      target: frontend
+#    command: npm run dev -- --port 8061 --host 0.0.0.0
+#    volumes:
+#      - ./frontend:/app
+#      - /app/node_modules/
+#    environment:
+#      - BACKEND_URL=http://linker:8060
+#    ports:
+#      - "8061:8061"
+
+volumes:
+  postgis-data:

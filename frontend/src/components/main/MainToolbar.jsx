@@ -10,8 +10,9 @@ import {
 } from '@mui/material';
 
 import { css } from '@emotion/react';
+import {memo} from "react";
 
-export default function MainToolbar({ keyword, setKeyword, onSearchEnter, listOpen, setListOpen }) {
+export default memo(function MainToolbar({ keyword, setKeyword, onSearchEnter, listOpen, setListOpen }) {
   const theme = useTheme();
 
   return (
@@ -46,4 +47,4 @@ export default function MainToolbar({ keyword, setKeyword, onSearchEnter, listOp
       />
     </Toolbar>
   );
-}
+})

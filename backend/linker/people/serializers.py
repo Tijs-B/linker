@@ -7,7 +7,7 @@ from .models import ContactPerson, OrganizationMember, TeamNote, Team
 class ContactPersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactPerson
-        fields = ['id', 'name', 'phone_number', 'email_address', 'is_leader']
+        fields = ['id', 'name', 'phone_number', 'email_address', 'is_favorite']
 
 
 class OrganizationMemberSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):

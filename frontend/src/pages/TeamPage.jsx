@@ -1,22 +1,14 @@
-import {useMemo, useState} from 'react';
+import {memo, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CallIcon from '@mui/icons-material/Call';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import {
     AppBar,
     Avatar,
     Container,
     Grid,
     IconButton,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
     Paper,
-    Snackbar,
     Table,
     TableBody,
     TableCell,
@@ -27,9 +19,15 @@ import {
 } from '@mui/material';
 
 import {teamColor} from '../theme/colors.js';
-import {useGetCheckpointLogsQuery, useGetFichesQuery, useGetTeamsQuery, useGetTochtenQuery} from "../services/linker.js";
+import {
+    useGetCheckpointLogsQuery,
+    useGetFichesQuery,
+    useGetTeamsQuery,
+    useGetTochtenQuery
+} from "../services/linker.js";
+import ContactPersonsList from "../components/team/ContactPersonsList.jsx";
 
-export default function TeamPage() {
+export default memo(function TeamPage() {
     const navigate = useNavigate();
     const {teamId} = useParams();
 
@@ -88,16 +86,16 @@ export default function TeamPage() {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Fiche</TableCell>
-                                        <TableCell>Type</TableCell>
-                                        <TableCell>Tijd</TableCell>
+                                        <TableCell>Aankomst</TableCell>
+                                        <TableCell>Vertrek</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {teamLogs.map((log) => (
                                         <TableRow key={log.id}>
                                             <TableCell>{log.ficheName}</TableCell>
-                                            <TableCell>{log.type}</TableCell>
-                                            <TableCell>{new Date(log.timestamp).toLocaleString()}</TableCell>
+                                            <TableCell>{new Date(log.arrived).toLocaleString()}</TableCell>
+                                            <TableCell>{new Date(log.left).toLocaleString()}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -110,51 +108,12 @@ export default function TeamPage() {
                                 <Typography variant="h6" sx={{pt: 2}}>
                                     Leden
                                 </Typography>
-                                <List dense>
-                                    {team.contact_persons.map((person) => (
-                                        <ListItem
-                                            key={person.id}
-                                            disablePadding
-                                            secondaryAction={
-                                                <IconButton
-                                                    edge="end"
-                                                    disabled={!person.phone_number}
-                                                    onClick={() => {
-                                                        navigator.clipboard.writeText(person.phone_number);
-                                                        setCopied(true);
-                                                    }}
-                                                >
-                                                    <ContentCopyIcon/>
-                                                </IconButton>
-                                            }
-                                        >
-                                            <ListItemButton
-                                                component="a"
-                                                href={`tel:${person.phone_number}`}
-                                                disabled={!person.phone_number}
-                                            >
-                                                <ListItemIcon>
-                                                    <CallIcon/>
-                                                </ListItemIcon>
-                                                <ListItemText
-                                                    primary={person.name}
-                                                    secondary={person.phone_number ? person.phone_number : '-'}
-                                                />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    ))}
-                                </List>
+                                <ContactPersonsList team={team}/>
                             </Container>
                         </Paper>
                     </Grid>
                 </Grid>
             </Container>
-            <Snackbar
-                open={copied}
-                onClose={() => setCopied(false)}
-                autoHideDuration={2000}
-                message="Gekopiëerd!"
-            />
         </>
     );
-}
+})

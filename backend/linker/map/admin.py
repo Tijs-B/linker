@@ -1,10 +1,11 @@
 from django.contrib.gis import admin
 
-from .models import Weide, Fiche, Zijweg, Tocht, MapNote
+from .models import Weide, Fiche, Zijweg, Tocht, MapNote, Basis
 
 admin.site.register(Weide, admin.GISModelAdmin)
 admin.site.register(Fiche, admin.GISModelAdmin)
 admin.site.register(Zijweg, admin.GISModelAdmin)
+admin.site.register(Basis, admin.GISModelAdmin)
 
 
 @admin.register(Tocht)

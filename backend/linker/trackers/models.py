@@ -1,7 +1,9 @@
 from django.contrib.gis.db.models import MakeLine
-from django.contrib.gis.geos import Point, LineString
+from django.contrib.gis.geos import Point, LineString, MultiLineString
 from django.contrib.gis.db import models
 from django.contrib.gis.measure import D
+
+from linker.map.models import Basis
 
 
 class Tracker(models.Model):
@@ -17,11 +19,12 @@ class Tracker(models.Model):
             return self.tracker_id
 
     def get_track(self, skip_basis: bool = False) -> LineString:
-        queryset = self.tracker_logs.order_by('gps_datetime')
+        queryset = self.tracker_logs
         if skip_basis:
-            basis = Point(5.920033, 50.354934)
-            queryset = queryset.filter(point__distance_gt=(basis, D(m=100)))
-        return queryset.aggregate(MakeLine('point'))['point__makeline']
+            basis = Basis.objects.first()
+            queryset = queryset.filter(point__distance_gt=(basis.point, D(m=100)))
+        queryset = queryset.order_by('gps_datetime')
+        return LineString(list(queryset.values_list('point', flat=True)))
 
 
 class TrackerLog(models.Model):

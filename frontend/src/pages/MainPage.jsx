@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {useMap} from 'react-map-gl/maplibre';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -16,7 +16,7 @@ import MainMap from '../map/MainMap.jsx';
 import {trackersActions} from '../store/index.js';
 import {useGetOrganizationMembersQuery, useGetTeamsQuery, useGetTrackersQuery} from "../services/linker.js";
 
-export default function MainPage() {
+export default memo(function MainPage() {
     const theme = useTheme();
     const desktop = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -47,13 +47,13 @@ export default function MainPage() {
     }, [keyword])
 
 
-    const showItem = (tracker) => {
+    const showItem = useCallback((tracker) => {
         dispatch(trackersActions.setSelectedId(tracker));
         mainMap.easeTo({
             center: trackers.entities[tracker].last_log.point.coordinates,
             zoom: 14,
         });
-    };
+    }, [dispatch, mainMap, trackers]);
 
     // Create fuse objects for search
     const teamFuse = useMemo(() => {
@@ -101,6 +101,8 @@ export default function MainPage() {
             return [];
         }
     }, [keyword, memberFuse, organizationMembers]);
+
+    const filteredTrackers = filteredTeams.map((t) => t.tracker).concat(filteredMembers.map((m) => m.tracker));
 
     const onSearchEnter = function (keyword) {
         if (keyword) {
@@ -166,7 +168,7 @@ export default function MainPage() {
             `}
         >
             {desktop && (
-                <MainMap/>
+                <MainMap trackers={filteredTrackers}/>
             )}
 
             <div css={sidebar}>
@@ -182,7 +184,7 @@ export default function MainPage() {
                 <div css={middle}>
                     {!desktop && (
                         <div css={contentMap}>
-                            <MainMap/>
+                            <MainMap trackers={filteredTrackers}/>
                         </div>
                     )}
                     <Paper css={contentList} sx={{visibility: listOpen ? 'visible' : 'hidden'}} square>
@@ -199,4 +201,4 @@ export default function MainPage() {
             {selectedId && showHistory && <HistoryCard/>}
         </div>
     );
-}
+})

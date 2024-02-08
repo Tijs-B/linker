@@ -1,11 +1,11 @@
-import {useEffect} from 'react';
+import {memo, useEffect} from 'react';
 import {Layer, Source, useMap} from 'react-map-gl/maplibre';
 
 import {yellow} from '@mui/material/colors';
 import {useGetMapNotesQuery} from "../services/linker.js";
 import {generateMapNoteIcon} from "../utils/icons.js";
 
-export default function MapNoteLayer({visible}) {
+export default memo(function MapNoteLayer({visible}) {
     const {mainMap} = useMap();
 
     const {data: mapNotes} = useGetMapNotesQuery();
@@ -71,4 +71,4 @@ export default function MapNoteLayer({visible}) {
             />
         </Source>
     );
-}
+})

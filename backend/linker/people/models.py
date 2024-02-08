@@ -12,7 +12,7 @@ class ContactPerson(models.Model):
     name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=13, blank=True, null=True)
     email_address = models.CharField(max_length=100, blank=True, null=True)
-    is_leader = models.BooleanField(default=False)
+    is_favorite = models.BooleanField(default=False)
 
     team = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='contact_persons')
 

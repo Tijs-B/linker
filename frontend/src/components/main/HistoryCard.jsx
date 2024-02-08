@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {memo, useEffect, useState} from 'react';
 import {useMap} from 'react-map-gl/maplibre';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -26,8 +26,10 @@ import {trackersActions} from '../../store/index.js';
 import {itemColor} from '../../theme/colors.js';
 import {useGetOrganizationMembersQuery, useGetTeamsQuery, useGetTrackerLogsQuery} from "../../services/linker.js";
 import {skipToken} from "@reduxjs/toolkit/query";
+import bbox from "@turf/bbox";
+import {feature, featureCollection} from "@turf/helpers";
 
-export default function HistoryCard() {
+export default memo(function HistoryCard() {
     const theme = useTheme();
 
     const root = css`
@@ -89,13 +91,10 @@ export default function HistoryCard() {
         if (!logs) {
             return;
         }
-        let longs = logs.map((l) => l.point.coordinates[0]);
-        let lats = logs.map((l) => l.point.coordinates[1]);
 
-        let southEast = [Math.min(...longs), Math.min(...lats)];
-        let northWest = [Math.max(...longs), Math.max(...lats)];
+        let bounds = bbox(featureCollection(logs.map((l) => feature(l.point))))
 
-        mainMap.fitBounds([southEast, northWest], {padding: 30});
+        mainMap.fitBounds(bounds, {padding: 30});
 
         setIndex(logs.length - 1);
         dispatch(trackersActions.setHistoryLog(logs[logs.length - 1]));
@@ -129,7 +128,6 @@ export default function HistoryCard() {
                             <IconButton
                                 size="small"
                                 onClick={() => {
-                                    dispatch(trackersActions.setSelectedId(null));
                                     dispatch(trackersActions.setShowHistory(false));
                                 }}
                             >
@@ -184,4 +182,4 @@ export default function HistoryCard() {
             </Card>
         </div>
     );
-}
+})

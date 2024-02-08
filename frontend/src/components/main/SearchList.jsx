@@ -1,4 +1,3 @@
-import {useSelector} from 'react-redux';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import {FixedSizeList} from 'react-window';
 
@@ -6,9 +5,16 @@ import {Avatar, ListItem, ListItemAvatar, ListItemButton, ListItemText} from '@m
 
 import {css} from '@emotion/react';
 
-import {itemColor, memberColor, teamColor} from '../../theme/colors.js';
-import {getLastCheckpointLog} from '../../utils/data.js';
-import {useGetCheckpointLogsQuery, useGetFichesQuery, useGetTochtenQuery} from "../../services/linker.js";
+import {memberColor, teamColor} from '../../theme/colors.js';
+import {
+    useGetBasisQuery,
+    useGetFichesQuery,
+    useGetTochtenQuery,
+    useGetTrackersQuery,
+    useGetWeidesQuery
+} from "../../services/linker.js";
+import {memo, useMemo} from "react";
+import {getPositionDescription} from "../../utils/data.js";
 
 const TrackerRow = ({data, index, style}) => {
     const item = data.items[index];
@@ -36,35 +42,44 @@ const TrackerRow = ({data, index, style}) => {
     );
 };
 
-export default function SearchList({members, teams, onClick}) {
-    const {data: checkpointLogs} = useGetCheckpointLogsQuery();
+export default memo(function SearchList({members, teams, onClick}) {
     const {data: fiches} = useGetFichesQuery();
     const {data: tochten} = useGetTochtenQuery();
+    const {data: weides} = useGetWeidesQuery();
+    const {data: basis} = useGetBasisQuery();
+    const {data: trackers} = useGetTrackersQuery();
 
-    const items = teams
-        .map((team) => {
-            const lastCheckpointLog = getLastCheckpointLog(team, Object.values(checkpointLogs.entities));
-            const fiche = lastCheckpointLog && fiches?.entities[lastCheckpointLog.fiche];
-            const tocht = fiche && tochten?.entities[fiche.tocht];
-            return {
-                color: teamColor(team),
-                code: team.number.toString().padStart(2, '0'),
-                primary: team.name,
-                secondary: lastCheckpointLog
-                    ? `${tocht?.identifier}${fiche?.order}`
-                    : ' ',
-                tracker: team.tracker,
-            };
-        })
-        .concat(
-            members.map((m) => ({
-                color: memberColor(m),
-                code: m.code,
-                primary: m.name,
-                secondary: null,
-                tracker: m.tracker,
-            })),
-        );
+    const items = useMemo(() =>
+        teams
+            .map((team) => {
+                return {
+                    color: teamColor(team),
+                    code: team.number.toString().padStart(2, '0'),
+                    primary: team.name,
+                    tracker: team.tracker,
+                };
+            })
+            .concat(
+                members.map((m) => ({
+                    color: memberColor(m),
+                    code: m.code,
+                    primary: m.name,
+                    tracker: m.tracker,
+                })),
+            )
+            .map((item) => {
+                let secondary = '';
+                if (fiches && tochten && weides && basis && trackers) {
+                    let tracker = trackers.entities[item.tracker];
+                    if (tracker.last_log) {
+                        secondary = getPositionDescription(tracker.last_log.point, fiches, tochten, weides, basis);
+                    }
+                }
+                return {
+                    secondary,
+                    ...item
+                }
+            }), [teams, members, fiches, tochten, weides, basis, trackers])
 
     return (
         <AutoSizer
@@ -85,4 +100,4 @@ export default function SearchList({members, teams, onClick}) {
             )}
         </AutoSizer>
     );
-}
+})

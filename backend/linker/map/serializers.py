@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Tocht, Fiche, Weide, Zijweg, MapNote
+from .models import Tocht, Fiche, Weide, Zijweg, MapNote, Basis
 
 
 class TochtSerializer(serializers.ModelSerializer):
@@ -32,3 +32,9 @@ class MapNoteSerializer(serializers.ModelSerializer):
         model = MapNote
         fields = ['id', 'created', 'updated', 'content', 'point']
         read_only_fields = ['created', 'updated']
+
+
+class BasisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Basis
+        fields = ['id', 'point']

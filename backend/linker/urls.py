@@ -23,9 +23,9 @@ from linker.map.views import (
     FicheViewSet,
     WeideViewSet,
     ZijwegViewSet,
-    MapNoteViewSet,
+    MapNoteViewSet, BasisViewSet,
 )
-from linker.people.views import TeamViewSet, OrganizationMemberViewSet, TeamNoteViewSet
+from linker.people.views import TeamViewSet, OrganizationMemberViewSet, TeamNoteViewSet, ContactPersonViewSet
 from linker.tracing.views import CheckpointLogViewSet
 from linker.trackers.views import TrackerViewSet
 
@@ -33,12 +33,14 @@ router = routers.DefaultRouter()
 router.register('teams', TeamViewSet)
 router.register('organization-members', OrganizationMemberViewSet)
 router.register('team-notes', TeamNoteViewSet)
+router.register('contact-persons', ContactPersonViewSet)
 
 router.register('tochten', TochtViewSet)
 router.register('fiches', FicheViewSet)
 router.register('weides', WeideViewSet)
 router.register('zijwegen', ZijwegViewSet)
 router.register('map-notes', MapNoteViewSet)
+router.register('basis', BasisViewSet)
 
 router.register('checkpoint-logs', CheckpointLogViewSet)
 

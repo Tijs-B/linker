@@ -4,8 +4,9 @@ import {red} from '@mui/material/colors';
 import {useSelector} from 'react-redux';
 import {useGetTrackerTrackQuery} from "../services/linker.js";
 import {skipToken} from "@reduxjs/toolkit/query";
+import {memo} from "react";
 
-export default function TrackerHistoryLayer() {
+export default memo(function TrackerHistoryLayer() {
     const selectedId = useSelector((state) => state.trackers.selectedId);
     const {currentData: track} = useGetTrackerTrackQuery(selectedId ? selectedId : skipToken);
 
@@ -43,4 +44,4 @@ export default function TrackerHistoryLayer() {
             )}
         </>
     );
-}
+})

@@ -1,4 +1,4 @@
-import {useRef, useState} from 'react';
+import {memo, useEffect, useRef, useState} from 'react';
 import Map, {GeolocateControl, NavigationControl, ScaleControl} from 'react-map-gl/maplibre';
 import {useDispatch} from 'react-redux';
 
@@ -17,29 +17,46 @@ import MapNoteLayer from './MapNoteLayer';
 import MapPadding from './MapPadding.jsx';
 import TrackerHistoryLayer from './TrackerHistoryLayer.jsx';
 import TrackerLayer from './TrackerLayer.jsx';
+import {useGetTochtenQuery} from "../services/linker.js";
+import bbox from "@turf/bbox";
+import {feature, featureCollection} from "@turf/helpers";
 
-const initialBounds = {
-    bounds: [5.901138, 50.313015, 6.01506, 50.380425],
-    fitBoundsOptions: {padding: {top: 30, left: 30, right: 30, bottom: 30}},
+const BOUNDS_OPTIONS = {padding: {top: 30, left: 30, right: 30, bottom: 30}};
+const DEFAULT_INITIAL_BOUNDS = {
+    bounds: [5.9011, 50.3130, 6.0151, 50.3805],
+    fitBoundsOptions: BOUNDS_OPTIONS,
 };
 
-export default function MainMap() {
+export default memo(function MainMap({trackers}) {
     const theme = useTheme();
     const desktop = useMediaQuery(theme.breakpoints.up('md'));
     const dispatch = useDispatch();
     const [showHeatmap, setShowHeatmap] = useState(false);
     const [showSatellite, setShowSatellite] = useState(false);
+    const [hasRecentered, setRecentered] = useState(false);
+    const [initialBounds, setInitialBounds] = useState(DEFAULT_INITIAL_BOUNDS);
     const mapRef = useRef();
+    const {data: tochten} = useGetTochtenQuery();
 
     const mapStyle = showHeatmap
         ? 'https://tiles.tijsb.be/styles/dark-matter/style.json'
         : showSatellite ? 'https://tiles.tijsb.be/styles/satellite/style.json' :
             'https://tiles.tijsb.be/styles/outdoor/style.json';
 
+    useEffect(() => {
+        if (tochten && mapRef && mapRef.current && !hasRecentered) {
+            let features = Object.values(tochten.entities).map((tocht) => feature(tocht.route));
+            let bounds = bbox(featureCollection(features));
+            mapRef.current.fitBounds(bounds, BOUNDS_OPTIONS);
+            setRecentered(true);
+            setInitialBounds({bounds, fitBoundsOptions: BOUNDS_OPTIONS});
+        }
+    }, [tochten, mapRef, hasRecentered, setRecentered])
+
     return (
         <Map
             id="mainMap"
-            initialViewState={initialBounds}
+            initialViewState={DEFAULT_INITIAL_BOUNDS}
             style={{width: '100%', height: '100%'}}
             css={css`
                 width: 100%;
@@ -56,7 +73,7 @@ export default function MainMap() {
             <BackgroundLayers showHeatmap={showHeatmap}/>
 
             <MapNoteLayer visible={!showHeatmap}/>
-            <TrackerLayer visible={!showHeatmap}/>
+            <TrackerLayer visible={!showHeatmap} trackers={trackers}/>
             <TrackerHistoryLayer visible={!showHeatmap}/>
 
             <NavigationControl/>
@@ -118,4 +135,4 @@ export default function MainMap() {
             {desktop && <MapPadding left={parseInt(theme.dimensions.drawerWidthDesktop, 10)}/>}
         </Map>
     );
-}
+})

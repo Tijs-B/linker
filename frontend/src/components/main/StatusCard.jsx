@@ -1,14 +1,13 @@
-import {useState} from 'react';
+import {memo, useCallback, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 
 import CallIcon from '@mui/icons-material/Call';
 import CloseIcon from '@mui/icons-material/Close';
 import DirectionsIcon from '@mui/icons-material/Directions';
-import EditNoteIcon from '@mui/icons-material/EditNote';
 import HistoryIcon from '@mui/icons-material/History';
 import InfoIcon from '@mui/icons-material/Info';
-import SatelliteAltIcon from '@mui/icons-material/SatelliteAlt';
+import SearchIcon from '@mui/icons-material/Search';
 import StarIcon from '@mui/icons-material/Star';
 import {
     Avatar,
@@ -40,9 +39,10 @@ import {getLastCheckpointLog} from '../../utils/data.js';
 import {
     useGetCheckpointLogsQuery,
     useGetFichesQuery, useGetOrganizationMembersQuery,
-    useGetTeamsQuery,
+    useGetTeamsQuery, useGetTochtenQuery,
     useGetTrackersQuery
 } from "../../services/linker.js";
+import {useMap} from "react-map-gl/maplibre";
 
 const cell = css`
     border-bottom: none;
@@ -53,12 +53,14 @@ const cell = css`
 function TeamRows({team}) {
     const {data: checkpointLogs} = useGetCheckpointLogsQuery();
     const {data: fiches} = useGetFichesQuery();
+    const {data: tochten} = useGetTochtenQuery();
 
-    const lastCheckpointLog = getLastCheckpointLog(team, checkpointLogs.entities);
+    const lastCheckpointLog = checkpointLogs && getLastCheckpointLog(team, checkpointLogs.entities);
     const formattedDate = lastCheckpointLog
-        ? new Date(lastCheckpointLog.timestamp).toLocaleTimeString()
+        ? new Date(lastCheckpointLog.arrived).toLocaleTimeString()
         : '-';
-    const fiche = lastCheckpointLog && fiches.entities[lastCheckpointLog.fiche];
+    const fiche = lastCheckpointLog && fiches && fiches.entities[lastCheckpointLog.fiche];
+    const tocht = tochten && fiche && tochten.entities[fiche.tocht];
 
     return (
         <TableRow>
@@ -68,23 +70,27 @@ function TeamRows({team}) {
             <TableCell css={cell}>
                 <Stack direction="row" gap={2}>
                     <Typography variant="body2" color="textSecondary">
-                        {lastCheckpointLog ? `${fiche.tocht}${fiche.order} om ${formattedDate}` : '-'}
+                        {lastCheckpointLog ? `${tocht.identifier}${fiche.order} om ${formattedDate}` : '-'}
                     </Typography>
-                    {lastCheckpointLog &&
-                        (lastCheckpointLog.type === 'automated' ? (
-                            <SatelliteAltIcon fontSize="small"/>
-                        ) : (
-                            <EditNoteIcon fontSize="small"/>
-                        ))}
                 </Stack>
             </TableCell>
         </TableRow>
     );
 }
 
-export default function StatusCard() {
+export default memo(function StatusCard() {
     const theme = useTheme();
     const desktop = useMediaQuery(theme.breakpoints.up('md'));
+    const {mainMap} = useMap();
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [anchorEl, setAnchorEl] = useState(null);
+    const selectedId = useSelector((state) => state.trackers.selectedId);
+
+    const {data: trackers} = useGetTrackersQuery();
+    const {data: teams} = useGetTeamsQuery();
+    const {data: organizationMembers} = useGetOrganizationMembersQuery();
 
     const root = css`
         pointer-events: none;
@@ -125,22 +131,13 @@ export default function StatusCard() {
         padding-top: ${theme.spacing(0.5)};
     `;
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const [anchorEl, setAnchorEl] = useState(null);
-    const selectedId = useSelector((state) => state.trackers.selectedId);
-
-    const {data: trackers} = useGetTrackersQuery();
-    const {data: teams} = useGetTeamsQuery();
-    const {data: organizationMembers} = useGetOrganizationMembersQuery();
-
     const tracker = trackers && trackers.entities[selectedId];
     const team = teams && Object.values(teams.entities).find((t) => t.tracker === selectedId);
     const member = organizationMembers && Object.values(organizationMembers.entities).find((m) => m.tracker === selectedId);
 
     const code = member ? member.code : team.number.toString().padStart(2, '0');
 
-    const [longitude, latitude] = tracker.last_log.point.coordinates;
+    const [longitude, latitude] = tracker?.last_log?.point.coordinates;
     const navigateUrl = desktop
         ? `https://www.google.com/maps/search/?api=1&query=${latitude}%2C${longitude}`
         : `geo:${latitude},${longitude}`;
@@ -148,6 +145,15 @@ export default function StatusCard() {
     const lastUpdate = tracker.last_log
         ? new Date(tracker.last_log.gps_datetime).toLocaleTimeString()
         : '-';
+
+    const focusMap = useCallback(() => {
+        if (mainMap && tracker && tracker.last_log) {
+            mainMap.easeTo({
+                center: tracker.last_log.point.coordinates,
+                zoom: 14,
+            });
+        }
+    }, [mainMap, tracker])
 
     return (
         <div css={root}>
@@ -205,6 +211,10 @@ export default function StatusCard() {
                         <DirectionsIcon/>
                     </IconButton>
 
+                    <IconButton onClick={focusMap}>
+                        <SearchIcon/>
+                    </IconButton>
+
                     <IconButton onClick={() => dispatch(trackersActions.setShowHistory(true))}>
                         <HistoryIcon/>
                     </IconButton>
@@ -219,7 +229,7 @@ export default function StatusCard() {
                                     .filter((p) => p.phone_number)
                                     .map((person) => (
                                         <MenuItem key={person.id} component="a" href={`tel:${person.phone_number}`}>
-                                            {person.is_leader && (
+                                            {person.is_favorite && (
                                                 <ListItemIcon>
                                                     <StarIcon/>
                                                 </ListItemIcon>
@@ -228,13 +238,9 @@ export default function StatusCard() {
                                         </MenuItem>
                                     ))}
                             </Menu>
-                            <IconButton onClick={() => navigate(`/team/${team.id}`)}>
-                                <Badge badgeContent={team.team_notes.length} color="primary">
-                                    <InfoIcon/>
-                                </Badge>
-                            </IconButton>
                         </>
                     )}
+
                     {member && (
                         <IconButton
                             component="a"
@@ -244,8 +250,16 @@ export default function StatusCard() {
                             <CallIcon/>
                         </IconButton>
                     )}
+
+                    {team && (
+                        <IconButton onClick={() => navigate(`/team/${team.id}`)}>
+                            <Badge badgeContent={team.team_notes.length} color="primary">
+                                <InfoIcon/>
+                            </Badge>
+                        </IconButton>
+                    )}
                 </CardActions>
             </Card>
         </div>
     );
-}
+})

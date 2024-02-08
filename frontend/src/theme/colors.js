@@ -1,7 +1,7 @@
 import { blue, green, indigo, lightGreen, orange, purple, red } from '@mui/material/colors';
 
 export function teamColor(team) {
-  return team.direction == 'R' ? red[500] : blue[500];
+  return team.direction === 'R' ? red[500] : blue[500];
 }
 
 export function memberColor(member) {
@@ -10,7 +10,7 @@ export function memberColor(member) {
       return green[500];
     case 'Coordinatie':
       return lightGreen[500];
-    case 'Rode kruis':
+    case 'Rode Kruis':
       return orange[500];
     case 'Handige Harry':
       return purple[500];

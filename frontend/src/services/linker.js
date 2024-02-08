@@ -9,6 +9,7 @@ const ficheAdapter = createEntityAdapter();
 const checkpointLogAdapter = createEntityAdapter();
 const mapNoteAdapter = createEntityAdapter();
 const zijwegenAdapter = createEntityAdapter();
+const weidesAdapter = createEntityAdapter();
 
 export const linkerApi = createApi({
     reducerPath: 'linkerApi',
@@ -64,12 +65,31 @@ export const linkerApi = createApi({
                 return zijwegenAdapter.addMany(zijwegenAdapter.getInitialState(), response);
             }
         }),
+        getWeides: build.query({
+            query: () => '/weides/',
+            transformResponse(response) {
+                return weidesAdapter.addMany(weidesAdapter.getInitialState(), response);
+            }
+        }),
         getTrackerLogs: build.query({
             query: (id) => `/trackers/${id}/logs/`,
         }),
         getTrackerTrack: build.query({
             query: (id) => `/trackers/${id}/track/`,
         }),
+        getBasis: build.query({
+            query: () => '/basis/',
+            transformResponse(response) {
+                return response[0].point;
+            }
+        }),
+        editContactPerson: build.mutation({
+            query: contactPerson => ({
+                url: `/contact-persons/${contactPerson.id}/`,
+                method: 'PATCH',
+                body: contactPerson,
+            }),
+        })
     })
 })
 
@@ -84,4 +104,7 @@ export const {
     useGetZijwegenQuery,
     useGetTrackerLogsQuery,
     useGetTrackerTrackQuery,
+    useGetBasisQuery,
+    useGetWeidesQuery,
+    useEditContactPersonMutation,
 } = linkerApi;

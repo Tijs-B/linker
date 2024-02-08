@@ -2,8 +2,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import MapIcon from '@mui/icons-material/Map';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
+import {memo} from "react";
 
-export default function BottomMenu() {
+export default memo(function BottomMenu() {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -22,4 +23,4 @@ export default function BottomMenu() {
       </BottomNavigation>
     </Paper>
   )
-}
+})

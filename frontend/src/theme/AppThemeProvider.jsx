@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
+import {memo} from "react";
 
 const theme = createTheme({
   dimensions: {
@@ -8,6 +9,6 @@ const theme = createTheme({
   },
 });
 
-export default function AppThemeProvider({ children }) {
+export default memo(function AppThemeProvider({ children }) {
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
-}
+})
