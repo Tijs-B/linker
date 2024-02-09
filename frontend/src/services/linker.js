@@ -1,5 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {createEntityAdapter} from "@reduxjs/toolkit";
+import {getCookie} from "../utils/cookie.js";
 
 const trackerAdapter = createEntityAdapter();
 const teamAdapter = createEntityAdapter();
@@ -13,7 +14,16 @@ const weidesAdapter = createEntityAdapter();
 
 export const linkerApi = createApi({
     reducerPath: 'linkerApi',
-    baseQuery: fetchBaseQuery({baseUrl: '/api/'}),
+    baseQuery: fetchBaseQuery({
+        baseUrl: '/api/',
+        prepareHeaders: (headers, {type}) => {
+            if (type === 'mutation') {
+                const csrf = getCookie('csrftoken');
+                headers.set('X-CSRFToken', csrf);
+            }
+            return headers;
+        }
+    }),
     refetchOnFocus: true,
     refetchOnReconnect: true,
     endpoints: (build) => ({
@@ -93,6 +103,13 @@ export const linkerApi = createApi({
         getStats: build.query({
             query: () => '/stats/',
         }),
+        loginUser: build.mutation({
+            query: (body) => ({
+                url: `/login/`,
+                method: 'POST',
+                body,
+            }),
+        }),
     })
 })
 
@@ -110,5 +127,6 @@ export const {
     useGetBasisQuery,
     useGetWeidesQuery,
     useEditContactPersonMutation,
+    useLoginUserMutation,
     useGetStatsQuery,
 } = linkerApi;

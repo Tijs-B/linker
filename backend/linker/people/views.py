@@ -1,3 +1,8 @@
+from json import loads
+
+from django.contrib.auth import authenticate
+from django.http import HttpResponse
+from django.views import View
 from rest_framework import viewsets
 
 from .models import Team, OrganizationMember, TeamNote, ContactPerson
@@ -27,3 +32,14 @@ class TeamNoteViewSet(viewsets.ModelViewSet):
 class ContactPersonViewSet(viewsets.ModelViewSet):
     queryset = ContactPerson.objects.all()
     serializer_class = ContactPersonSerializer
+
+
+class LoginView(View):
+    def post(self, request):
+        data = loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is None:
+            return HttpResponse(status=404)
+        return HttpResponse(status=200)

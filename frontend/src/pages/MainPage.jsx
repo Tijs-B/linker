@@ -15,6 +15,7 @@ import StatusCard from '../components/main/StatusCard.jsx';
 import MainMap from '../map/MainMap.jsx';
 import {trackersActions} from '../store/index.js';
 import {useGetOrganizationMembersQuery, useGetTeamsQuery, useGetTrackersQuery} from "../services/linker.js";
+import {useNavigate} from "react-router-dom";
 
 export default memo(function MainPage() {
     const theme = useTheme();
@@ -23,14 +24,22 @@ export default memo(function MainPage() {
     const [keyword, setKeyword] = useState('');
     const [listOpen, setListOpen] = useState(desktop);
     const {mainMap} = useMap();
+    const navigate = useNavigate();
 
     const dispatch = useDispatch();
     const selectedId = useSelector((state) => state.trackers.selectedId);
     const showHistory = useSelector((state) => state.trackers.showHistory);
 
-    const {data: teams} = useGetTeamsQuery();
+    const {data: teams, error: queryError} = useGetTeamsQuery();
     const {data: organizationMembers} = useGetOrganizationMembersQuery();
     const {data: trackers} = useGetTrackersQuery();
+
+    // Navigate to login if unauthenticated
+    useEffect(() => {
+        if (queryError && queryError.status === 403) {
+            navigate('/login/')
+        }
+    }, [queryError])
 
     // Close the list on mobile when team is selected
     useEffect(() => {

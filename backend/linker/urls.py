@@ -26,7 +26,7 @@ from linker.map.views import (
     MapNoteViewSet,
     BasisViewSet,
 )
-from linker.people.views import TeamViewSet, OrganizationMemberViewSet, TeamNoteViewSet, ContactPersonViewSet
+from linker.people.views import TeamViewSet, OrganizationMemberViewSet, TeamNoteViewSet, ContactPersonViewSet, LoginView
 from linker.tracing.views import CheckpointLogViewSet, all_stats
 from linker.trackers.views import TrackerViewSet
 
@@ -51,6 +51,7 @@ router.register('trackers', TrackerViewSet)
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api/stats/', all_stats),
+    path('api/login/', LoginView.as_view()),
     path('admin/', admin.site.urls),
     path('__debug__/', include('debug_toolbar.urls')),
 ]
