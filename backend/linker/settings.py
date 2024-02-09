@@ -143,7 +143,7 @@ GEOS_LIBRARY_PATH = env('GEOS_LIBRARY_PATH', default=None)
 
 SIMULATION_PATH = env('SIMULATION_PATH', default=None)
 
-CELERY_BROKER_URL = env('CACHE_URL')
+CELERY_BROKER_URL = env('CACHE_URL', default='redis://localhost:6379')
 CELERY_TIMEZONE = 'Europe/Brussels'
 CELERY_BEAT_SCHEDULE = {
     'download-tracker-data': {
