@@ -37,7 +37,14 @@ export const linkerApi = createApi({
             query: () => '/teams/',
             transformResponse(response) {
                 return teamAdapter.addMany(teamAdapter.getInitialState(), response);
-            }
+            },
+            providesTags: (result) => result ?
+                [
+                    ...result.ids.map((id) => ({type: 'Team', id})),
+                    {type: 'Team', id: 'LIST'},
+                ]
+                :
+                [{type: 'Team', id: 'LIST'}]
         }),
         getOrganizationMembers: build.query({
             query: () => '/organization-members/',
@@ -93,12 +100,13 @@ export const linkerApi = createApi({
                 return response[0].point;
             }
         }),
-        editContactPerson: build.mutation({
+        updateContactPerson: build.mutation({
             query: contactPerson => ({
                 url: `/contact-persons/${contactPerson.id}/`,
                 method: 'PATCH',
                 body: contactPerson,
             }),
+            invalidatesTags: (result, error, { team }) => [{type: 'Team', id: team}]
         }),
         getStats: build.query({
             query: () => '/stats/',
@@ -126,7 +134,7 @@ export const {
     useGetTrackerTrackQuery,
     useGetBasisQuery,
     useGetWeidesQuery,
-    useEditContactPersonMutation,
+    useUpdateContactPersonMutation,
     useLoginUserMutation,
     useGetStatsQuery,
 } = linkerApi;

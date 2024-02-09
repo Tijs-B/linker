@@ -4,33 +4,39 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import {memo, useCallback, useState} from "react";
+import {useUpdateContactPersonMutation} from "../../services/linker.js";
 
-export default memo(function ({team}) {
-    const [copied, setCopied] = useState(false);
 
-    const copyPhoneNumber = useCallback((phoneNumber) => {
-        navigator.clipboard.writeText(phoneNumber);
-        setCopied(true);
-    }, [setCopied]);
+const ContactPersonItem = memo(function ContactPersonItem({person}) {
+    const [updateContactPerson, _] = useUpdateContactPersonMutation();
 
-    const items = team.contact_persons.map((person) => (
+    const copyPhoneNumber = useCallback(() => {
+        navigator.clipboard.writeText(person.phoneNumber);
+    }, [person]);
+
+    const toggleFavorite = useCallback(() => {
+        updateContactPerson({
+            ...person,
+            is_favorite: !person.is_favorite,
+        })
+    }, [updateContactPerson, person]);
+
+    return (
         <ListItem
             key={person.id}
             disablePadding
             secondaryAction={<>
-                {person.is_favorite ?
-                    <IconButton>
+                <IconButton onClick={toggleFavorite}>
+                    {person.is_favorite ?
                         <StarIcon/>
-                    </IconButton>
-                    :
-                    <IconButton>
+                        :
                         <StarBorderIcon/>
-                    </IconButton>
-                }
+                    }
+                </IconButton>
                 <IconButton
                     edge="end"
                     disabled={!person.phone_number}
-                    onClick={() => copyPhoneNumber(person.phone_number)}
+                    onClick={copyPhoneNumber}
                 >
                     <ContentCopyIcon/>
                 </IconButton>
@@ -50,20 +56,17 @@ export default memo(function ({team}) {
                 />
             </ListItemButton>
         </ListItem>
+    )
+})
 
-    ))
-
+export default memo(function ContactPersonsList({team}) {
     return (
         <>
             <List dense>
-                {items}
+                {team.contact_persons.map((person) => (
+                    <ContactPersonItem person={person} key={person.id}/>
+                ))}
             </List>
-            <Snackbar
-                open={copied}
-                onClose={() => setCopied(false)}
-                autoHideDuration={2000}
-                message="Gekopiëerd!"
-            />
         </>
     )
 });
