@@ -23,8 +23,10 @@ djangorestframework-gis==1.0
 et-xmlfile==1.1.0
 geographiclib==2.0
 geopy==2.4.1
+gunicorn==21.2.0
 kombu==5.3.5
 openpyxl==3.1.2
+packaging==23.2
 pillow==10.2.0
 prompt-toolkit==3.0.43
 psycopg==3.1.18

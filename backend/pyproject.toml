@@ -13,6 +13,7 @@ dependencies = [
     "geopy>=2.4.1",
     "Pillow>=10.2.0",
     "djangorestframework-gis>=1.0",
+    "gunicorn>=21.2.0",
 ]
 
 [tool.rye]
