@@ -1,5 +1,4 @@
-from django.contrib.gis.db.models import MakeLine
-from django.contrib.gis.geos import Point, LineString, MultiLineString
+from django.contrib.gis.geos import LineString
 from django.contrib.gis.db import models
 from django.contrib.gis.measure import D
 

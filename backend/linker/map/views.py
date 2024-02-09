@@ -6,7 +6,8 @@ from .serializers import (
     ZijwegSerializer,
     FicheSerializer,
     MapNoteSerializer,
-    TochtSerializer, BasisSerializer,
+    TochtSerializer,
+    BasisSerializer,
 )
 
 

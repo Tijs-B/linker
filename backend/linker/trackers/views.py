@@ -15,18 +15,26 @@ from linker.trackers.serializers import TrackerSerializer, TrackerLogSerializer
 
 class TrackerViewSet(viewsets.ModelViewSet):
     queryset = Tracker.objects.select_related('last_log').annotate(
-        fiche=Subquery(Fiche.objects
-                       .filter(point__distance_lte=(OuterRef('last_log__point'), D(m=FICHE_MAX_DISTANCE)))
-                       .values('pk')[:1]),
-        tocht=Subquery(Tocht.objects
-                       .filter(route__distance_lte=(OuterRef('last_log__point'), D(m=TOCHT_MAX_DISTANCE)))
-                       .values('pk')[:1]),
-        weide=Subquery(Weide.objects
-                       .filter(polygon__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE)))
-                       .values('pk')[:1]),
-        basis=Subquery(Basis.objects
-                       .filter(point__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE)))
-                       .values('pk')[:1]),
+        fiche=Subquery(
+            Fiche.objects.filter(point__distance_lte=(OuterRef('last_log__point'), D(m=FICHE_MAX_DISTANCE))).values(
+                'pk'
+            )[:1]
+        ),
+        tocht=Subquery(
+            Tocht.objects.filter(route__distance_lte=(OuterRef('last_log__point'), D(m=TOCHT_MAX_DISTANCE))).values(
+                'pk'
+            )[:1]
+        ),
+        weide=Subquery(
+            Weide.objects.filter(polygon__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))).values(
+                'pk'
+            )[:1]
+        ),
+        basis=Subquery(
+            Basis.objects.filter(point__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))).values(
+                'pk'
+            )[:1]
+        ),
     )
     serializer_class = TrackerSerializer
 

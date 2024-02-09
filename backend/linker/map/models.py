@@ -5,7 +5,7 @@ from django.core.validators import MinValueValidator
 
 class Tocht(models.Model):
     identifier = models.CharField(max_length=1, unique=True)
-    order = models.PositiveIntegerField(unique=True)
+    order = models.IntegerField(validators=[MinValueValidator(1)])
     leads = models.ManyToManyField('people.OrganizationMember')
 
     route = models.LineStringField()

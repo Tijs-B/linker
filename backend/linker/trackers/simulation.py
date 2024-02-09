@@ -120,7 +120,7 @@ def import_gpkg(filename: Path):
         identifier = str(feature['name'])[0].upper()
         Tocht.objects.update_or_create(
             identifier=identifier,
-            order=ord(identifier) - ord('A'),
+            order=ord(identifier) - ord('A') + 1,
             defaults=dict(route=GEOSGeometry(feature.geom[0].ewkt)),
         )
 
@@ -222,11 +222,7 @@ def import_groepen_en_deelnemers(filename: Path):
 
         team = Team.objects.get(number=id)
         ContactPerson.objects.create(
-            name=name,
-            phone_number=phone,
-            email_address=email,
-            team=team,
-            is_favorite=is_favorite
+            name=name, phone_number=phone, email_address=email, team=team, is_favorite=is_favorite
         )
 
 

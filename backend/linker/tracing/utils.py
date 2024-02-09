@@ -49,9 +49,11 @@ def trace_team(team: Team):
         else:
             current_left = log['gps_datetime']
     if current_fiche is not None:
-        if (CheckpointLog.objects.filter(team=team, fiche_id=current_fiche)
-                .filter(Q(left=None) | Q(left__gte=current_arrived))
-                .exists()):
+        if (
+            CheckpointLog.objects.filter(team=team, fiche_id=current_fiche)
+            .filter(Q(left=None) | Q(left__gte=current_arrived))
+            .exists()
+        ):
             CheckpointLog.objects.create(
                 arrived=current_arrived,
                 left=current_left,

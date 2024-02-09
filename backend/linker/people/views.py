@@ -4,7 +4,8 @@ from .models import Team, OrganizationMember, TeamNote, ContactPerson
 from .serializers import (
     TeamSerializer,
     OrganizationMemberSerializer,
-    TeamNoteSerializer, ContactPersonSerializer,
+    TeamNoteSerializer,
+    ContactPersonSerializer,
 )
 
 

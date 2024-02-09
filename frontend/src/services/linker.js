@@ -89,7 +89,10 @@ export const linkerApi = createApi({
                 method: 'PATCH',
                 body: contactPerson,
             }),
-        })
+        }),
+        getStats: build.query({
+            query: () => '/stats/',
+        }),
     })
 })
 
@@ -107,4 +110,5 @@ export const {
     useGetBasisQuery,
     useGetWeidesQuery,
     useEditContactPersonMutation,
+    useGetStatsQuery,
 } = linkerApi;
