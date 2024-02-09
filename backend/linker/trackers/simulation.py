@@ -237,3 +237,12 @@ def import_organization_members(filename: Path):
             code=line['code'],
             member_type=MemberType(line['member_type']),
         )
+
+
+def import_all():
+    simulation_path = Path(settings.SIMULATION_PATH)
+    import_gpkg(simulation_path / 'Link 2023.gpkg')
+    import_organization_members(simulation_path / 'organization_members.csv')
+    import_groepen_en_deelnemers(simulation_path / 'GroepenEnDeelnemers2023.xlsx')
+    simulate_download_tracker_data()
+    couple_trackers()
