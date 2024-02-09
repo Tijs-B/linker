@@ -1,6 +1,6 @@
 from json import loads
 
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.http import HttpResponse
 from django.views import View
 from rest_framework import viewsets
@@ -42,4 +42,5 @@ class LoginView(View):
         user = authenticate(request, username=username, password=password)
         if user is None:
             return HttpResponse(status=404)
+        login(request, user)
         return HttpResponse(status=200)

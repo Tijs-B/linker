@@ -22,8 +22,6 @@ export default memo(function LoginPage() {
         }
     }, [isSuccess])
 
-    console.log(isError, error);
-
     return (
         <Container sx={{pt: 2}}>
             <Grid container alignItems='center' justifyContent='center'>
