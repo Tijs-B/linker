@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'rest_framework',
     'rest_framework_gis',
-    'debug_toolbar',
     'linker.map',
     'linker.people',
     'linker.tracing',
@@ -56,8 +55,11 @@ INSTALLED_APPS = [
     'linker.config',
 ]
 
+if DEBUG:
+    index = INSTALLED_APPS.index('linker.map')
+    INSTALLED_APPS.insert(index, 'debug_toolbar')
+
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -66,6 +68,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if DEBUG:
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
 ROOT_URLCONF = 'linker.urls'
 
