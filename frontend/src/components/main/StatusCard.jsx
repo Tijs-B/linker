@@ -21,7 +21,6 @@ import {
     ListItemText,
     Menu,
     MenuItem,
-    Stack,
     Table,
     TableBody,
     TableCell,
@@ -38,11 +37,12 @@ import {itemColor} from '../../theme/colors.js';
 import {getLastCheckpointLog} from '../../utils/data.js';
 import {
     useGetCheckpointLogsQuery,
-    useGetFichesQuery, useGetOrganizationMembersQuery,
+    useGetFichesQuery, useGetOrganizationMembersQuery, useGetStatsQuery,
     useGetTeamsQuery, useGetTochtenQuery,
     useGetTrackersQuery
 } from "../../services/linker.js";
 import {useMap} from "react-map-gl/maplibre";
+import {secondsToHoursMinutes} from "../../utils/time.js";
 
 const cell = css`
     border-bottom: none;
@@ -54,6 +54,7 @@ function TeamRows({team}) {
     const {data: checkpointLogs} = useGetCheckpointLogsQuery();
     const {data: fiches} = useGetFichesQuery();
     const {data: tochten} = useGetTochtenQuery();
+    const {data: stats} = useGetStatsQuery();
 
     const lastCheckpointLog = checkpointLogs && getLastCheckpointLog(team, checkpointLogs.entities);
     const formattedDate = lastCheckpointLog
@@ -61,20 +62,41 @@ function TeamRows({team}) {
         : '-';
     const fiche = lastCheckpointLog && fiches && fiches.entities[lastCheckpointLog.fiche];
     const tocht = tochten && fiche && tochten.entities[fiche.tocht];
+    const teamStats = stats && stats.teams[team.id];
 
     return (
-        <TableRow>
-            <TableCell css={cell}>
-                <Typography variant="body2">Laatste fiche</Typography>
-            </TableCell>
-            <TableCell css={cell}>
-                <Stack direction="row" gap={2}>
+        <>
+            <TableRow>
+                <TableCell css={cell}>
+                    <Typography variant="body2">Laatste fiche</Typography>
+                </TableCell>
+                <TableCell css={cell}>
                     <Typography variant="body2" color="textSecondary">
                         {lastCheckpointLog ? `${tocht.identifier}${fiche.order} om ${formattedDate}` : '-'}
                     </Typography>
-                </Stack>
-            </TableCell>
-        </TableRow>
+                </TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell css={cell}>
+                    <Typography variant="body2">Gem. afwijking voor tochten</Typography>
+                </TableCell>
+                <TableCell css={cell}>
+                    <Typography variant="body2" color="textSecondary">
+                        {teamStats ? secondsToHoursMinutes(teamStats.avgTochtDeviation) : '-'}
+                    </Typography>
+                </TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell css={cell}>
+                    <Typography variant="body2">Gem. afwijking voor fiches</Typography>
+                </TableCell>
+                <TableCell css={cell}>
+                    <Typography variant="body2" color="textSecondary">
+                        {teamStats ? secondsToHoursMinutes(teamStats.avgFicheDeviation) : '-'}
+                    </Typography>
+                </TableCell>
+            </TableRow>
+        </>
     );
 }
 

@@ -7,8 +7,18 @@ export function toHoursMinutes(dateTime) {
 }
 
 export function secondsToHoursMinutes(seconds) {
-    const totalMinutes = Math.round(seconds / 60);
+    const totalMinutes = Math.floor(Math.abs(seconds) / 60);
     const minutes = totalMinutes % 60;
     const hours = Math.floor(totalMinutes / 60);
-    return `${hours} uur ${minutes} minuten`;
+
+    const hoursText = hours > 0 ? `${hours} uur ` : '';
+    const prefix = seconds < 0 ? '- ' : '+ '
+
+    if (minutes > 0) {
+        return `${prefix}${hoursText}${minutes} minuten`;
+    } else {
+        return `${prefix}${Math.abs(seconds)} seconden`;
+    }
 }
+
+

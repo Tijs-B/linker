@@ -105,7 +105,7 @@ def calculate_stats() -> dict:
     for team in team_fiche_durations.keys():
         if len(team_fiche_durations[team]) > 0:
             avg_fiche_deviation = round(sum(
-                avg_fiche_durations[fiche][team.direction.value]['average'] - duration
+                duration - avg_fiche_durations[fiche][team.direction.value]['average']
                 for fiche, duration in team_fiche_durations[team].items()
             ) / len(team_fiche_durations[team]))
         else:
@@ -113,7 +113,7 @@ def calculate_stats() -> dict:
 
         if len(team_tocht_durations[team]) > 0:
             avg_tocht_deviation = round(sum(
-                avg_tocht_durations[tocht][team.direction.value]['average'] - duration
+                duration - avg_tocht_durations[tocht][team.direction.value]['average']
                 for tocht, duration in team_tocht_durations[team].items()
             ) / len(team_tocht_durations[team]))
         else:
