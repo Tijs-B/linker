@@ -7,6 +7,8 @@ from linker.tracing.models import CheckpointLog
 
 
 def calculate_stats() -> dict:
+    # Good luck :)
+
     all_fiches = list(Fiche.objects.order_by('tocht__order', 'order').all())
 
     next_fiche_map = {a.id: b.id for a, b in zip(all_fiches, all_fiches[1:])}
@@ -28,7 +30,7 @@ def calculate_stats() -> dict:
     team_tocht_durations = {}
 
     for team in Team.objects.prefetch_related(
-        Prefetch('checkpointlogs', queryset=CheckpointLog.objects.order_by('arrived'))
+            Prefetch('checkpointlogs', queryset=CheckpointLog.objects.order_by('arrived'))
     ):
         fiche_durations = {}
         tocht_durations = {}
@@ -53,7 +55,7 @@ def calculate_stats() -> dict:
 
             # If we're at a weide
             if (team.direction == Direction.RED and current_fiche in next_tocht_fiche_map) or (
-                team.direction == Direction.BLUE and current_fiche in prev_tocht_fiche_map
+                    team.direction == Direction.BLUE and current_fiche in prev_tocht_fiche_map
             ):
                 if team.direction == Direction.RED:
                     expected_fiche = next_tocht_fiche_map[current_fiche]
@@ -82,26 +84,50 @@ def calculate_stats() -> dict:
         for tocht, duration in tocht_durations.items():
             all_tocht_durations[tocht][team.direction].append(duration)
 
+    avg_fiche_durations = {
+        fiche: {
+            direction.value: {'average': round(sum(durations) / len(durations)) if durations else None, 'nb_teams': len(durations)}
+            for direction, durations in directions.items()
+        }
+        for fiche, directions in all_fiche_durations.items()
+    }
+
+    avg_tocht_durations = {
+        tocht: {
+            direction.value: {'average': round(sum(durations) / len(durations)) if durations else None, 'nb_teams': len(durations)}
+            for direction, durations in directions.items()
+        }
+        for tocht, directions in all_tocht_durations.items()
+    }
+
+    team_durations = {}
+
+    for team in team_fiche_durations.keys():
+        if len(team_fiche_durations[team]) > 0:
+            avg_fiche_deviation = round(sum(
+                avg_fiche_durations[fiche][team.direction.value]['average'] - duration
+                for fiche, duration in team_fiche_durations[team].items()
+            ) / len(team_fiche_durations[team]))
+        else:
+            avg_fiche_deviation = None
+
+        if len(team_tocht_durations[team]) > 0:
+            avg_tocht_deviation = round(sum(
+                avg_tocht_durations[tocht][team.direction.value]['average'] - duration
+                for tocht, duration in team_tocht_durations[team].items()
+            ) / len(team_tocht_durations[team]))
+        else:
+            avg_tocht_deviation = None
+
+        team_durations[team.id] = {
+            'fiches': team_fiche_durations[team],
+            'tochten': team_tocht_durations[team],
+            'avgFicheDeviation': avg_fiche_deviation,
+            'avgTochtDeviation': avg_tocht_deviation,
+        }
+
     return {
-        'fiches': {
-            fiche: {
-                direction.value: {'average': round(sum(durations) / len(durations)), 'nb_teams': len(durations)}
-                for direction, durations in directions.items()
-            }
-            for fiche, directions in all_fiche_durations.items()
-        },
-        'tochten': {
-            tocht: {
-                direction.value: {'average': round(sum(durations) / len(durations)), 'nb_teams': len(durations)}
-                for direction, durations in directions.items()
-            }
-            for tocht, directions in all_tocht_durations.items()
-        },
-        'teams': {
-            team.id: {
-                'fiches': team_fiche_durations[team],
-                'tochten': team_tocht_durations[team],
-            }
-            for team in team_fiche_durations.keys()
-        },
+        'fiches': avg_fiche_durations,
+        'tochten': avg_tocht_durations,
+        'teams': team_durations,
     }

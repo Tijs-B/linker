@@ -36,8 +36,6 @@ export default memo(function TeamPage() {
     const {data: fiches} = useGetFichesQuery();
     const {data: tochten} = useGetTochtenQuery();
 
-    const [copied, setCopied] = useState();
-
     const team = teams?.entities[Number(teamId)];
 
     const teamLogs = useMemo(() => {

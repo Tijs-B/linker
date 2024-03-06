@@ -51,3 +51,27 @@ export function getPositionDescription(point, fiches, tochten, weides, basis) {
     }
     return `⚠️ Verloren gelopen`;
 }
+
+export function ficheDisplay(fiche, fiches, tochten) {
+    const ficheData = fiches.entities[fiche];
+    const tocht = tochten.entities[ficheData.tocht];
+    return `${tocht.identifier}${ficheData.order}`
+}
+
+export function getNextFiche(fiche, fiches) {
+    const index = fiches.ids.indexOf(fiche);
+    if (index === fiches.ids.length - 1) {
+        return fiches.ids[0];
+    } else {
+        return fiches.ids[index + 1];
+    }
+}
+
+export function getCheckpointLog(team, fiche, checkpointLogs) {
+    for (let log of Object.values(checkpointLogs.entities)) {
+        if (log.fiche === fiche && log.team === team) {
+            return log;
+        }
+    }
+    return null;
+}

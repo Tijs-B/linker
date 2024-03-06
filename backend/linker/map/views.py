@@ -12,7 +12,7 @@ from .serializers import (
 
 
 class TochtViewSet(viewsets.ModelViewSet):
-    queryset = Tocht.objects.all()
+    queryset = Tocht.objects.all().order_by('order')
     serializer_class = TochtSerializer
 
 
@@ -27,7 +27,7 @@ class ZijwegViewSet(viewsets.ModelViewSet):
 
 
 class FicheViewSet(viewsets.ModelViewSet):
-    queryset = Fiche.objects.all()
+    queryset = Fiche.objects.all().order_by('tocht__order', 'order')
     serializer_class = FicheSerializer
 
 
