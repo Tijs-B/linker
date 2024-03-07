@@ -17,6 +17,7 @@ Including another URLconf
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import routers
 
 from linker.map.views import (
@@ -54,7 +55,7 @@ router.register('trackers', TrackerViewSet)
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api/stats/', all_stats),
-    path('api/login/', LoginView.as_view()),
+    path('api/login/', csrf_exempt(LoginView.as_view())),
     path('admin/', admin.site.urls),
 ]
 

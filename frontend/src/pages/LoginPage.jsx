@@ -1,10 +1,12 @@
 import {memo, useEffect} from "react";
 import {Button, Container, Grid, Paper, TextField} from "@mui/material";
-import {useLoginUserMutation} from "../services/linker.js";
+import {useGetTeamsQuery, useLoginUserMutation} from "../services/linker.js";
 import {useNavigate} from "react-router-dom";
 
 export default memo(function LoginPage() {
     const [loginUser, { error, isError, isSuccess }] = useLoginUserMutation();
+    const {data: teams, error: queryError} = useGetTeamsQuery();
+
     const navigate = useNavigate();
 
     function submitForm(event) {
@@ -17,10 +19,17 @@ export default memo(function LoginPage() {
     }
 
     useEffect(() => {
+        console.log(isSuccess);
         if (isSuccess) {
             navigate('/');
         }
-    }, [isSuccess])
+    }, [navigate, isSuccess])
+
+    useEffect(() => {
+        if (teams && !queryError) {
+            navigate('/');
+        }
+    }, [navigate, teams, queryError]);
 
     return (
         <Container sx={{pt: 2}}>
