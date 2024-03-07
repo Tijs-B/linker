@@ -59,7 +59,7 @@ const ContactPersonItem = memo(function ContactPersonItem({person}) {
     )
 })
 
-export default memo(function ContactPersonsList({team}) {
+const ContactPersonsList = memo(function ContactPersonsList({team}) {
     return (
         <>
             <List dense>
@@ -70,3 +70,5 @@ export default memo(function ContactPersonsList({team}) {
         </>
     )
 });
+
+export default ContactPersonsList;

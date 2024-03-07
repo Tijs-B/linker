@@ -1,6 +1,6 @@
 import {memo, useCallback, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {Link as RouterLink} from 'react-router-dom';
 
 import CallIcon from '@mui/icons-material/Call';
 import CloseIcon from '@mui/icons-material/Close';
@@ -10,7 +10,6 @@ import InfoIcon from '@mui/icons-material/Info';
 import SearchIcon from '@mui/icons-material/Search';
 import StarIcon from '@mui/icons-material/Star';
 import {
-    Avatar,
     Badge,
     Card,
     CardActions,
@@ -33,7 +32,6 @@ import {
 import {css} from '@emotion/react';
 
 import {trackersActions} from '../../store/index.js';
-import {itemColor} from '../../theme/colors.js';
 import {getLastCheckpointLog} from '../../utils/data.js';
 import {
     useGetCheckpointLogsQuery,
@@ -43,6 +41,8 @@ import {
 } from "../../services/linker.js";
 import {useMap} from "react-map-gl/maplibre";
 import {secondsToHoursMinutes} from "../../utils/time.js";
+import PersonAvatar from "../PersonAvatar.jsx";
+import SafeSelector from "../SafeSelector.jsx";
 
 const cell = css`
     border-bottom: none;
@@ -82,7 +82,7 @@ function TeamRows({team}) {
                 </TableCell>
                 <TableCell css={cell}>
                     <Typography variant="body2" color="textSecondary">
-                        {teamStats ? secondsToHoursMinutes(teamStats.avgTochtDeviation) : '-'}
+                        {teamStats && teamStats.avgTochtDeviation ? secondsToHoursMinutes(teamStats.avgTochtDeviation) : '-'}
                     </Typography>
                 </TableCell>
             </TableRow>
@@ -92,21 +92,28 @@ function TeamRows({team}) {
                 </TableCell>
                 <TableCell css={cell}>
                     <Typography variant="body2" color="textSecondary">
-                        {teamStats ? secondsToHoursMinutes(teamStats.avgFicheDeviation) : '-'}
+                        {teamStats && teamStats.avgFicheDeviation ? secondsToHoursMinutes(teamStats.avgFicheDeviation) : '-'}
                     </Typography>
+                </TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell css={cell}>
+                    <Typography variant="body2">Safe</Typography>
+                </TableCell>
+                <TableCell css={cell}>
+                    <SafeSelector team={team}/>
                 </TableCell>
             </TableRow>
         </>
     );
 }
 
-export default memo(function StatusCard() {
+const StatusCard = memo(function StatusCard() {
     const theme = useTheme();
     const desktop = useMediaQuery(theme.breakpoints.up('md'));
     const {mainMap} = useMap();
 
     const dispatch = useDispatch();
-    const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const selectedId = useSelector((state) => state.trackers.selectedId);
 
@@ -157,40 +164,31 @@ export default memo(function StatusCard() {
     const team = teams && Object.values(teams.entities).find((t) => t.tracker === selectedId);
     const member = organizationMembers && Object.values(organizationMembers.entities).find((m) => m.tracker === selectedId);
 
-    const code = member ? member.code : team.number.toString().padStart(2, '0');
+    const last_log = tracker && tracker.last_log
 
-    const [longitude, latitude] = tracker?.last_log?.point.coordinates;
+    const [longitude, latitude] = last_log ? last_log.point.coordinates : [null, null];
     const navigateUrl = desktop
         ? `https://www.google.com/maps/search/?api=1&query=${latitude}%2C${longitude}`
         : `geo:${latitude},${longitude}`;
 
-    const lastUpdate = tracker.last_log
-        ? new Date(tracker.last_log.gps_datetime).toLocaleTimeString()
+    const lastUpdate = last_log
+        ? new Date(last_log.gps_datetime).toLocaleTimeString()
         : '-';
 
     const focusMap = useCallback(() => {
-        if (mainMap && tracker && tracker.last_log) {
+        if (mainMap && last_log) {
             mainMap.easeTo({
-                center: tracker.last_log.point.coordinates,
+                center: last_log.point.coordinates,
                 zoom: 14,
             });
         }
-    }, [mainMap, tracker])
+    }, [mainMap, last_log])
 
     return (
         <div css={root}>
             <Card css={card}>
                 <CardHeader
-                    avatar={
-                        <Avatar
-                            sx={{
-                                bgcolor: itemColor(team || member),
-                                fontSize: code.length > 2 ? '16px' : '20px',
-                            }}
-                        >
-                            {code}
-                        </Avatar>
-                    }
+                    avatar={<PersonAvatar item={team || member}/>}
                     title={team?.name || member?.name}
                     titleTypographyProps={{noWrap: true}}
                     subheader={team?.chiro}
@@ -213,7 +211,6 @@ export default memo(function StatusCard() {
                 <CardContent css={content}>
                     <Table size="small">
                         <TableBody>
-                            {team && <TeamRows team={team}/>}
                             <TableRow>
                                 <TableCell css={cell}>
                                     <Typography variant="body2">Laatste update</Typography>
@@ -224,12 +221,13 @@ export default memo(function StatusCard() {
                                     </Typography>
                                 </TableCell>
                             </TableRow>
+                            {team && <TeamRows team={team}/>}
                         </TableBody>
                     </Table>
                 </CardContent>
 
                 <CardActions css={actions} disableSpacing>
-                    <IconButton target="_blank" href={navigateUrl}>
+                    <IconButton target="_blank" href={navigateUrl} disabled={!last_log}>
                         <DirectionsIcon/>
                     </IconButton>
 
@@ -274,7 +272,7 @@ export default memo(function StatusCard() {
                     )}
 
                     {team && (
-                        <IconButton onClick={() => navigate(`/team/${team.id}`)}>
+                        <IconButton component={RouterLink} to={`/team/${team.id}/`}>
                             <Badge badgeContent={team.team_notes.length} color="primary">
                                 <InfoIcon/>
                             </Badge>
@@ -284,4 +282,6 @@ export default memo(function StatusCard() {
             </Card>
         </div>
     );
-})
+});
+
+export default StatusCard;

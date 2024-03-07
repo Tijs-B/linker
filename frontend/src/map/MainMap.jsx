@@ -27,13 +27,14 @@ const DEFAULT_INITIAL_BOUNDS = {
     fitBoundsOptions: BOUNDS_OPTIONS,
 };
 
-export default memo(function MainMap({trackers}) {
+const MainMap = memo(function MainMap({trackers}) {
     const theme = useTheme();
     const desktop = useMediaQuery(theme.breakpoints.up('md'));
     const dispatch = useDispatch();
     const [showHeatmap, setShowHeatmap] = useState(false);
     const [showSatellite, setShowSatellite] = useState(false);
     const [hasRecentered, setRecentered] = useState(false);
+    const [creatingMarker, setCreatingMarker] = useState(false);
     const [initialBounds, setInitialBounds] = useState(DEFAULT_INITIAL_BOUNDS);
     const mapRef = useRef();
     const {data: tochten} = useGetTochtenQuery();
@@ -69,6 +70,7 @@ export default memo(function MainMap({trackers}) {
             }}
             ref={mapRef}
             interactiveLayerIds={['trackers']}
+            styleDiffing={false}
         >
             <BackgroundLayers showHeatmap={showHeatmap}/>
 
@@ -81,27 +83,24 @@ export default memo(function MainMap({trackers}) {
             <ScaleControl position="bottom-right"/>
 
             <CustomOverlay>
-                <div className="maplibregl-ctrl maplibregl-ctrl-group">
-                    <IconButton
-                        onClick={() => {
-                            if (showHeatmap) {
-                                setShowHeatmap(false);
-                            } else {
-                                setShowHeatmap(true);
-                                setShowSatellite(false);
-                            }
-                        }}
-                    >
-                        <WhatshotIcon
-                            color="primary"
-                            sx={{color: showHeatmap ? '' : '#000', marginTop: '2px'}}
-                        />
-                    </IconButton>
-                </div>
+                <IconButton
+                    onClick={() => {
+                        if (showHeatmap) {
+                            setShowHeatmap(false);
+                        } else {
+                            setShowHeatmap(true);
+                            setShowSatellite(false);
+                        }
+                    }}
+                >
+                    <WhatshotIcon
+                        color="primary"
+                        sx={{color: showHeatmap ? '' : '#000', marginTop: '2px'}}
+                    />
+                </IconButton>
             </CustomOverlay>
 
             <CustomOverlay>
-                <div className="maplibregl-ctrl maplibregl-ctrl-group">
                     <IconButton
                         onClick={() => {
                             if (showSatellite) {
@@ -117,11 +116,9 @@ export default memo(function MainMap({trackers}) {
                             sx={{color: showSatellite ? '' : '#000', marginTop: '2px'}}
                         />
                     </IconButton>
-                </div>
             </CustomOverlay>
 
             <CustomOverlay>
-                <div className="maplibregl-ctrl maplibregl-ctrl-group">
                     <IconButton
                         onClick={() =>
                             mapRef.current.fitBounds(initialBounds.bounds, initialBounds.fitBoundsOptions)
@@ -129,10 +126,11 @@ export default memo(function MainMap({trackers}) {
                     >
                         <ZoomOutMapIcon sx={{color: '#000', marginTop: '2px'}}/>
                     </IconButton>
-                </div>
             </CustomOverlay>
 
             {desktop && <MapPadding left={parseInt(theme.dimensions.drawerWidthDesktop, 10)}/>}
         </Map>
     );
-})
+});
+
+export default MainMap;

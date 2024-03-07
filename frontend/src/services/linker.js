@@ -120,6 +120,29 @@ export const linkerApi = createApi({
         }),
         getForbiddenAreas: build.query({
             query: () => '/forbidden-areas/',
+        }),
+        updateTeam: build.mutation({
+            query: team => ({
+                url: `/teams/${team.id}/`,
+                method: 'PATCH',
+                body: team,
+            }),
+            invalidatesTags: (result, error, { id }) => [{type: 'Team', id}],
+        }),
+        deleteTeamNote: build.mutation({
+            query: note => ({
+                url: `/team-notes/${note.id}/`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: (result, error, { team }) => [{type: 'Team', id: team}]
+        }),
+        createTeamNote: build.mutation({
+            query: note => ({
+                url: '/team-notes/',
+                method: 'POST',
+                body: note,
+            }),
+            invalidatesTags: (result, error, { team }) => [{type: 'Team', id: team}]
         })
     })
 })
@@ -141,4 +164,7 @@ export const {
     useLoginUserMutation,
     useGetStatsQuery,
     useGetForbiddenAreasQuery,
+    useUpdateTeamMutation,
+    useDeleteTeamNoteMutation,
+    useCreateTeamNoteMutation,
 } = linkerApi;

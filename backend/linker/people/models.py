@@ -7,7 +7,6 @@ from linker.people.constants import MemberType, Direction
 from linker.trackers.models import Tracker, TrackerLog
 
 
-#
 class ContactPerson(models.Model):
     name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=13, blank=True, null=True)
@@ -48,12 +47,16 @@ class Team(models.Model):
     name = models.CharField(max_length=100)
     chiro = models.CharField(max_length=100)
     tracker = models.OneToOneField(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
-    group_picture = models.ImageField(upload_to=group_picture_path)
+    group_picture = models.ImageField(upload_to=group_picture_path, blank=True, null=True)
 
     start_weide_1 = models.ForeignKey('map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='+')
     eind_weide_1 = models.ForeignKey('map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='+')
     start_weide_2 = models.ForeignKey('map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='+')
     eind_weide_2 = models.ForeignKey('map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='+')
+
+    safe_weide = models.ForeignKey(
+        'map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='safe_teams'
+    )
 
     @property
     def last_log(self) -> Optional[TrackerLog]:

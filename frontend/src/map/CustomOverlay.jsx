@@ -1,4 +1,4 @@
-import {cloneElement, memo, useState} from 'react';
+import {memo, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {useControl} from 'react-map-gl/maplibre';
 
@@ -35,7 +35,7 @@ class OverlayControl {
     }
 }
 
-export default memo(function CustomOverlay({children, position}) {
+const CustomOverlay = memo(function CustomOverlay({children, position}) {
     const [, setVersion] = useState(0);
     const ctrl = useControl(() => {
         const forceUpdate = () => setVersion((v) => v + 1);
@@ -43,5 +43,11 @@ export default memo(function CustomOverlay({children, position}) {
     }, {position});
 
     const map = ctrl.getMap();
-    return map && createPortal(cloneElement(children, {map}), ctrl.getElement());
-})
+    return map && createPortal((
+        <div className="maplibregl-ctrl maplibregl-ctrl-group">
+            {children}
+        </div>
+    ), ctrl.getElement())
+});
+
+export default CustomOverlay;

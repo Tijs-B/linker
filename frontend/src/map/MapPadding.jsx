@@ -1,7 +1,7 @@
 import {memo, useEffect} from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
-export default memo(function MapPadding({ top, right, bottom, left }) {
+const MapPadding = memo(function MapPadding({ top, right, bottom, left }) {
   const { mainMap } = useMap();
 
   useEffect(() => {
@@ -20,4 +20,8 @@ export default memo(function MapPadding({ top, right, bottom, left }) {
       });
     };
   }, [top, right, bottom, left, mainMap]);
-})
+
+  return null;
+});
+
+export default MapPadding;

@@ -6,7 +6,7 @@ import {useGetTrackerTrackQuery} from "../services/linker.js";
 import {skipToken} from "@reduxjs/toolkit/query";
 import {memo} from "react";
 
-export default memo(function TrackerHistoryLayer() {
+const TrackerHistoryLayer = memo(function TrackerHistoryLayer() {
     const selectedId = useSelector((state) => state.trackers.selectedId);
     const {currentData: track} = useGetTrackerTrackQuery(selectedId ? selectedId : skipToken);
 
@@ -44,4 +44,6 @@ export default memo(function TrackerHistoryLayer() {
             )}
         </>
     );
-})
+});
+
+export default TrackerHistoryLayer;

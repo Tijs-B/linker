@@ -17,12 +17,14 @@ import {trackersActions} from '../store/index.js';
 import {useGetOrganizationMembersQuery, useGetTeamsQuery, useGetTrackersQuery} from "../services/linker.js";
 import {useNavigate} from "react-router-dom";
 
-export default memo(function MainPage() {
+const MainPage = memo(function MainPage() {
     const theme = useTheme();
     const desktop = useMediaQuery(theme.breakpoints.up('md'));
 
     const [keyword, setKeyword] = useState('');
     const [listOpen, setListOpen] = useState(desktop);
+    const [filterSafe, setFilterSafe] = useState(true);
+    const [filterMembers, setFilterMembers] = useState(true);
     const {mainMap} = useMap();
     const navigate = useNavigate();
 
@@ -39,7 +41,7 @@ export default memo(function MainPage() {
         if (queryError && queryError.status === 403) {
             navigate('/login/')
         }
-    }, [queryError])
+    }, [navigate, queryError])
 
     // Close the list on mobile when team is selected
     useEffect(() => {
@@ -71,23 +73,21 @@ export default memo(function MainPage() {
                 ...team,
                 number: team.number.toString().padStart(2, '0'),
             }));
-            const fuse = new Fuse(data, {
+            return new Fuse(data, {
                 keys: ['number', 'name', 'contact_persons.name', 'chiro'],
                 threshold: 0.2,
                 includeScore: true,
             });
-            return fuse;
         }
     }, [teams]);
 
     const memberFuse = useMemo(() => {
         if (organizationMembers && organizationMembers.ids.length > 0) {
-            const fuse = new Fuse(Object.values(organizationMembers.entities), {
+            return new Fuse(Object.values(organizationMembers.entities), {
                 keys: ['name', 'code'],
                 threshold: 0.2,
                 includeScore: true,
             });
-            return fuse;
         }
     }, [organizationMembers]);
 
@@ -95,21 +95,23 @@ export default memo(function MainPage() {
         if (teamFuse && keyword) {
             return teamFuse.search(keyword).map((item) => item.item);
         } else if (teams) {
-            return Object.values(teams.entities);
+            return Object.values(teams.entities).filter((team) => filterSafe || !team.safe_weide);
         } else {
             return [];
         }
-    }, [keyword, teams, teamFuse]);
+    }, [keyword, teams, teamFuse, filterSafe]);
 
     const filteredMembers = useMemo(() => {
-        if (memberFuse && keyword) {
+        if (!filterMembers) {
+            return []
+        } else if (memberFuse && keyword) {
             return memberFuse.search(keyword).map((item) => item.item);
         } else if (organizationMembers) {
             return Object.values(organizationMembers.entities);
         } else {
             return [];
         }
-    }, [keyword, memberFuse, organizationMembers]);
+    }, [filterMembers, keyword, memberFuse, organizationMembers]);
 
     const filteredTrackers = filteredTeams.map((t) => t.tracker).concat(filteredMembers.map((m) => m.tracker));
 
@@ -188,6 +190,10 @@ export default memo(function MainPage() {
                         onSearchEnter={onSearchEnter}
                         listOpen={listOpen}
                         setListOpen={setListOpen}
+                        filterSafe={filterSafe}
+                        setFilterSafe={setFilterSafe}
+                        filterMembers={filterMembers}
+                        setFilterMembers={setFilterMembers}
                     />
                 </Paper>
                 <div css={middle}>
@@ -210,4 +216,6 @@ export default memo(function MainPage() {
             {selectedId && showHistory && <HistoryCard/>}
         </div>
     );
-})
+});
+
+export default MainPage;

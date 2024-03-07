@@ -18,7 +18,7 @@ class TochtViewSet(viewsets.ModelViewSet):
 
 
 class WeideViewSet(viewsets.ModelViewSet):
-    queryset = Weide.objects.all()
+    queryset = Weide.objects.all().order_by('tocht__order')
     serializer_class = WeideSerializer
 
 

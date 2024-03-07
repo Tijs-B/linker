@@ -1,4 +1,4 @@
-import {memo, useCallback, useEffect, useMemo} from 'react';
+import {memo, useEffect, useMemo} from 'react';
 import {Layer, Source, useMap} from 'react-map-gl/maplibre';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -8,7 +8,7 @@ import {useGetOrganizationMembersQuery, useGetTeamsQuery, useGetTrackersQuery} f
 import {generateTracker, generateTrackerOutline} from "../utils/icons.js";
 import {feature, featureCollection} from "@turf/helpers";
 
-export default memo(function TrackerLayer({visible, trackers}) {
+const TrackerLayer = memo(function TrackerLayer({visible, trackers}) {
     const dispatch = useDispatch();
     const selectedId = useSelector((state) => state.trackers.selectedId);
     const showHistory = useSelector((state) => state.trackers.showHistory);
@@ -23,8 +23,6 @@ export default memo(function TrackerLayer({visible, trackers}) {
     });
 
     const {mainMap} = useMap();
-
-    const onMouseEnter = useCallback()
 
     useEffect(() => {
         const onMouseEnter = function () {
@@ -46,7 +44,7 @@ export default memo(function TrackerLayer({visible, trackers}) {
             if (id.includes(prefix)) {
                 const [code, color] = id.replace(prefix, '').split('-');
                 mainMap.addImage(id, generateTracker(code, color));
-            } else if (id == 'trackermarkerbackground') {
+            } else if (id === 'trackermarkerbackground') {
                 mainMap.addImage('trackermarkerbackground', generateTrackerOutline());
             }
         };
@@ -64,9 +62,9 @@ export default memo(function TrackerLayer({visible, trackers}) {
         };
     }, [mainMap, dispatch]);
 
-    const trackerIds = historyLog && selectedId ? [selectedId] : trackers;
 
     const geoJsonData = useMemo(() => {
+        const trackerIds = historyLog && selectedId ? [selectedId] : trackers;
         let features = trackerIds.flatMap((trackerId) => {
             const lastLog = allTrackers?.entities[trackerId]?.last_log;
             if (!lastLog) {
@@ -84,15 +82,15 @@ export default memo(function TrackerLayer({visible, trackers}) {
             return [feature(point, props, {id: item.tracker})];
         });
         return featureCollection(features);
-    }, [teams, organizationMembers, allTrackers, trackerIds, selectedId, historyLog])
+    }, [teams, organizationMembers, allTrackers, selectedId, historyLog, trackers])
 
     const selectedData = useMemo(() => {
-        if (!showHistory && selectedId && allTrackers.entities[selectedId]?.last_log) {
+        if (!showHistory && selectedId && allTrackers?.entities[selectedId]?.last_log) {
             return featureCollection([feature(allTrackers.entities[selectedId].last_log.point)])
         } else {
             return featureCollection([]);
         }
-    }, [trackers, selectedId, showHistory]);
+    }, [allTrackers, selectedId, showHistory]);
 
     return (
         <>
@@ -129,4 +127,6 @@ export default memo(function TrackerLayer({visible, trackers}) {
             </Source>
         </>
     );
-})
+});
+
+export default TrackerLayer;

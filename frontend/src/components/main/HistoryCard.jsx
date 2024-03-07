@@ -29,7 +29,7 @@ import {skipToken} from "@reduxjs/toolkit/query";
 import bbox from "@turf/bbox";
 import {feature, featureCollection} from "@turf/helpers";
 
-export default memo(function HistoryCard() {
+const HistoryCard = memo(function HistoryCard() {
     const theme = useTheme();
 
     const root = css`
@@ -99,7 +99,7 @@ export default memo(function HistoryCard() {
         setIndex(logs.length - 1);
         dispatch(trackersActions.setHistoryLog(logs[logs.length - 1]));
 
-    }, [logs])
+    }, [logs, dispatch, mainMap])
 
     function onSliderChange(value) {
         setIndex(value);
@@ -182,4 +182,6 @@ export default memo(function HistoryCard() {
             </Card>
         </div>
     );
-})
+});
+
+export default HistoryCard;

@@ -7,6 +7,9 @@ export function toHoursMinutes(dateTime) {
 }
 
 export function secondsToHoursMinutes(seconds) {
+    if (seconds === null || seconds === undefined) {
+        return '-';
+    }
     const totalMinutes = Math.floor(Math.abs(seconds) / 60);
     const minutes = totalMinutes % 60;
     const hours = Math.floor(totalMinutes / 60);

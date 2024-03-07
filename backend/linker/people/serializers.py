@@ -42,4 +42,5 @@ class TeamSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
             'contact_persons',
             'team_notes',
             'group_picture',
+            'safe_weide',
         ]

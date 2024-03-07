@@ -1,23 +1,23 @@
-import {memo, useEffect} from 'react';
+import {memo, useEffect, useMemo} from 'react';
 import {Layer, Source, useMap} from 'react-map-gl/maplibre';
 
 import {yellow} from '@mui/material/colors';
 import {useGetMapNotesQuery} from "../services/linker.js";
 import {generateMapNoteIcon} from "../utils/icons.js";
 
-export default memo(function MapNoteLayer({visible}) {
+const MapNoteLayer = memo(function MapNoteLayer({visible}) {
     const {mainMap} = useMap();
 
     const {data: mapNotes} = useGetMapNotesQuery();
 
-    const geojsonData = {
+    const geojsonData = useMemo(() => ({
         type: 'FeatureCollection',
         features: mapNotes ? Object.values(mapNotes.entities).map((mapNote) => ({
             type: 'Feature',
             id: mapNote.id,
             geometry: mapNote.point,
         })) : [],
-    };
+    }), [mapNotes]);
 
     useEffect(() => {
         const onImageMissing = function (e) {
@@ -26,12 +26,6 @@ export default memo(function MapNoteLayer({visible}) {
             }
         };
 
-        mainMap.on('styleimagemissing', onImageMissing);
-
-        return () => mainMap.off('styleimagemissing', onImageMissing);
-    }, [mainMap]);
-
-    useEffect(() => {
         const onMouseEnter = function () {
             mainMap.getCanvas().style.cursor = 'pointer';
         };
@@ -47,11 +41,13 @@ export default memo(function MapNoteLayer({visible}) {
         mainMap.on('mouseenter', 'map-notes', onMouseEnter);
         mainMap.on('mouseleave', 'map-notes', onMouseLeave);
         mainMap.on('click', 'map-notes', onClick);
+        mainMap.on('styleimagemissing', onImageMissing);
 
         return () => {
             mainMap.off('mouseenter', 'map-notes', onMouseEnter);
             mainMap.off('mouseleave', 'map-notes', onMouseLeave);
             mainMap.off('click', 'map-notes', onClick);
+            mainMap.off('styleimagemissing', onImageMissing);
         };
     }, [mainMap]);
 
@@ -71,4 +67,6 @@ export default memo(function MapNoteLayer({visible}) {
             />
         </Source>
     );
-})
+});
+
+export default MapNoteLayer;

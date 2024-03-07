@@ -10,7 +10,7 @@ import {
 import {feature, featureCollection} from '@turf/helpers';
 import {memo, useMemo} from 'react';
 
-export default memo(function BackgroundLayers({showHeatmap}) {
+const BackgroundLayers = memo(function BackgroundLayers({showHeatmap}) {
     const {data: tochten} = useGetTochtenQuery();
     const {data: fiches} = useGetFichesQuery();
     const {data: zijwegen} = useGetZijwegenQuery();
@@ -51,7 +51,7 @@ export default memo(function BackgroundLayers({showHeatmap}) {
             return null;
         }
         return featureCollection(forbiddenAreas.map((area) => feature(area.area, {description: area.description}, {id: area.id})))
-    })
+    }, [forbiddenAreas])
 
     const tochtenLayer = {
         id: 'tochten',
@@ -164,4 +164,6 @@ export default memo(function BackgroundLayers({showHeatmap}) {
             </Source>
         </>
     );
-})
+});
+
+export default BackgroundLayers;
