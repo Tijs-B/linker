@@ -7,7 +7,8 @@ from .serializers import (
     FicheSerializer,
     MapNoteSerializer,
     TochtSerializer,
-    BasisSerializer, ForbiddenAreaSerializer,
+    BasisSerializer,
+    ForbiddenAreaSerializer,
 )
 
 

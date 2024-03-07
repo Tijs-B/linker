@@ -1,7 +1,7 @@
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models import Collect
 from django.contrib.gis.db.models.functions import Centroid
-from django.contrib.gis.geos import MultiLineString, Point
+from django.contrib.gis.geos import Point
 from django.core.validators import MinValueValidator
 
 

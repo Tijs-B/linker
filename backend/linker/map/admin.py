@@ -17,4 +17,3 @@ class TochtAdmin(admin.GISModelAdmin):
 @admin.register(MapNote)
 class MapNoteAdmin(admin.GISModelAdmin):
     readonly_fields = ('created', 'updated')
-

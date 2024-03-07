@@ -25,7 +25,8 @@ from linker.map.views import (
     WeideViewSet,
     ZijwegViewSet,
     MapNoteViewSet,
-    BasisViewSet, ForbiddenAreaViewSet,
+    BasisViewSet,
+    ForbiddenAreaViewSet,
 )
 from linker.people.views import TeamViewSet, OrganizationMemberViewSet, TeamNoteViewSet, ContactPersonViewSet, LoginView
 from linker.tracing.views import CheckpointLogViewSet, all_stats
