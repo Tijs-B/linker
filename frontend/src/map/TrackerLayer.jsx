@@ -52,6 +52,9 @@ const TrackerLayer = memo(function TrackerLayer({visible, trackers}) {
 
 
     const geoJsonData = useMemo(() => {
+        if (!teams || !organizationMembers || !allTrackers || !trackers) {
+            return featureCollection([]);
+        }
         const trackerIds = historyLog && selectedId ? [selectedId] : trackers;
         let features = trackerIds.flatMap((trackerId) => {
             const lastLog = allTrackers?.entities[trackerId]?.last_log;
@@ -73,7 +76,7 @@ const TrackerLayer = memo(function TrackerLayer({visible, trackers}) {
     }, [teams, organizationMembers, allTrackers, selectedId, historyLog, trackers])
 
     const selectedData = useMemo(() => {
-        if (!showHistory && selectedId && allTrackers?.entities[selectedId]?.last_log) {
+        if (!showHistory && selectedId && allTrackers && allTrackers?.entities[selectedId]?.last_log) {
             return featureCollection([feature(allTrackers.entities[selectedId].last_log.point)])
         } else {
             return featureCollection([]);

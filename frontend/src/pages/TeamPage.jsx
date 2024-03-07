@@ -53,7 +53,7 @@ const TeamPage = memo(function TeamPage() {
     const team = teams?.entities[Number(teamId)];
 
     const teamLogs = useMemo(() => {
-        if (!checkpointLogs || !fiches || !teams || !tochten) {
+        if (!checkpointLogs || !fiches || !tochten) {
             return [];
         }
         let result = Object.values(checkpointLogs.entities)
@@ -68,7 +68,7 @@ const TeamPage = memo(function TeamPage() {
             })
         result.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
         return result;
-    }, [teamId, checkpointLogs, fiches, teams, tochten]);
+    }, [teamId, checkpointLogs, fiches, tochten]);
 
     const code = team?.number.toString().padStart(2, '0');
 
