@@ -104,7 +104,7 @@ const MainMap = memo(function MainMap({trackers}) {
     const onStartMapNoteCreation = useCallback(() => {
         if (creatingMarker) {
             setCreatingMarker(false);
-            setCursor('auto');
+            setCursor('inherit');
         } else {
             setCreatingMarker(true);
             setCursor('crosshair');
@@ -114,6 +114,7 @@ const MainMap = memo(function MainMap({trackers}) {
     const onMapClick = useCallback((e) => {
         if (creatingMarker) {
             setCreatingMarker(false);
+            setCursor('inherit');
             setMapNoteLngLat(e.lngLat);
             setCreateMapNoteDialogOpen(true);
         } else {
@@ -127,6 +128,7 @@ const MainMap = memo(function MainMap({trackers}) {
         setCreateMapNoteDialogOpen(false);
         setMapNoteLngLat(null);
         setMapNoteDescription('');
+        setCursor('inherit');
     }, []);
 
     const onCreateMapNote = useCallback(() => {
@@ -143,6 +145,7 @@ const MainMap = memo(function MainMap({trackers}) {
         setMapNoteLngLat(null);
         setMapNoteDescription('');
         setCreatingMarker(false);
+        setCursor('inherit');
     }, [createMapNote, mapNoteDescription, mapNoteLngLat])
 
     return (
