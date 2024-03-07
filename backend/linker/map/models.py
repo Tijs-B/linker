@@ -1,5 +1,7 @@
 from django.contrib.gis.db import models
-from django.contrib.gis.geos import MultiLineString
+from django.contrib.gis.db.models import Collect
+from django.contrib.gis.db.models.functions import Centroid
+from django.contrib.gis.geos import MultiLineString, Point
 from django.core.validators import MinValueValidator
 
 
@@ -17,10 +19,8 @@ class Tocht(models.Model):
         return self.identifier
 
     @classmethod
-    def centroid(cls):
-        routes = list(tocht.route for tocht in cls.objects.all())
-        multi_linestring = MultiLineString(*routes)
-        return multi_linestring.centroid
+    def centroid(cls) -> Point:
+        return cls.objects.aggregate(centroid=Centroid(Collect('route')))['centroid']
 
 
 class Weide(models.Model):

@@ -1,4 +1,4 @@
-import {memo, useCallback, useEffect, useMemo, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo} from 'react';
 import {Layer, Source, useMap} from 'react-map-gl/maplibre';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -9,8 +9,6 @@ import {generateTracker, generateTrackerOutline} from "../utils/icons.js";
 import {feature, featureCollection} from "@turf/helpers";
 
 export default memo(function TrackerLayer({visible, trackers}) {
-    const [cursor, setCursor] = useState('auto');
-
     const dispatch = useDispatch();
     const selectedId = useSelector((state) => state.trackers.selectedId);
     const showHistory = useSelector((state) => state.trackers.showHistory);
