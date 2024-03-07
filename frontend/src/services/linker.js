@@ -74,7 +74,8 @@ export const linkerApi = createApi({
             query: () => '/map-notes/',
             transformResponse(response) {
                 return mapNoteAdapter.addMany(mapNoteAdapter.getInitialState(), response);
-            }
+            },
+            providesTags: [{type: 'mapNote', id: 'LIST'}],
         }),
         getZijwegen: build.query({
             query: () => '/zijwegen/',
@@ -143,7 +144,15 @@ export const linkerApi = createApi({
                 body: note,
             }),
             invalidatesTags: (result, error, { team }) => [{type: 'Team', id: team}]
-        })
+        }),
+        createMapNote: build.mutation({
+            query: mapNote => ({
+                url: '/map-notes/',
+                method: 'POST',
+                body: mapNote,
+            }),
+            invalidatesTags: [{type: 'mapNote', id: 'LIST'}],
+        }),
     })
 })
 
@@ -167,4 +176,5 @@ export const {
     useUpdateTeamMutation,
     useDeleteTeamNoteMutation,
     useCreateTeamNoteMutation,
+    useCreateMapNoteMutation,
 } = linkerApi;

@@ -25,14 +25,6 @@ const TrackerLayer = memo(function TrackerLayer({visible, trackers}) {
     const {mainMap} = useMap();
 
     useEffect(() => {
-        const onMouseEnter = function () {
-            mainMap.getCanvas().style.cursor = 'pointer';
-        };
-
-        const onMouseLeave = function () {
-            mainMap.getCanvas().style.cursor = '';
-        };
-
         const onClick = (e) => {
             e.features.sort((a, b) => b.properties.sortKey - a.properties.sortKey);
             dispatch(trackersActions.setSelectedId(e.features[0].id));
@@ -49,14 +41,10 @@ const TrackerLayer = memo(function TrackerLayer({visible, trackers}) {
             }
         };
 
-        mainMap.on('mouseenter', 'trackers', onMouseEnter);
-        mainMap.on('mouseleave', 'trackers', onMouseLeave);
         mainMap.on('click', 'trackers', onClick);
         mainMap.on('styleimagemissing', onImageMissing);
 
         return () => {
-            mainMap.off('mouseenter', 'trackers', onMouseEnter);
-            mainMap.off('mouseleave', 'trackers', onMouseLeave);
             mainMap.off('click', 'trackers', onClick);
             mainMap.off('styleimagemissing', onImageMissing);
         };

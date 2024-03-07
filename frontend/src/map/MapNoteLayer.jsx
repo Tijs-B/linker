@@ -35,7 +35,8 @@ const MapNoteLayer = memo(function MapNoteLayer({visible}) {
         };
 
         const onClick = (e) => {
-            // TODO: dit
+            const noteId = e.features[0].id;
+            console.log(noteId);
         };
 
         mainMap.on('mouseenter', 'map-notes', onMouseEnter);
