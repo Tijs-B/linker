@@ -25,7 +25,7 @@ from linker.map.views import (
     WeideViewSet,
     ZijwegViewSet,
     MapNoteViewSet,
-    BasisViewSet,
+    BasisViewSet, ForbiddenAreaViewSet,
 )
 from linker.people.views import TeamViewSet, OrganizationMemberViewSet, TeamNoteViewSet, ContactPersonViewSet, LoginView
 from linker.tracing.views import CheckpointLogViewSet, all_stats
@@ -43,6 +43,7 @@ router.register('weides', WeideViewSet)
 router.register('zijwegen', ZijwegViewSet)
 router.register('map-notes', MapNoteViewSet)
 router.register('basis', BasisViewSet)
+router.register('forbidden-areas', ForbiddenAreaViewSet)
 
 router.register('checkpoint-logs', CheckpointLogViewSet)
 

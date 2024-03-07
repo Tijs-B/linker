@@ -56,3 +56,8 @@ class MapNote(models.Model):
     updated = models.DateTimeField(auto_now=True)
     content = models.TextField()
     point = models.PointField()
+
+
+class ForbiddenArea(models.Model):
+    description = models.TextField(blank=True)
+    area = models.MultiPolygonField()

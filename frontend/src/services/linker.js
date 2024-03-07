@@ -118,6 +118,9 @@ export const linkerApi = createApi({
                 body,
             }),
         }),
+        getForbiddenAreas: build.query({
+            query: () => '/forbidden-areas/',
+        })
     })
 })
 
@@ -137,4 +140,5 @@ export const {
     useUpdateContactPersonMutation,
     useLoginUserMutation,
     useGetStatsQuery,
+    useGetForbiddenAreasQuery,
 } = linkerApi;

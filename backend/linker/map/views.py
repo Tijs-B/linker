@@ -1,13 +1,13 @@
 from rest_framework import viewsets
 
-from .models import Weide, Zijweg, Fiche, MapNote, Tocht, Basis
+from .models import Weide, Zijweg, Fiche, MapNote, Tocht, Basis, ForbiddenArea
 from .serializers import (
     WeideSerializer,
     ZijwegSerializer,
     FicheSerializer,
     MapNoteSerializer,
     TochtSerializer,
-    BasisSerializer,
+    BasisSerializer, ForbiddenAreaSerializer,
 )
 
 
@@ -39,3 +39,8 @@ class MapNoteViewSet(viewsets.ModelViewSet):
 class BasisViewSet(viewsets.ModelViewSet):
     queryset = Basis.objects.all()
     serializer_class = BasisSerializer
+
+
+class ForbiddenAreaViewSet(viewsets.ModelViewSet):
+    queryset = ForbiddenArea.objects.all()
+    serializer_class = ForbiddenAreaSerializer

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Tocht, Fiche, Weide, Zijweg, MapNote, Basis
+from .models import Tocht, Fiche, Weide, Zijweg, MapNote, Basis, ForbiddenArea
 
 
 class TochtSerializer(serializers.ModelSerializer):
@@ -38,3 +38,9 @@ class BasisSerializer(serializers.ModelSerializer):
     class Meta:
         model = Basis
         fields = ['id', 'point']
+
+
+class ForbiddenAreaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ForbiddenArea
+        fields = ['id', 'description', 'area']

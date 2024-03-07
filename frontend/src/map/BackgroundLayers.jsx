@@ -1,7 +1,12 @@
 import {Layer, Source} from 'react-map-gl/maplibre';
 
-import {grey} from '@mui/material/colors';
-import {useGetFichesQuery, useGetTochtenQuery, useGetZijwegenQuery} from '../services/linker.js';
+import {grey, red} from '@mui/material/colors';
+import {
+    useGetFichesQuery,
+    useGetForbiddenAreasQuery,
+    useGetTochtenQuery,
+    useGetZijwegenQuery
+} from '../services/linker.js';
 import {feature, featureCollection} from '@turf/helpers';
 import {memo, useMemo} from 'react';
 
@@ -9,6 +14,7 @@ export default memo(function BackgroundLayers({showHeatmap}) {
     const {data: tochten} = useGetTochtenQuery();
     const {data: fiches} = useGetFichesQuery();
     const {data: zijwegen} = useGetZijwegenQuery();
+    const {data: forbiddenAreas} = useGetForbiddenAreasQuery();
 
     const tochtenData = useMemo(() => {
         if (!tochten) {
@@ -39,6 +45,13 @@ export default memo(function BackgroundLayers({showHeatmap}) {
         }
         return featureCollection(Object.values(zijwegen.entities).map((zijweg) => feature(zijweg.geom, {}, {id: zijweg.id})))
     }, [zijwegen]);
+
+    const forbiddenAreasData = useMemo(() => {
+        if (!forbiddenAreas) {
+            return null;
+        }
+        return featureCollection(forbiddenAreas.map((area) => feature(area.area, {description: area.description}, {id: area.id})))
+    })
 
     const tochtenLayer = {
         id: 'tochten',
@@ -87,7 +100,7 @@ export default memo(function BackgroundLayers({showHeatmap}) {
             'icon-allow-overlap': true,
             'text-field': ['get', 'name'],
             'text-size': 10,
-            'text-font': ['DIN Pro Bold', 'Arial Unicode MS Regular'],
+            'text-font': ['D-DIN DIN-Bold', 'Arial Unicode MS Regular'],
             'text-max-width': 5,
         },
         paint: {
@@ -109,6 +122,17 @@ export default memo(function BackgroundLayers({showHeatmap}) {
         },
         minzoom: 13,
     };
+
+    const forbiddenAreasLayer = {
+        id: 'forbidden-areas',
+        type: 'fill',
+        beforeId: 'zijwegen-outline',
+        paint: {
+            'fill-color': red[500],
+            'fill-opacity': 0.5,
+            'fill-outline-color': red[800],
+        }
+    }
 
     return (
         <>
@@ -134,6 +158,9 @@ export default memo(function BackgroundLayers({showHeatmap}) {
             <Source type="geojson" data={zijwegenData}>
                 <Layer layout={{visibility: showHeatmap ? 'none' : 'visible'}} {...zijwegenLayer} />
                 <Layer layout={{visibility: showHeatmap ? 'none' : 'visible'}} {...zijwegenOutlineLayer} />
+            </Source>
+            <Source type="geojson" data={forbiddenAreasData}>
+                <Layer layout={{visibility: showHeatmap ? 'none' : 'visible'}} {...forbiddenAreasLayer}/>
             </Source>
         </>
     );
