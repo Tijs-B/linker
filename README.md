@@ -54,6 +54,7 @@ De frontend draait nu op [localhost:8061](http://localhost:8060) en de backend o
 - [x] Leesbare locatie per team
 - [x] Safe status per team (veilig op een weide)
   - [x] Filter lijst van teams op teams die nog niet safe zijn
+  - [ ] Timestamp safe
   - [ ] Formulier voor weidebewoner om in te vullen
   - [ ] Veilig op bus?
 - [x] Notities per team
