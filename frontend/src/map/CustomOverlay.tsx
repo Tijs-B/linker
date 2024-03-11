@@ -42,7 +42,7 @@ interface CustomOverlayProps {
 
 const CustomOverlay = memo(function CustomOverlay({
   children,
-  position = 'top-left',
+  position = 'top-right',
 }: CustomOverlayProps) {
   const [, setVersion] = useState(0);
   const ctrl = useControl(
