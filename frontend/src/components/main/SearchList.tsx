@@ -2,21 +2,20 @@ import { CSSProperties, memo, useCallback, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
 
-
-
 import { Badge, Chip, ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
-
-
 
 import { css } from '@emotion/react';
 
-
-
-import { useGetBasisQuery, useGetFichesQuery, useGetTochtenQuery, useGetTrackersQuery, useGetWeidesQuery } from '../../services/linker.ts';
+import {
+  useGetBasisQuery,
+  useGetFichesQuery,
+  useGetTochtenQuery,
+  useGetTrackersQuery,
+  useGetWeidesQuery,
+} from '../../services/linker.ts';
 import { OrganizationMember, Team } from '../../services/types.ts';
 import { getPositionDescription } from '../../utils/data';
 import PersonAvatar from '../PersonAvatar';
-
 
 type TrackerRowDataItem = (OrganizationMember | Team) & {
   secondary: string;
@@ -53,11 +52,7 @@ const TrackerRow = ({ data, index, style }: TrackerRowProps) => {
             secondaryTypographyProps={{ noWrap: true }}
           />
           {'safe_weide' in item && item.safe_weide && (
-            <Chip
-              color="primary"
-              variant="outlined"
-              label={`Safe op ${item.safe_weide}`}
-            />
+            <Chip color="primary" variant="outlined" label={`Safe op ${item.safe_weide}`} />
           )}
         </ListItemButton>
       </ListItem>
@@ -77,7 +72,6 @@ export default memo(function SearchList({ members, teams, onClick }: SearchListP
   const { data: weides } = useGetWeidesQuery();
   const { data: basis } = useGetBasisQuery();
   const { data: trackers } = useGetTrackersQuery();
-  
 
   const items = useMemo(() => {
     const allItems = [...teams, ...members];

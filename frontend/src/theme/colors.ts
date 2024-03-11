@@ -1,5 +1,6 @@
-import {blue, green, indigo, lightGreen, orange, purple, red} from '@mui/material/colors';
-import {Direction, OrganizationMember, Team} from "../services/types.ts";
+import { blue, green, indigo, lightGreen, orange, purple, red } from '@mui/material/colors';
+
+import { Direction, OrganizationMember, Team } from '../services/types.ts';
 
 export function teamColor(team: Team): string {
   return team.direction === Direction.RED ? red[500] : blue[500];

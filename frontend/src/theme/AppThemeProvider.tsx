@@ -1,6 +1,7 @@
+import { ReactElement, memo } from 'react';
+
 import { ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
-import { memo, ReactElement } from 'react';
 
 declare module '@mui/material/styles' {
   interface Theme {
@@ -9,6 +10,7 @@ declare module '@mui/material/styles' {
       popupMaxWidth: string;
     };
   }
+
   interface ThemeOptions {
     dimensions?: {
       drawerWidthDesktop?: string;

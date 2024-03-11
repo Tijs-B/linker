@@ -8,7 +8,12 @@ interface MapPaddingProps {
   left?: number;
 }
 
-const MapPadding = memo(function MapPadding({ top = 0, right = 0, bottom = 0, left = 0 }: MapPaddingProps) {
+const MapPadding = memo(function MapPadding({
+  top = 0,
+  right = 0,
+  bottom = 0,
+  left = 0,
+}: MapPaddingProps) {
   const { mainMap } = useMap();
 
   useEffect(() => {

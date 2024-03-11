@@ -40,7 +40,7 @@ const MainToolbar = memo(function MainToolbar({
   setFilterSafe,
   filterMembers,
   setFilterMembers,
-} : MainToolbarProps) {
+}: MainToolbarProps) {
   const theme = useTheme();
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<Element | null>(null);

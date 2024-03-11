@@ -37,11 +37,7 @@ function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
     }
     return featureCollection(
       Object.values(fiches.entities).map((fiche) =>
-        feature(
-          fiche.point,
-          { name: fiche.display_name },
-          { id: fiche.id },
-        ),
+        feature(fiche.point, { name: fiche.display_name }, { id: fiche.id }),
       ),
     );
   }, [fiches]);

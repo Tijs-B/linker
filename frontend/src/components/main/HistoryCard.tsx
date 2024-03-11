@@ -125,7 +125,7 @@ const HistoryCard = memo(function HistoryCard() {
             avatar={
               <Avatar
                 sx={{
-                  bgcolor: (team || member) ? itemColor((team || member)!) : '#000',
+                  bgcolor: team || member ? itemColor((team || member)!) : '#000',
                   fontSize: code && code.length > 2 ? '16px' : '20px',
                 }}
               >
