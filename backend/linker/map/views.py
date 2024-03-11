@@ -1,3 +1,5 @@
+from django.db.models import F, CharField
+from django.db.models.functions import Concat
 from rest_framework import viewsets
 
 from .models import Weide, Zijweg, Fiche, MapNote, Tocht, Basis, ForbiddenArea
@@ -18,7 +20,7 @@ class TochtViewSet(viewsets.ModelViewSet):
 
 
 class WeideViewSet(viewsets.ModelViewSet):
-    queryset = Weide.objects.all().order_by('tocht__order')
+    queryset = Weide.objects.all().annotate(display_name=F('tocht__identifier')).order_by('tocht__order')
     serializer_class = WeideSerializer
 
 
@@ -28,7 +30,11 @@ class ZijwegViewSet(viewsets.ModelViewSet):
 
 
 class FicheViewSet(viewsets.ModelViewSet):
-    queryset = Fiche.objects.all().order_by('tocht__order', 'order')
+    queryset = (
+        Fiche.objects.all()
+        .annotate(display_name=Concat(F('tocht__identifier'), F('order'), output_field=CharField()))
+        .order_by('tocht__order', 'order')
+    )
     serializer_class = FicheSerializer
 
 

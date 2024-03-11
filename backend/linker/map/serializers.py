@@ -10,15 +10,19 @@ class TochtSerializer(serializers.ModelSerializer):
 
 
 class FicheSerializer(serializers.ModelSerializer):
+    display_name = serializers.CharField()
+
     class Meta:
         model = Fiche
-        fields = ['id', 'order', 'point', 'tocht']
+        fields = ['id', 'order', 'point', 'tocht', 'display_name']
 
 
 class WeideSerializer(serializers.ModelSerializer):
+    display_name = serializers.CharField()
+
     class Meta:
         model = Weide
-        fields = ['id', 'tocht', 'polygon']
+        fields = ['id', 'tocht', 'polygon', 'display_name']
 
 
 class ZijwegSerializer(serializers.ModelSerializer):
