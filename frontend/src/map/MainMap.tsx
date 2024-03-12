@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, memo, useCallback, useEffect, useRef, useState } from 'react';
 import Map, {
   GeolocateControl,
   LngLat,
@@ -167,6 +167,11 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
     setCursor('inherit');
   }, [createMapNote, mapNoteDescription, mapNoteLngLat]);
 
+  const onMapNoteDescriptionChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => setMapNoteDescription(event.target.value),
+    [],
+  );
+
   return (
     <>
       <Map
@@ -238,7 +243,7 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
           </DialogContentText>
           <TextField
             value={mapNoteDescription}
-            onChange={(e) => setMapNoteDescription(e.target.value)}
+            onChange={onMapNoteDescriptionChange}
             label="Beschrijving"
             variant="standard"
             fullWidth
