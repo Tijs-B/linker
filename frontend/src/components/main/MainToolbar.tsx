@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -20,7 +20,7 @@ import { css } from '@emotion/react';
 
 interface MainToolbarProps {
   keyword: string;
-  setKeyword: React.Dispatch<React.SetStateAction<string>>;
+  onChangeKeyword: (value: string) => void;
   onSearchEnter: (value: string) => void;
   listOpen: boolean;
   setListOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -31,24 +31,38 @@ interface MainToolbarProps {
 }
 
 const MainToolbar = memo(function MainToolbar({
-  keyword,
-  setKeyword,
-  onSearchEnter,
-  listOpen,
-  setListOpen,
-  filterSafe,
-  setFilterSafe,
-  filterMembers,
-  setFilterMembers,
-}: MainToolbarProps) {
+                                                keyword,
+                                                onChangeKeyword,
+                                                onSearchEnter,
+                                                listOpen,
+                                                setListOpen,
+                                                filterSafe,
+                                                setFilterSafe,
+                                                filterMembers,
+                                                setFilterMembers,
+                                              }: MainToolbarProps) {
   const theme = useTheme();
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<Element | null>(null);
 
+  const onSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    onChangeKeyword(event.target.value);
+  }, [onChangeKeyword]);
+
+  const onSearchKeyUp = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      onSearchEnter(keyword);
+    }
+  }, [keyword, onSearchEnter]);
+
+  const onClearKeyword = useCallback(() => {
+    onChangeKeyword('');
+  }, [onChangeKeyword]);
+
   return (
     <Toolbar
       css={css`
-        gap: ${theme.spacing(1)};
+          gap: ${theme.spacing(1)};
       `}
     >
       <IconButton edge="start" onClick={() => setListOpen(!listOpen)}>
@@ -75,16 +89,12 @@ const MainToolbar = memo(function MainToolbar({
         placeholder="Zoeken"
         size="small"
         value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => {
-          if (e.key === 'Enter') {
-            onSearchEnter(keyword);
-          }
-        }}
+        onChange={onSearchChange}
+        onKeyUp={onSearchKeyUp}
         endAdornment={
           keyword && (
             <InputAdornment position="end">
-              <IconButton onClick={() => setKeyword('')}>
+              <IconButton onClick={onClearKeyword}>
                 <CloseIcon />
               </IconButton>
             </InputAdornment>

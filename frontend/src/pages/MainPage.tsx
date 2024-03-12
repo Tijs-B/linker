@@ -54,13 +54,6 @@ export default function MainPage() {
     }
   }, [desktop, selectedId]);
 
-  // Open the list when a keyword is entered
-  useEffect(() => {
-    if (keyword) {
-      setListOpen(true);
-    }
-  }, [keyword]);
-
   const showItem = useCallback(
     (tracker: number) => {
       dispatch(trackersActions.setSelectedId(tracker));
@@ -127,22 +120,33 @@ export default function MainPage() {
     }
   }, [filterMembers, keyword, memberFuse, organizationMembers]);
 
-  const filteredTrackers: number[] = filteredTeams
+  const filteredTrackers = useMemo(() => filteredTeams
     .map((t) => t.tracker)
     .concat(filteredMembers.map((m) => m.tracker))
-    .flatMap((tracker) => (tracker ? [tracker] : []));
+    .flatMap((tracker) => (tracker ? [tracker] : []))
+  , [filteredTeams, filteredMembers]);
 
-  const onSearchEnter = function (keyword: string) {
-    if (keyword && teamFuse && memberFuse) {
-      const results = teamFuse.search(keyword).concat(memberFuse.search(keyword));
-      if (results.length > 0) {
-        const highest = results.sort((a, b) => a.score! - b.score!)[0].item;
-        if (highest.tracker) {
-          showItem(highest.tracker);
+  const onSearchEnter = useCallback(
+    (keyword: string) => {
+      if (keyword && teamFuse && memberFuse) {
+        const results = teamFuse.search(keyword).concat(memberFuse.search(keyword));
+        if (results.length > 0) {
+          const highest = results.sort((a, b) => a.score! - b.score!)[0].item;
+          if (highest.tracker) {
+            showItem(highest.tracker);
+          }
         }
       }
+    },
+    [memberFuse, teamFuse, showItem],
+  );
+
+  const onChangeKeyword = useCallback((keyword: string) => {
+    if (keyword) {
+      setListOpen(true);
     }
-  };
+    setKeyword(keyword);
+  }, []);
 
   const sidebar = css`
     display: flex;
@@ -203,7 +207,7 @@ export default function MainPage() {
         <Paper elevation={3} square css={header}>
           <MainToolbar
             keyword={keyword}
-            setKeyword={setKeyword}
+            onChangeKeyword={onChangeKeyword}
             onSearchEnter={onSearchEnter}
             listOpen={listOpen}
             setListOpen={setListOpen}

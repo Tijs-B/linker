@@ -57,7 +57,7 @@ const TeamPage = memo(function TeamPage() {
 
   const [newNoteText, setNewNoteText] = useState('');
 
-  const team = teams?.entities[Number(teamId)];
+  const team = teams && teamId !== undefined ? teams.entities[Number(teamId)] : null;
   const code = team?.number.toString().padStart(2, '0');
   const teamStats = stats && teamId !== undefined ? stats.teams[+teamId] : null;
 
