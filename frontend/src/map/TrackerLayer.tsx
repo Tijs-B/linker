@@ -2,7 +2,6 @@ import { memo, useEffect, useMemo } from 'react';
 import { Layer, MapLayerMouseEvent, Source, useMap } from 'react-map-gl/maplibre';
 
 import { feature, featureCollection } from '@turf/helpers';
-import { MapStyleImageMissingEvent } from 'maplibre-gl';
 
 import {
   useGetOrganizationMembersQuery,
@@ -11,7 +10,6 @@ import {
 } from '../services/linker.ts';
 import { trackersActions, useAppDispatch, useAppSelector } from '../store/index.js';
 import { itemColor } from '../theme/colors.ts';
-import { generateTracker, generateTrackerOutline } from '../utils/icons.ts';
 
 interface TrackerLayerProps {
   visible: boolean;
@@ -46,29 +44,10 @@ const TrackerLayer = memo(function TrackerLayer({ visible, trackers }: TrackerLa
       }
     };
 
-    const onImageMissing = function (event: MapStyleImageMissingEvent) {
-      const id = event.id;
-      const prefix = 'trackermarker-';
-      if (id.includes(prefix)) {
-        const [code, color] = id.replace(prefix, '').split('-');
-        const icon = generateTracker(code, color);
-        if (icon) {
-          mainMap.addImage(id, icon);
-        }
-      } else if (id === 'trackermarkerbackground') {
-        const icon = generateTrackerOutline();
-        if (icon) {
-          mainMap.addImage('trackermarkerbackground', icon);
-        }
-      }
-    };
-
     mainMap.on('click', 'trackers', onClick);
-    mainMap.on('styleimagemissing', onImageMissing);
 
     return () => {
       mainMap.off('click', 'trackers', onClick);
-      mainMap.off('styleimagemissing', onImageMissing);
     };
   }, [mainMap, dispatch]);
 
@@ -90,10 +69,9 @@ const TrackerLayer = memo(function TrackerLayer({ visible, trackers }: TrackerLa
       if (!item) {
         return [];
       }
-      const code = team ? team.number.toString().padStart(2, '0') : member ? member.code : '-';
       const point = historyLog ? historyLog.point : lastLog.point;
       const props = {
-        image: `trackermarker-${code}-${itemColor(item)}`,
+        image: `tracker-${item.code}-${itemColor(item)}`,
         sortKey: selectedId === item.tracker ? 100 : 100 - point.coordinates[1],
       };
       return [feature(point, props, { id: item.tracker! })];
@@ -124,7 +102,7 @@ const TrackerLayer = memo(function TrackerLayer({ visible, trackers }: TrackerLa
           layout={{
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
-            'icon-image': 'trackermarkerbackground',
+            'icon-image': 'tracker-outline',
             'icon-offset': [0, -16.5 * 2],
             'icon-size': 0.5,
             visibility: visible ? 'visible' : 'none',

@@ -7,7 +7,6 @@ import Map, {
   NavigationControl,
   ScaleControl,
 } from 'react-map-gl/maplibre';
-import { useDispatch } from 'react-redux';
 
 import FlagIcon from '@mui/icons-material/Flag';
 import SatelliteIcon from '@mui/icons-material/Satellite';
@@ -30,8 +29,14 @@ import bbox from '@turf/bbox';
 import { feature, featureCollection } from '@turf/helpers';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-import { useCreateMapNoteMutation, useGetTochtenQuery } from '../services/linker.ts';
-import { trackersActions } from '../store/index.js';
+import {
+  useCreateMapNoteMutation,
+  useGetOrganizationMembersQuery,
+  useGetTeamsQuery,
+  useGetTochtenQuery,
+} from '../services/linker.ts';
+import { trackersActions, useAppDispatch } from '../store/index.js';
+import { generateAllIcons } from '../utils/icons.ts';
 import BackgroundLayers from './BackgroundLayers';
 import CustomOverlay from './CustomOverlay.jsx';
 import MapNoteLayer from './MapNoteLayer';
@@ -48,7 +53,8 @@ const DEFAULT_INITIAL_BOUNDS = {
 const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+
   const [cursor, setCursor] = useState('inherit');
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showSatellite, setShowSatellite] = useState(false);
@@ -58,8 +64,12 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
   const [mapNoteDescription, setMapNoteDescription] = useState('');
   const [createMapNoteDialogOpen, setCreateMapNoteDialogOpen] = useState(false);
   const [initialBounds, setInitialBounds] = useState(DEFAULT_INITIAL_BOUNDS);
+  const [iconsAdded, setIconsAdded] = useState(true);
+
   const mapRef = useRef<MapRef>(null);
   const { data: tochten } = useGetTochtenQuery();
+  const { data: teams } = useGetTeamsQuery();
+  const { data: members } = useGetOrganizationMembersQuery();
   const createMapNote = useCreateMapNoteMutation()[0];
 
   const mapStyle = showHeatmap
@@ -78,6 +88,16 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
       setInitialBounds({ bounds, fitBoundsOptions: BOUNDS_OPTIONS });
     }
   }, [tochten, mapRef, hasRecentered, setRecentered]);
+
+  useEffect(() => {
+    if (teams && members && mapRef && mapRef.current && !iconsAdded) {
+      const allItems = [...Object.values(teams.entities), ...Object.values(members.entities)];
+      setIconsAdded(true);
+      generateAllIcons(allItems, (name, image) => {
+        mapRef.current!.addImage(name, image);
+      });
+    }
+  }, [iconsAdded, members, teams, mapRef]);
 
   const onMouseEnter = useCallback(() => {
     if (!creatingMarker) {
@@ -172,6 +192,8 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
     [],
   );
 
+  const onMapLoad = useCallback(() => setIconsAdded(false), []);
+
   return (
     <>
       <Map
@@ -189,6 +211,7 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
         // maxPitch={85}
         // terrain={{source: 'relief', exaggeration: 2}}
         // fog={{range: [2,12], color: 'white', 'horizon-blend': 0.1}}
+        onLoad={onMapLoad}
       >
         <BackgroundLayers showHeatmap={showHeatmap} />
 

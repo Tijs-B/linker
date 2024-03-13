@@ -58,7 +58,6 @@ const TeamPage = memo(function TeamPage() {
   const [newNoteText, setNewNoteText] = useState('');
 
   const team = teams && teamId !== undefined ? teams.entities[Number(teamId)] : null;
-  const code = team?.number.toString().padStart(2, '0');
   const teamStats = stats && teamId !== undefined ? stats.teams[+teamId] : null;
 
   const teamLogs = useMemo(() => {
@@ -110,7 +109,7 @@ const TeamPage = memo(function TeamPage() {
           <IconButton sx={{ mr: 2 }} component={RouterLink} to={-1} color="inherit">
             <ArrowBackIcon />
           </IconButton>
-          <Avatar sx={{ bgcolor: teamColor(team), mr: 2 }}>{code}</Avatar>
+          <Avatar sx={{ bgcolor: teamColor(team), mr: 2 }}>{team.code}</Avatar>
           <Typography variant="h6" sx={{ mr: 2 }}>
             {team.name}
           </Typography>

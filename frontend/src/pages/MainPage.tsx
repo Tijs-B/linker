@@ -69,12 +69,8 @@ export default function MainPage() {
   // Create fuse objects for search
   const teamFuse = useMemo(() => {
     if (teams && teams.ids.length > 0) {
-      const data = Object.values(teams.entities).map((team) => ({
-        ...team,
-        teamNumber: team.number.toString().padStart(2, '0'),
-      }));
-      return new Fuse(data, {
-        keys: ['teamNumber', 'name', 'contact_persons.name', 'chiro'],
+      return new Fuse(Object.values(teams.entities), {
+        keys: ['code', 'name', 'contact_persons.name', 'chiro'],
         threshold: 0.2,
         includeScore: true,
       });
@@ -93,14 +89,7 @@ export default function MainPage() {
 
   const filteredTeams: Team[] = useMemo(() => {
     if (teamFuse && keyword) {
-      return teamFuse
-        .search(keyword)
-        .map((item) => item.item)
-        .map((item) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { teamNumber: _, ...rest } = item;
-          return rest;
-        });
+      return teamFuse.search(keyword).map((item) => item.item);
     } else if (teams) {
       return Object.values(teams.entities).filter((team) => filterSafe || !team.safe_weide);
     } else {
@@ -120,11 +109,14 @@ export default function MainPage() {
     }
   }, [filterMembers, keyword, memberFuse, organizationMembers]);
 
-  const filteredTrackers = useMemo(() => filteredTeams
-    .map((t) => t.tracker)
-    .concat(filteredMembers.map((m) => m.tracker))
-    .flatMap((tracker) => (tracker ? [tracker] : []))
-  , [filteredTeams, filteredMembers]);
+  const filteredTrackers = useMemo(
+    () =>
+      filteredTeams
+        .map((t) => t.tracker)
+        .concat(filteredMembers.map((m) => m.tracker))
+        .flatMap((tracker) => (tracker ? [tracker] : [])),
+    [filteredTeams, filteredMembers],
+  );
 
   const onSearchEnter = useCallback(
     (keyword: string) => {

@@ -25,6 +25,10 @@ class TeamNoteSerializer(serializers.ModelSerializer):
 class TeamSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
     contact_persons = ContactPersonSerializer(many=True)
     team_notes = TeamNoteSerializer(many=True)
+    code = serializers.SerializerMethodField('get_code')
+
+    def get_code(self, obj):
+        return f'{obj.number:02d}'
 
     class Meta:
         model = Team
@@ -43,4 +47,5 @@ class TeamSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
             'team_notes',
             'group_picture',
             'safe_weide',
+            'code',
         ]

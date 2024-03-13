@@ -85,7 +85,7 @@ const HistoryCard = memo(function HistoryCard() {
     organizationMembers &&
     Object.values(organizationMembers.entities).find((m) => m.tracker === selectedId);
 
-  const code = member ? member.code : team?.number.toString().padStart(2, '0');
+  const code = (team || member)?.code;
 
   const { currentData: logs } = useGetTrackerLogsQuery(
     selectedId && showHistory ? selectedId : skipToken,

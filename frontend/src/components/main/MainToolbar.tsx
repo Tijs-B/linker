@@ -31,29 +31,35 @@ interface MainToolbarProps {
 }
 
 const MainToolbar = memo(function MainToolbar({
-                                                keyword,
-                                                onChangeKeyword,
-                                                onSearchEnter,
-                                                listOpen,
-                                                setListOpen,
-                                                filterSafe,
-                                                setFilterSafe,
-                                                filterMembers,
-                                                setFilterMembers,
-                                              }: MainToolbarProps) {
+  keyword,
+  onChangeKeyword,
+  onSearchEnter,
+  listOpen,
+  setListOpen,
+  filterSafe,
+  setFilterSafe,
+  filterMembers,
+  setFilterMembers,
+}: MainToolbarProps) {
   const theme = useTheme();
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<Element | null>(null);
 
-  const onSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    onChangeKeyword(event.target.value);
-  }, [onChangeKeyword]);
+  const onSearchChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChangeKeyword(event.target.value);
+    },
+    [onChangeKeyword],
+  );
 
-  const onSearchKeyUp = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      onSearchEnter(keyword);
-    }
-  }, [keyword, onSearchEnter]);
+  const onSearchKeyUp = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Enter') {
+        onSearchEnter(keyword);
+      }
+    },
+    [keyword, onSearchEnter],
+  );
 
   const onClearKeyword = useCallback(() => {
     onChangeKeyword('');
@@ -62,7 +68,7 @@ const MainToolbar = memo(function MainToolbar({
   return (
     <Toolbar
       css={css`
-          gap: ${theme.spacing(1)};
+        gap: ${theme.spacing(1)};
       `}
     >
       <IconButton edge="start" onClick={() => setListOpen(!listOpen)}>

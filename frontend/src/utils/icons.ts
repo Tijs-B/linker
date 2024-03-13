@@ -1,4 +1,11 @@
-export function generateMapNoteIcon(color: string): ImageData | null {
+import { yellow } from '@mui/material/colors';
+
+import dDinUrl from '../assets/fonts/D-DIN-Bold.woff2';
+import dDinCondensedUrl from '../assets/fonts/D-DINCondensed-Bold.woff2';
+import { OrganizationMember, Team } from '../services/types.ts';
+import { itemColor } from '../theme/colors.ts';
+
+function generateMapNoteIcon(color: string): ImageData | null {
   const canvas = document.createElement('canvas');
   canvas.width = 33 * 2;
   canvas.height = 48 * 2;
@@ -42,7 +49,7 @@ export function generateMapNoteIcon(color: string): ImageData | null {
   return ctx.getImageData(0, 0, 33 * 2, 48 * 2);
 }
 
-export function generateTracker(code: string, color: string): ImageData | null {
+function generateTracker(code: string, color: string): ImageData | null {
   const canvas = document.createElement('canvas');
   canvas.width = 33 * 2;
   canvas.height = 48 * 2;
@@ -76,7 +83,7 @@ export function generateTracker(code: string, color: string): ImageData | null {
     ),
   );
 
-  ctx.font = code.length == 2 ? '17px D-DIN' : '14px D-DINCondensed';
+  ctx.font = code.length == 2 ? '17px D-DIN Bold' : '14px D-DINCondensed Bold';
   ctx.textAlign = 'center';
   ctx.fillStyle = '#fff';
   ctx.fillText(code, 16.5, 23.1);
@@ -84,7 +91,7 @@ export function generateTracker(code: string, color: string): ImageData | null {
   return ctx.getImageData(0, 0, 33 * 2, 48 * 2);
 }
 
-export function generateTrackerOutline(): ImageData | null {
+function generateTrackerOutline(): ImageData | null {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) {
@@ -99,4 +106,37 @@ export function generateTrackerOutline(): ImageData | null {
   );
 
   return ctx.getImageData(0, 0, 33 * 2, 48 * 2);
+}
+
+export function generateAllIcons(
+  items: (Team | OrganizationMember)[],
+  addToMap: (name: string, data: ImageData) => void,
+) {
+  const dDinFontFace = new FontFace('D-DIN Bold', `url(${dDinUrl})`);
+  const dDinCondensedFontFace = new FontFace('D-DINCondensed Bold', `url(${dDinCondensedUrl})`);
+  document.fonts.add(dDinFontFace);
+  document.fonts.add(dDinCondensedFontFace);
+
+  dDinFontFace.load().then(() => {
+    dDinCondensedFontFace.load().then(() => {
+      for (const item of items) {
+        const color = itemColor(item);
+        if (color) {
+          const image = generateTracker(item.code, color);
+          if (image) {
+            const name = `tracker-${item.code}-${color}`;
+            addToMap(name, image);
+          }
+        }
+      }
+      const mapNoteIcon = generateMapNoteIcon(yellow[400]);
+      if (mapNoteIcon) {
+        addToMap('map-note', mapNoteIcon);
+      }
+      const trackerOutlineIcon = generateTrackerOutline();
+      if (trackerOutlineIcon) {
+        addToMap('tracker-outline', trackerOutlineIcon);
+      }
+    });
+  });
 }
