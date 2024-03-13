@@ -212,6 +212,7 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
         // terrain={{source: 'relief', exaggeration: 2}}
         // fog={{range: [2,12], color: 'white', 'horizon-blend': 0.1}}
         onLoad={onMapLoad}
+        attributionControl={false}
       >
         <BackgroundLayers showHeatmap={showHeatmap} />
 
