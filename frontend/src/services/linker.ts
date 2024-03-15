@@ -192,6 +192,14 @@ export const linkerApi = createApi({
       }),
       invalidatesTags: ['MapNote'],
     }),
+    uploadGroupPicture: build.mutation<void, {id: number, data: FormData}>({
+      query: ({ id, data }) => ({
+        url: `/teams/${id}/group-picture/`,
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Team'],
+    }),
   }),
 });
 
@@ -218,4 +226,5 @@ export const {
   useCreateMapNoteMutation,
   useUpdateMapNoteMutation,
   useDeleteMapNoteMutation,
+  useUploadGroupPictureMutation,
 } = linkerApi;

@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponse
 from django.views import View
 from rest_framework import viewsets
+from rest_framework.decorators import action
 
 from .models import Team, OrganizationMember, TeamNote, ContactPerson
 from .serializers import (
@@ -17,6 +18,14 @@ from .serializers import (
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.prefetch_related('contact_persons').prefetch_related('team_notes').order_by('number')
     serializer_class = TeamSerializer
+
+    @action(detail=True, methods=['post'], url_path='group-picture')
+    def group_picture(self, request, pk=None):
+        team = self.get_object()
+        team.group_picture = request.FILES['picture']
+        team.save()
+        return HttpResponse(status=200)
+
 
 
 class OrganizationMemberViewSet(viewsets.ModelViewSet):
