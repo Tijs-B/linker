@@ -39,7 +39,8 @@ import {
   useGetTeamsQuery,
   useGetTochtenQuery,
   useGetTrackersQuery,
-  useGetWeidesQuery, useUploadGroupPictureMutation,
+  useGetWeidesQuery,
+  useUploadGroupPictureMutation,
 } from '../services/linker.ts';
 import { teamColor } from '../theme/colors.ts';
 import { getPositionDescription } from '../utils/data.ts';
@@ -130,7 +131,7 @@ const TeamPage = memo(function TeamPage() {
       });
       setUploadedFile(null);
     }
-  }, [uploadedFile, teamId, uploadGroupPicture])
+  }, [uploadedFile, teamId, uploadGroupPicture]);
 
   if (!team) {
     return <div>Team not found</div>;
