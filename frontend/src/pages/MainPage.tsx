@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 import { useNavigate } from 'react-router-dom';
 
-import { Paper, useMediaQuery, useTheme } from '@mui/material';
+import { Alert, AlertTitle, Paper, Snackbar, useMediaQuery, useTheme } from '@mui/material';
 
 import { css } from '@emotion/react';
 import Fuse from 'fuse.js';
@@ -29,6 +29,7 @@ export default function MainPage() {
   const [listOpen, setListOpen] = useState(desktop);
   const [filterSafe, setFilterSafe] = useState(true);
   const [filterMembers, setFilterMembers] = useState(true);
+  const [errorDismissed, setErrorDismissed] = useState(false);
   const { mainMap } = useMap();
   const navigate = useNavigate();
 
@@ -36,9 +37,12 @@ export default function MainPage() {
   const selectedId = useAppSelector((state) => state.trackers.selectedId);
   const showHistory = useAppSelector((state) => state.trackers.showHistory);
 
-  const { data: teams, error: queryError } = useGetTeamsQuery();
+  const { data: teams } = useGetTeamsQuery();
   const { data: organizationMembers } = useGetOrganizationMembersQuery();
-  const { data: trackers } = useGetTrackersQuery();
+  const { data: trackers, error: queryError } = useGetTrackersQuery(undefined, {
+    pollingInterval: 15000,
+    skipPollingIfUnfocused: true,
+  });
 
   // Navigate to login if unauthenticated
   useEffect(() => {
@@ -46,6 +50,16 @@ export default function MainPage() {
       navigate('/login/');
     }
   }, [navigate, queryError]);
+
+  // Set errorDismissed to false after 2 minutes
+  useEffect(() => {
+    if (errorDismissed) {
+      const timer = window.setTimeout(() => {
+        setErrorDismissed(false);
+      }, 2 * 60 * 1000);
+      return () => { window.clearTimeout(timer) }
+    }
+  }, [errorDismissed])
 
   // Close the list on mobile when team is selected
   useEffect(() => {
@@ -140,6 +154,10 @@ export default function MainPage() {
     setKeyword(keyword);
   }, []);
 
+  const onErrorClose = useCallback(() => {
+    setErrorDismissed(true);
+  }, []);
+
   const sidebar = css`
     display: flex;
     flex-direction: column;
@@ -188,45 +206,60 @@ export default function MainPage() {
   `;
 
   return (
-    <div
-      css={css`
-        height: 100%;
-      `}
-    >
-      {desktop && <MainMap trackers={filteredTrackers} />}
+    <>
+      <div
+        css={css`
+          height: 100%;
+        `}
+      >
+        {desktop && <MainMap trackers={filteredTrackers} />}
 
-      <div css={sidebar}>
-        <Paper elevation={3} square css={header}>
-          <MainToolbar
-            keyword={keyword}
-            onChangeKeyword={onChangeKeyword}
-            onSearchEnter={onSearchEnter}
-            listOpen={listOpen}
-            setListOpen={setListOpen}
-            filterSafe={filterSafe}
-            setFilterSafe={setFilterSafe}
-            filterMembers={filterMembers}
-            setFilterMembers={setFilterMembers}
-          />
-        </Paper>
-        <div css={middle}>
-          {!desktop && (
-            <div css={contentMap}>
-              <MainMap trackers={filteredTrackers} />
+        <div css={sidebar}>
+          <Paper elevation={3} square css={header}>
+            <MainToolbar
+              keyword={keyword}
+              onChangeKeyword={onChangeKeyword}
+              onSearchEnter={onSearchEnter}
+              listOpen={listOpen}
+              setListOpen={setListOpen}
+              filterSafe={filterSafe}
+              setFilterSafe={setFilterSafe}
+              filterMembers={filterMembers}
+              setFilterMembers={setFilterMembers}
+            />
+          </Paper>
+          <div css={middle}>
+            {!desktop && (
+              <div css={contentMap}>
+                <MainMap trackers={filteredTrackers} />
+              </div>
+            )}
+            <Paper css={contentList} sx={{ visibility: listOpen ? 'visible' : 'hidden' }} square>
+              <SearchList members={filteredMembers} teams={filteredTeams} onClick={showItem} />
+            </Paper>
+          </div>
+          {desktop && (
+            <div css={footer}>
+              <BottomMenu />
             </div>
           )}
-          <Paper css={contentList} sx={{ visibility: listOpen ? 'visible' : 'hidden' }} square>
-            <SearchList members={filteredMembers} teams={filteredTeams} onClick={showItem} />
-          </Paper>
         </div>
-        {desktop && (
-          <div css={footer}>
-            <BottomMenu />
-          </div>
-        )}
+        {selectedId && !showHistory && <StatusCard />}
+        {selectedId && showHistory && <HistoryCard />}
       </div>
-      {selectedId && !showHistory && <StatusCard />}
-      {selectedId && showHistory && <HistoryCard />}
-    </div>
+      <Snackbar
+        open={!!queryError && !errorDismissed}
+        onClose={onErrorClose}
+        anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+      >
+        <Alert severity="error" variant="filled" onClose={onErrorClose}>
+          <AlertTitle>
+            Geen internetverbinding
+          </AlertTitle>
+          {/* @ts-expect-error I have no idea */}
+          {queryError?.error}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }

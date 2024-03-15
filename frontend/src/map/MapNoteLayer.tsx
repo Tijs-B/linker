@@ -123,8 +123,6 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
     setSelectedNote((note) => note && { ...note, content: e.target.value });
   }, []);
 
-  console.log(hoverInfo?.x);
-
   return (
     <>
       <Source type="geojson" data={geojsonData}>

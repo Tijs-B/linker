@@ -28,7 +28,6 @@ export default function LoginPage() {
   );
 
   useEffect(() => {
-    console.log(isSuccess);
     if (isSuccess) {
       navigate('/');
     }

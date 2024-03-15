@@ -62,9 +62,9 @@ De frontend draait nu op [localhost:8061](http://localhost:8060) en de backend o
   - [x] Toevoegen via frontend
   - [x] Opmerking bekijken via frontend
   - [x] Verwijderen
-- [ ] Groepsfoto's
+- [x] Groepsfoto's
   - [x] Backend
-  - [ ] Retrieve / update in frontend
+  - [x] Retrieve / update in frontend
 - [ ] Frontend polling & offline data management
   - [ ] Auto refetch tracker data. Werkt dat nu zelfs?
   - [ ] Melding bij offline
