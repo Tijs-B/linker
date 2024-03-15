@@ -140,7 +140,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Media storage
-MEDIA_ROOT = env('MEDIA_ROOT')
+MEDIA_ROOT = env('MEDIA_ROOT', default='/media')
 MEDIA_URL = 'media/'
 
 # Default primary key field type
