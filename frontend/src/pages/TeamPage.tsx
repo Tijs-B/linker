@@ -1,4 +1,4 @@
-import { ChangeEvent, ChangeEventHandler, memo, useCallback, useMemo, useState } from 'react';
+import { ChangeEvent, memo, useCallback, useMemo, useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
