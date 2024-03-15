@@ -12,6 +12,7 @@ import '@fontsource/roboto/latin-500.css';
 import '@fontsource/roboto/latin-700.css';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/nl-be';
 
 import Navigation from './Navigation';
 import { store } from './store';
