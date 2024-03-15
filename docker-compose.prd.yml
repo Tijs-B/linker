@@ -17,7 +17,7 @@ services:
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
-      - DEBUG=True
+      - DEBUG=False
       - MEDIA_ROOT=/media
     networks:
       - linker_net
