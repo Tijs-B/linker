@@ -89,6 +89,8 @@ services:
     networks:
       - linker_net
       - caddy
+    volumes:
+      - upload-media:/media
     depends_on:
       - linker
     labels:
