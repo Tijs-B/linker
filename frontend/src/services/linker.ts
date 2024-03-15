@@ -177,6 +177,21 @@ export const linkerApi = createApi({
       }),
       invalidatesTags: ['MapNote'],
     }),
+    updateMapNote: build.mutation<MapNote, Partial<MapNote> & Pick<MapNote, 'id'>>({
+      query: (mapNote) => ({
+        url: `/map-notes/${mapNote.id}/`,
+        method: 'PATCH',
+        body: mapNote,
+      }),
+      invalidatesTags: ['MapNote'],
+    }),
+    deleteMapNote: build.mutation<void, number>({
+      query: (noteId) => ({
+        url: `/map-notes/${noteId}/`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['MapNote'],
+    }),
   }),
 });
 
@@ -201,4 +216,6 @@ export const {
   useDeleteTeamNoteMutation,
   useCreateTeamNoteMutation,
   useCreateMapNoteMutation,
+  useUpdateMapNoteMutation,
+  useDeleteMapNoteMutation,
 } = linkerApi;

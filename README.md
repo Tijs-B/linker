@@ -58,10 +58,10 @@ De frontend draait nu op [localhost:8061](http://localhost:8060) en de backend o
   - [ ] Formulier voor weidebewoner om in te vullen
   - [ ] Veilig op bus?
 - [x] Notities per team
-- [ ] Kaartnotities
+- [x] Kaartnotities
   - [x] Toevoegen via frontend
-  - [ ] Opmerking bekijken via frontend
-  - [ ] Verwijderen
+  - [x] Opmerking bekijken via frontend
+  - [x] Verwijderen
 - [ ] Groepsfoto's
   - [x] Backend
   - [ ] Retrieve / update in frontend
