@@ -27,7 +27,6 @@ class TeamViewSet(viewsets.ModelViewSet):
         return HttpResponse(status=200)
 
 
-
 class OrganizationMemberViewSet(viewsets.ModelViewSet):
     queryset = OrganizationMember.objects.order_by('member_type', 'name')
     serializer_class = OrganizationMemberSerializer
