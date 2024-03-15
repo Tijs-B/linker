@@ -1,0 +1,105 @@
+version: "3.4"
+
+services:
+  linker:
+    build:
+      context: .
+      target: production
+    depends_on:
+      - postgis
+      - redis
+    volumes:
+      - ./simulation-data:/simulation-data:ro
+      - upload-media:/media
+    environment:
+      - ALLOWED_HOSTS=link.tijsb.be
+      - CSRF_TRUSTED_ORIGINS=https://link.tijsb.be
+      - DATABASE_URL=postgis://root:pass@postgis:5432/linker
+      - CACHE_URL=redis://redis:6379
+      - SIMULATION_PATH=/simulation-data
+      - DEBUG=True
+      - MEDIA_ROOT=/media
+    networks:
+      - linker_net
+
+  linker_celery:
+    build:
+      context: .
+      target: production
+    command: celery -A linker worker -l INFO
+    depends_on:
+      - postgis
+      - redis
+    volumes:
+      - ./simulation-data:/simulation-data:ro
+      - upload-media:/media
+    environment:
+      - ALLOWED_HOSTS=link.tijsb.be
+      - CSRF_TRUSTED_ORIGINS=https://link.tijsb.be
+      - DATABASE_URL=postgis://root:pass@postgis:5432/linker
+      - CACHE_URL=redis://redis:6379
+      - SIMULATION_PATH=/simulation-data
+      - DEBUG=False
+      - MEDIA_ROOT=/media
+    networks:
+      - linker_net
+
+  linker_celery_beat:
+    build:
+      context: .
+      target: production
+    command: celery -A linker beat -l INFO
+    depends_on:
+      - postgis
+      - redis
+    volumes:
+      - ./simulation-data:/simulation-data:ro
+      - upload-media:/media
+    environment:
+      - ALLOWED_HOSTS=link.tijsb.be
+      - CSRF_TRUSTED_ORIGINS=https://link.tijsb.be
+      - DATABASE_URL=postgis://root:pass@postgis:5432/linker
+      - CACHE_URL=redis://redis:6379
+      - SIMULATION_PATH=/simulation-data
+      - DEBUG=False
+      - MEDIA_ROOT=/media
+    networks:
+      - linker_net
+
+  postgis:
+    image: kartoza/postgis:16-3.4
+    environment:
+      - POSTGRES_DB=linker
+      - POSTGRES_USER=root
+      - POSTGRES_PASS=pass
+    volumes:
+      - postgis-data:/var/lib/postgresql
+    networks:
+      - linker_net
+
+  redis:
+    image: redis:6
+    networks:
+      - linker_net
+
+  nginx:
+    build:
+      context: .
+      target: custom-nginx
+    networks:
+      - linker_net
+      - caddy
+    depends_on:
+      - linker
+    labels:
+      caddy: link.tijsb.be
+      caddy.reverse_proxy: "{{upstreams 80}}"
+
+volumes:
+  postgis-data:
+  upload-media:
+
+networks:
+  caddy:
+    external: true
+  linker_net:

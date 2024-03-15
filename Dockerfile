@@ -64,3 +64,14 @@ COPY --from=frontend_builder /app/dist/ ./static
 RUN python manage.py collectstatic --noinput
 
 CMD gunicorn linker.wsgi --bind 0.0.0.0:8000 --chdir=/app
+
+#############
+### NGINX ###
+#############
+FROM nginx AS custom-nginx
+
+RUN rm /etc/nginx/conf.d/default.conf
+COPY deployment/nginx.conf /etc/nginx/conf.d
+
+COPY --from=production /app/staticfiles /app/staticfiles
+

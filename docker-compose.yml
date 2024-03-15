@@ -12,12 +12,15 @@ services:
     volumes:
       - ./simulation-data:/simulation-data:ro
       - ./backend:/app
+      - ./media:/media
     environment:
       - ALLOWED_HOSTS=*
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
       - DEBUG=True
+      - MEDIA_ROOT=/media
+      - SECRET_KEY=secret
     ports:
       - "8060:8060"
 
@@ -38,6 +41,8 @@ services:
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
       - DEBUG=True
+      - MEDIA_ROOT=/media
+      - SECRET_KEY=secret
 
   postgis:
     image: kartoza/postgis:16-3.4
