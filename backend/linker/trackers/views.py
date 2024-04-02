@@ -59,12 +59,3 @@ class TrackerViewSet(viewsets.ModelViewSet):
 
         serializer = TrackerLogSerializer(queryset, many=True)
         return Response(serializer.data)
-
-
-@login_required
-def get_heatmap_tile(request, z, x, y):
-    heatmap_dir = Path(settings.HEATMAP_PATH)
-    filename = heatmap_dir / str(z) / str(x) / f'{y}.png'
-    if filename.is_file():
-        return HttpResponse(filename.read_bytes(), content_type='image/png', headers={'cache-control': 'max-age=120'})
-    return HttpResponse(status=404)

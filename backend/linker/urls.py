@@ -39,7 +39,7 @@ from linker.people.views import (
     UserView,
 )
 from linker.tracing.views import CheckpointLogViewSet, all_stats
-from linker.trackers.views import TrackerViewSet, get_heatmap_tile
+from linker.trackers.views import TrackerViewSet
 
 router = routers.DefaultRouter()
 router.register('teams', TeamViewSet)
@@ -65,7 +65,6 @@ urlpatterns = [
     path('api/stats/', all_stats),
     path('api/login/', csrf_exempt(LoginView.as_view())),
     path('api/user/', UserView.as_view()),
-    path('api/heatmap/<int:z>/<int:x>/<int:y>.png', get_heatmap_tile),
     path('admin/', admin.site.urls),
 ]
 

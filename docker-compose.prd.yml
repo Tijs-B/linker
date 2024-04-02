@@ -97,6 +97,7 @@ services:
       - caddy
     volumes:
       - upload-media:/media
+      - heatmap-data:/heatmap
     depends_on:
       - linker
     labels:
