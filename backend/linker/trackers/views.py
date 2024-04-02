@@ -1,8 +1,14 @@
 from json import loads
+from pathlib import Path
 
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import D
 from django.db.models import Subquery, OuterRef
+from django.http import HttpResponse
+from django.views import View
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -55,3 +61,12 @@ class TrackerViewSet(viewsets.ModelViewSet):
 
         serializer = TrackerLogSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+@login_required
+def get_heatmap_tile(request, z, x, y):
+    heatmap_dir = Path(settings.HEATMAP_PATH)
+    filename = heatmap_dir / str(z) / str(x) / f'{y}.png'
+    if filename.is_file():
+        return HttpResponse(filename.read_bytes(), content_type='image/png', headers={'cache-control': 'max-age=120'})
+    return HttpResponse(status=404)

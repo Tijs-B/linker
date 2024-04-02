@@ -11,6 +11,7 @@ services:
     volumes:
       - ./simulation-data:/simulation-data:ro
       - upload-media:/media
+      - heatmap-data:/heatmap
     environment:
       - ALLOWED_HOSTS=link.tijsb.be
       - CSRF_TRUSTED_ORIGINS=https://link.tijsb.be
@@ -19,6 +20,7 @@ services:
       - SIMULATION_PATH=/simulation-data
       - DEBUG=False
       - MEDIA_ROOT=/media
+      - HEATMAP_PATH=/heatmap
     networks:
       - linker_net
 
@@ -33,6 +35,7 @@ services:
     volumes:
       - ./simulation-data:/simulation-data:ro
       - upload-media:/media
+      - heatmap-data:/heatmap
     environment:
       - ALLOWED_HOSTS=link.tijsb.be
       - CSRF_TRUSTED_ORIGINS=https://link.tijsb.be
@@ -41,6 +44,7 @@ services:
       - SIMULATION_PATH=/simulation-data
       - DEBUG=False
       - MEDIA_ROOT=/media
+      - HEATMAP_PATH=/heatmap
     networks:
       - linker_net
 
@@ -55,6 +59,7 @@ services:
     volumes:
       - ./simulation-data:/simulation-data:ro
       - upload-media:/media
+      - heatmap-data:/heatmap
     environment:
       - ALLOWED_HOSTS=link.tijsb.be
       - CSRF_TRUSTED_ORIGINS=https://link.tijsb.be
@@ -63,6 +68,7 @@ services:
       - SIMULATION_PATH=/simulation-data
       - DEBUG=False
       - MEDIA_ROOT=/media
+      - HEATMAP_PATH=/heatmap
     networks:
       - linker_net
 
@@ -100,6 +106,7 @@ services:
 volumes:
   postgis-data:
   upload-media:
+  heatmap-data:
 
 networks:
   caddy:

@@ -13,6 +13,7 @@ services:
       - ./simulation-data:/simulation-data:ro
       - ./backend:/app
       - ./media:/media
+      - heatmap-data:/heatmap
     environment:
       - ALLOWED_HOSTS=*
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker
@@ -21,6 +22,7 @@ services:
       - DEBUG=True
       - MEDIA_ROOT=/media
       - SECRET_KEY=secret
+      - HEATMAP_PATH=/heatmap
     ports:
       - "8060:8060"
 
@@ -35,6 +37,7 @@ services:
     volumes:
       - ./simulation-data:/simulation-data:ro
       - ./backend:/app
+      - heatmap-data:/heatmap
     environment:
       - ALLOWED_HOSTS=*
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker
@@ -43,6 +46,7 @@ services:
       - DEBUG=True
       - MEDIA_ROOT=/media
       - SECRET_KEY=secret
+      - HEATMAP_PATH=/heatmap
 
   postgis:
     image: kartoza/postgis:16-3.4
@@ -75,3 +79,4 @@ services:
 
 volumes:
   postgis-data:
+  heatmap-data:

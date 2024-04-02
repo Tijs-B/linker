@@ -1,24 +1,25 @@
 import json
 import re
-import shutil
 import subprocess
 import tempfile
 from pathlib import Path
+from shutil import rmtree
 
 from linker.trackers.models import Tracker
 
 
 def generate_heatmap_tiles(result_path: Path):
-    if result_path.is_dir():
-        shutil.rmtree(result_path)
-
-    result_path.mkdir()
+    for path in result_path.glob("*"):
+        if path.is_file():
+            path.unlink()
+        elif path.is_dir():
+            rmtree(path)
 
     line_strings = []
     for tracker in Tracker.objects.all():
         if not hasattr(tracker, 'team'):
             continue
-        line_strings.extend(track for track in tracker.get_track(skip_basis=True))
+        line_strings.append(tracker.get_track(skip_basis=True))
 
     if len(line_strings) == 0:
         return
@@ -110,6 +111,6 @@ def generate_heatmap_tiles(result_path: Path):
         ]
     )
 
-    subprocess.run(['gdal2tiles.py', '--xyz', '--zoom', '9-16', heatmap_color_tif, result_path])
+    subprocess.run(['gdal2tiles.py', '--xyz', '--zoom', '9-16', '-w', 'none', heatmap_color_tif, result_path])
 
-    shutil.rmtree(tmp_dir)
+    rmtree(tmp_dir)

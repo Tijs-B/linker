@@ -152,6 +152,7 @@ GDAL_LIBRARY_PATH = env('GDAL_LIBRARY_PATH', default=None)
 GEOS_LIBRARY_PATH = env('GEOS_LIBRARY_PATH', default=None)
 
 SIMULATION_PATH = env('SIMULATION_PATH', default=None)
+HEATMAP_PATH = env('HEATMAP_PATH', default=None)
 
 CELERY_BROKER_URL = env('CACHE_URL', default='redis://localhost:6379')
 CELERY_TIMEZONE = 'Europe/Brussels'
