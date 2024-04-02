@@ -28,7 +28,7 @@ services:
     build:
       context: .
       target: production
-    command: celery -A linker worker -l INFO
+    command: celery -A linker worker -l INFO --concurrency=3
     depends_on:
       - postgis
       - redis
