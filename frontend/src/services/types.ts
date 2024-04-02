@@ -97,7 +97,7 @@ export interface Weide {
 
 export interface Zijweg {
   id: number;
-  geom: Polygon;
+  geom: LineString;
 }
 
 export interface MapNote {

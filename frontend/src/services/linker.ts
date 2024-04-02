@@ -1,7 +1,8 @@
 import { createEntityAdapter } from '@reduxjs/toolkit';
 import type { EntityState } from '@reduxjs/toolkit';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { LineString, Point } from 'geojson';
+import { feature, featureCollection } from '@turf/helpers';
+import { FeatureCollection, LineString, MultiPolygon, Point } from 'geojson';
 
 import { getCookie } from '../utils/cookie';
 import {
@@ -30,7 +31,6 @@ const tochtAdapter = createEntityAdapter<Tocht>();
 const ficheAdapter = createEntityAdapter<Fiche>();
 const checkpointLogAdapter = createEntityAdapter<CheckpointLog>();
 const mapNoteAdapter = createEntityAdapter<MapNote>();
-const zijwegenAdapter = createEntityAdapter<Zijweg>();
 const weidesAdapter = createEntityAdapter<Weide>();
 
 export const linkerApi = createApi({
@@ -99,10 +99,12 @@ export const linkerApi = createApi({
       },
       providesTags: ['MapNote'],
     }),
-    getZijwegen: build.query<EntityState<Zijweg, number>, void>({
+    getZijwegen: build.query<FeatureCollection<LineString>, void>({
       query: () => '/zijwegen/',
       transformResponse(response: Zijweg[]) {
-        return zijwegenAdapter.addMany(zijwegenAdapter.getInitialState(), response);
+        return featureCollection(
+          response.map((zijweg) => feature(zijweg.geom, {}, { id: zijweg.id })),
+        );
       },
     }),
     getWeides: build.query<EntityState<Weide, number>, void>({
@@ -144,8 +146,11 @@ export const linkerApi = createApi({
         body,
       }),
     }),
-    getForbiddenAreas: build.query<ForbiddenArea[], void>({
+    getForbiddenAreas: build.query<FeatureCollection<MultiPolygon>, void>({
       query: () => '/forbidden-areas/',
+      transformResponse(response: ForbiddenArea[]) {
+        return featureCollection(response.map((area) => feature(area.area, {}, { id: area.id })));
+      },
     }),
     updateTeam: build.mutation<Team, Partial<Team> & Pick<Team, 'id'>>({
       query: (team) => ({

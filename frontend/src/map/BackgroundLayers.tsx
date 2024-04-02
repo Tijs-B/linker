@@ -42,26 +42,6 @@ function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
     );
   }, [fiches]);
 
-  const zijwegenData = useMemo(() => {
-    if (!zijwegen) {
-      return featureCollection([]);
-    }
-    return featureCollection(
-      Object.values(zijwegen.entities).map((zijweg) => feature(zijweg.geom, {}, { id: zijweg.id })),
-    );
-  }, [zijwegen]);
-
-  const forbiddenAreasData = useMemo(() => {
-    if (!forbiddenAreas) {
-      return featureCollection([]);
-    }
-    return featureCollection(
-      forbiddenAreas.map((area) =>
-        feature(area.area, { description: area.description }, { id: area.id }),
-      ),
-    );
-  }, [forbiddenAreas]);
-
   return (
     <>
       <Source
@@ -133,7 +113,7 @@ function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
           layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
         />
       </Source>
-      <Source type="geojson" data={zijwegenData}>
+      <Source type="geojson" data={zijwegen || featureCollection([])}>
         <Layer
           id="zijwegen"
           beforeId="tochten"
@@ -155,7 +135,7 @@ function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
           layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
         />
       </Source>
-      <Source type="geojson" data={forbiddenAreasData}>
+      <Source type="geojson" data={forbiddenAreas || featureCollection([])}>
         <Layer
           id="forbidden-areas"
           type="fill"
