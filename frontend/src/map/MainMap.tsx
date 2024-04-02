@@ -113,6 +113,7 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
   const onToggleHeatmap = useCallback(() => {
     if (showHeatmap) {
       setShowHeatmap(false);
+      setIconsAdded(false);
     } else {
       setShowHeatmap(true);
       setShowSatellite(false);
@@ -122,6 +123,7 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
   const onToggleSatellite = useCallback(() => {
     if (showSatellite) {
       setShowSatellite(false);
+      setIconsAdded(false);
     } else {
       setShowSatellite(true);
       setShowHeatmap(false);
