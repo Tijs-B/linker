@@ -9,7 +9,7 @@ from linker.trackers.models import Tracker
 
 
 def generate_heatmap_tiles(result_path: Path):
-    for path in result_path.glob("*"):
+    for path in result_path.glob('*'):
         if path.is_file():
             path.unlink()
         elif path.is_dir():
