@@ -127,6 +127,7 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
     } else {
       setShowSatellite(true);
       setShowHeatmap(false);
+      setIconsAdded(false);
     }
   }, [showSatellite]);
 
