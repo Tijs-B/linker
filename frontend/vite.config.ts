@@ -23,6 +23,28 @@ export default defineConfig(({ mode }) => {
       //   },
       //   workbox: {
       //     globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+      //     runtimeCaching: [
+      //       {
+      //         urlPattern: /^https:\/\/link.tijsb.be\/api\/user/,
+      //         handler: 'NetworkOnly',
+      //       },
+      //       {
+      //         urlPattern: /^https:\/\/link.tijsb.be\/api\//,
+      //         handler: 'NetworkFirst',
+      //         options: {
+      //           cacheName: 'api-cache',
+      //         },
+      //       },
+      //       {
+      //         urlPattern: /^https:\/\/tiles.tijsb.be/,
+      //         handler: 'StaleWhileRevalidate',
+      //         options: {
+      //           cacheableResponse: {
+      //             statuses: [0, 200, 204],
+      //           },
+      //         },
+      //       },
+      //     ],
       //   },
       // }),
     ],

@@ -201,6 +201,9 @@ export const linkerApi = createApi({
       }),
       invalidatesTags: ['Team'],
     }),
+    getUser: build.query<void, void>({
+      query: () => '/user/',
+    }),
   }),
 });
 
@@ -228,4 +231,5 @@ export const {
   useUpdateMapNoteMutation,
   useDeleteMapNoteMutation,
   useUploadGroupPictureMutation,
+  useGetUserQuery,
 } = linkerApi;

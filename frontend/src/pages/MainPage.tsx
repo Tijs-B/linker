@@ -6,6 +6,7 @@ import { Paper, useMediaQuery, useTheme } from '@mui/material';
 
 import { css } from '@emotion/react';
 import Fuse from 'fuse.js';
+import { SnackbarKey, useSnackbar } from 'notistack';
 
 import BottomMenu from '../components/main/BottomMenu';
 import HistoryCard from '../components/main/HistoryCard';
@@ -17,14 +18,10 @@ import {
   useGetOrganizationMembersQuery,
   useGetTeamsQuery,
   useGetTrackersQuery,
+  useGetUserQuery,
 } from '../services/linker';
 import { Team } from '../services/types.ts';
-import {
-  trackersActions,
-  useAppDispatch,
-  useAppSelector,
-} from '../store/index.ts';
-import { SnackbarKey, useSnackbar } from 'notistack';
+import { trackersActions, useAppDispatch, useAppSelector } from '../store/index.ts';
 
 export default function MainPage() {
   const theme = useTheme();
@@ -34,7 +31,9 @@ export default function MainPage() {
   const [listOpen, setListOpen] = useState(desktop);
   const [filterSafe, setFilterSafe] = useState(true);
   const [filterMembers, setFilterMembers] = useState(true);
-  const [networkErrorNotificationId, setNetworkErrorNotificationId] = useState<SnackbarKey | null>(null);
+  const [networkErrorNotificationId, setNetworkErrorNotificationId] = useState<SnackbarKey | null>(
+    null,
+  );
   const { mainMap } = useMap();
   const navigate = useNavigate();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -45,29 +44,29 @@ export default function MainPage() {
 
   const { data: teams } = useGetTeamsQuery();
   const { data: organizationMembers } = useGetOrganizationMembersQuery();
-  const { data: trackers, error: queryError, isSuccess: querySuccess } = useGetTrackersQuery(undefined, {
+  const { data: trackers } = useGetTrackersQuery(undefined, {
     pollingInterval: 15000,
     skipPollingIfUnfocused: true,
+  });
+
+  const { error: queryError } = useGetUserQuery(undefined, {
+    pollingInterval: 3000,
   });
 
   // Navigate to login page if unauthenticated
   // Check query error for network errors
   useEffect(() => {
-    if (queryError && 'status' in queryError && queryError.status === 403) {
+    if (queryError && 'status' in queryError && queryError.status === 404) {
       navigate('/login/');
-    } else if (queryError) {
+    } else if (queryError && !networkErrorNotificationId) {
+      console.log(queryError);
       const id = enqueueSnackbar('Geen internetverbinding', {
         variant: 'warning',
         preventDuplicate: true,
         persist: true,
       });
       setNetworkErrorNotificationId(id);
-    }
-  }, [dispatch, enqueueSnackbar, navigate, queryError]);
-
-  // Remove error snackbar on query success and show success snackbar
-  useEffect(() => {
-    if (querySuccess && networkErrorNotificationId) {
+    } else if (!queryError && networkErrorNotificationId) {
       closeSnackbar(networkErrorNotificationId);
       setNetworkErrorNotificationId(null);
       enqueueSnackbar('Internetverbinding hersteld', {
@@ -75,7 +74,7 @@ export default function MainPage() {
         preventDuplicate: true,
       });
     }
-  }, [closeSnackbar, enqueueSnackbar, networkErrorNotificationId, querySuccess])
+  }, [dispatch, enqueueSnackbar, navigate, queryError, networkErrorNotificationId, closeSnackbar]);
 
   // Close the list on mobile when team is selected
   useEffect(() => {

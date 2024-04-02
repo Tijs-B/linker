@@ -52,3 +52,10 @@ class LoginView(View):
             return HttpResponse(status=404)
         login(request, user)
         return HttpResponse(status=200)
+
+
+class UserView(View):
+    def get(self, request):
+        if self.request.user.is_authenticated:
+            return HttpResponse(status=200)
+        return HttpResponse(status=404)

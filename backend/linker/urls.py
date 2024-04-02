@@ -30,7 +30,14 @@ from linker.map.views import (
     BasisViewSet,
     ForbiddenAreaViewSet,
 )
-from linker.people.views import TeamViewSet, OrganizationMemberViewSet, TeamNoteViewSet, ContactPersonViewSet, LoginView
+from linker.people.views import (
+    TeamViewSet,
+    OrganizationMemberViewSet,
+    TeamNoteViewSet,
+    ContactPersonViewSet,
+    LoginView,
+    UserView,
+)
 from linker.tracing.views import CheckpointLogViewSet, all_stats
 from linker.trackers.views import TrackerViewSet
 
@@ -57,6 +64,7 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/stats/', all_stats),
     path('api/login/', csrf_exempt(LoginView.as_view())),
+    path('api/user/', UserView.as_view()),
     path('admin/', admin.site.urls),
 ]
 

@@ -13,12 +13,13 @@ import '@fontsource/roboto/latin-700.css';
 import dayjs from 'dayjs';
 import 'dayjs/locale/nl-be';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { SnackbarProvider } from 'notistack';
 
 import Navigation from './Navigation';
+import { notifications } from './config';
 import { store } from './store';
 import AppThemeProvider from './theme/AppThemeProvider.tsx';
-import { SnackbarProvider } from 'notistack';
-import { notifications } from './config';
+
 // import ReloadPrompt from './components/ReloadPrompt.tsx';
 
 dayjs.extend(relativeTime);
