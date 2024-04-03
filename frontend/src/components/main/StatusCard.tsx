@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -25,11 +25,11 @@ import {
   TableCell,
   TableRow,
   Typography,
-  useMediaQuery,
   useTheme,
 } from '@mui/material';
 
 import { css } from '@emotion/react';
+import isMobile from 'is-mobile';
 
 import {
   useGetCheckpointLogsQuery,
@@ -112,13 +112,61 @@ function TeamRows({ team }: { team: Team }) {
   );
 }
 
+const TeamCallButton = memo(function () {
+  const selectedId = useAppSelector((state) => state.trackers.selectedId);
+  const { data: teams } = useGetTeamsQuery();
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+
+  const team = useMemo(
+    () => teams && Object.values(teams.entities).find((t) => t.tracker === selectedId),
+    [selectedId, teams],
+  );
+
+  const onClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(e.currentTarget),
+    [],
+  );
+  const onClose = useCallback(() => setAnchorEl(null), []);
+
+  const items = useMemo(
+    () =>
+      team
+        ? team.contact_persons
+            .filter((p) => p.phone_number)
+            .map((person) => (
+              <MenuItem key={person.id} component="a" href={`tel:${person.phone_number}`}>
+                {person.is_favorite && (
+                  <ListItemIcon>
+                    <StarIcon />
+                  </ListItemIcon>
+                )}
+                <ListItemText>{person.name}</ListItemText>
+              </MenuItem>
+            ))
+        : null,
+    [team],
+  );
+
+  if (!team) {
+    return null;
+  }
+  return (
+    <>
+      <IconButton onClick={onClick}>
+        <CallIcon />
+      </IconButton>
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={onClose}>
+        {items}
+      </Menu>
+    </>
+  );
+});
+
 const StatusCard = memo(function StatusCard() {
   const theme = useTheme();
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const { mainMap } = useMap();
 
   const dispatch = useAppDispatch();
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const selectedId = useAppSelector((state) => state.trackers.selectedId);
 
   const { data: trackers } = useGetTrackersQuery();
@@ -157,6 +205,12 @@ const StatusCard = memo(function StatusCard() {
   const header = css`
     padding-top: ${theme.spacing(1.5)};
     padding-bottom: ${theme.spacing(0.5)};
+    display: flex;
+    overflow: hidden;
+
+    & .MuiCardHeader-content {
+      overflow: hidden;
+    }
   `;
 
   const actions = css`
@@ -172,14 +226,20 @@ const StatusCard = memo(function StatusCard() {
 
   const last_log = tracker && tracker.last_log;
 
-  const [longitude, latitude] = last_log ? last_log.point.coordinates : [null, null];
-  const navigateUrl = desktop
-    ? `https://www.google.com/maps/search/?api=1&query=${latitude}%2C${longitude}`
-    : `geo:${latitude},${longitude}`;
+  const navigateUrl = useMemo(() => {
+    const tracker = trackers && selectedId && trackers.entities[selectedId];
+    const last_log = tracker && tracker.last_log;
+    const [longitude, latitude] = last_log ? last_log.point.coordinates : [null, null];
+    return isMobile({ tablet: true, featureDetect: true })
+      ? `https://www.google.com/maps/search/?api=1&query=${latitude}%2C${longitude}`
+      : `geo:${latitude},${longitude}`;
+  }, [selectedId, trackers]);
 
   const lastUpdate = last_log ? new Date(last_log.gps_datetime).toLocaleTimeString() : '-';
 
   const focusMap = useCallback(() => {
+    const tracker = trackers && selectedId && trackers.entities[selectedId];
+    const last_log = tracker && tracker.last_log;
     if (mainMap && last_log) {
       mainMap.easeTo({
         // @ts-expect-error the point always has two coordinates
@@ -187,7 +247,7 @@ const StatusCard = memo(function StatusCard() {
         zoom: 14,
       });
     }
-  }, [mainMap, last_log]);
+  }, [mainMap, selectedId, trackers]);
 
   return (
     <div css={root}>
@@ -198,13 +258,6 @@ const StatusCard = memo(function StatusCard() {
           titleTypographyProps={{ noWrap: true }}
           subheader={team?.chiro}
           subheaderTypographyProps={{ noWrap: true }}
-          sx={{
-            display: 'flex',
-            overflow: 'hidden',
-            '& .MuiCardHeader-content': {
-              overflow: 'hidden',
-            },
-          }}
           action={
             <IconButton size="small" onClick={() => dispatch(trackersActions.setSelectedId(null))}>
               <CloseIcon />
@@ -244,27 +297,7 @@ const StatusCard = memo(function StatusCard() {
             <HistoryIcon />
           </IconButton>
 
-          {team && (
-            <>
-              <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
-                <CallIcon />
-              </IconButton>
-              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-                {team.contact_persons
-                  .filter((p) => p.phone_number)
-                  .map((person) => (
-                    <MenuItem key={person.id} component="a" href={`tel:${person.phone_number}`}>
-                      {person.is_favorite && (
-                        <ListItemIcon>
-                          <StarIcon />
-                        </ListItemIcon>
-                      )}
-                      <ListItemText>{person.name}</ListItemText>
-                    </MenuItem>
-                  ))}
-              </Menu>
-            </>
-          )}
+          <TeamCallButton />
 
           {member && (
             <IconButton

@@ -2,6 +2,7 @@ import { ChangeEvent, memo, useCallback, useEffect, useMemo, useState } from 're
 import { Layer, MapLayerMouseEvent, Source, useMap } from 'react-map-gl/maplibre';
 
 import DeleteIcon from '@mui/icons-material/Delete';
+import DirectionsIcon from '@mui/icons-material/Directions';
 import {
   Button,
   Dialog,
@@ -9,10 +10,13 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  IconButton,
   TextField,
 } from '@mui/material';
 
+import { feature, featureCollection } from '@turf/helpers';
 import dayjs from 'dayjs';
+import isMobile from 'is-mobile';
 
 import {
   useDeleteMapNoteMutation,
@@ -21,9 +25,10 @@ import {
 } from '../services/linker.ts';
 import { MapNote } from '../services/types.ts';
 
-type HoverInfo = MapNote & {
+type HoverInfo = {
   x: number;
   y: number;
+  content: string;
 };
 
 const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean }) {
@@ -35,19 +40,16 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
   const deleteMapNote = useDeleteMapNoteMutation()[0];
   const updateMapNote = useUpdateMapNoteMutation()[0];
 
-  const geojsonData = useMemo(
-    () => ({
-      type: 'FeatureCollection',
-      features: mapNotes
-        ? Object.values(mapNotes.entities).map((mapNote) => ({
-            type: 'Feature',
-            id: mapNote.id,
-            geometry: mapNote.point,
-          }))
-        : [],
-    }),
-    [mapNotes],
-  );
+  const geojsonData = useMemo(() => {
+    if (!mapNotes) {
+      return featureCollection([]);
+    }
+    return featureCollection(
+      Object.values(mapNotes.entities).map((mapNote) =>
+        feature(mapNote.point, { content: mapNote.content }, { id: mapNote.id }),
+      ),
+    );
+  }, [mapNotes]);
 
   useEffect(() => {
     if (!mainMap) {
@@ -69,14 +71,9 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
         features,
         point: { x, y },
       } = e;
-      const id = features && features[0] && features[0].id;
-      const note = mapNotes?.entities[Number(id)];
-      if (note) {
-        setHoverInfo({
-          x,
-          y,
-          ...note,
-        });
+      const content = features && features[0] && features[0].properties.content;
+      if (content) {
+        setHoverInfo({ x, y, content });
       } else {
         setHoverInfo(null);
       }
@@ -123,6 +120,17 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
     setSelectedNote((note) => note && { ...note, content: e.target.value });
   }, []);
 
+  const navigateUrl = useMemo(() => {
+    if (!selectedNote) {
+      return '';
+    }
+    const [longitude, latitude] = selectedNote.point.coordinates;
+
+    return isMobile({ tablet: true, featureDetect: true })
+      ? `geo:${latitude},${longitude}`
+      : `https://www.google.com/maps/search/?api=1&query=${latitude}%2C${longitude}`;
+  }, [selectedNote]);
+
   return (
     <>
       <Source type="geojson" data={geojsonData}>
@@ -160,6 +168,9 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
           </DialogContentText>
         </DialogContent>
         <DialogActions>
+          <IconButton target="_blank" href={navigateUrl}>
+            <DirectionsIcon />
+          </IconButton>
           <Button
             onClick={onDeleteMapNote}
             variant="outlined"
