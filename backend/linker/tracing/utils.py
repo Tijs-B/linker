@@ -15,12 +15,15 @@ def trace_team(team: Team):
         Fiche.objects.filter(point__distance_lte=(OuterRef('point'), D(m=FICHE_MAX_DISTANCE))).values('pk')[:1]
     )
 
-    logs = TrackerLog.objects.filter(tracker__team=team)
+    logs = TrackerLog.objects.filter(tracker__team=team, team_is_safe=False)
     last_checkpoint = team.checkpointlogs.order_by('-left').first()
     if last_checkpoint is not None:
         logs = logs.filter(gps_datetime__gte=last_checkpoint.arrived)
 
     logs = logs.annotate(closest_fiche=closest_fiche).order_by('gps_datetime').values('gps_datetime', 'closest_fiche')
+
+    if not logs.exists():
+        return
 
     current_fiche = logs[0]['closest_fiche']
     current_arrived = logs[0]['gps_datetime']

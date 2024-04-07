@@ -17,6 +17,7 @@ export interface TrackerLog {
   id: number;
   gps_datetime: string;
   point: Point;
+  team_is_safe: boolean;
 }
 
 export interface Tracker {

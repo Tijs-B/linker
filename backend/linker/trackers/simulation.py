@@ -15,7 +15,7 @@ from django.utils.timezone import now
 from openpyxl.reader.excel import load_workbook
 
 from .constants import SETTING_SIMULATION_START
-from .geodynamics import import_geodynamics_data_batch
+from .geodynamics import import_geodynamics_data
 from .models import TrackerLog, Tracker
 from ..config.models import Setting
 from ..map.models import Tocht, Weide, Fiche, Zijweg, Basis
@@ -63,16 +63,10 @@ def simulate_download_tracker_data(until: Optional[datetime.datetime] = None):
     files_to_do = [filename for filename in files_to_do if _get_timestamp_from_file_name(filename) <= until]
     files_to_do.sort(key=lambda filename: filename.name)
 
-    batch_size = 100
-
-    for index in range(0, len(files_to_do), batch_size):
-        all_data = []
-        print(_get_timestamp_from_file_name(files_to_do[index]))
-        for filename in files_to_do[index : index + batch_size]:
-            with gzip.open(filename, 'rb') as file:
-                all_data.append((_get_timestamp_from_file_name(filename), json.load(file)))
-
-        import_geodynamics_data_batch(all_data)
+    for filename in files_to_do:
+        with gzip.open(filename, 'rb') as file:
+            data = json.load(file)
+        import_geodynamics_data(data, _get_timestamp_from_file_name(filename))
 
     for tracker in Tracker.objects.all():
         tracker.last_log = tracker.tracker_logs.order_by('-gps_datetime').first()

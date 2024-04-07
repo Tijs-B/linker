@@ -6,7 +6,7 @@ from .models import Tracker, TrackerLog
 class TrackerLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrackerLog
-        fields = ['id', 'gps_datetime', 'point']
+        fields = ['id', 'gps_datetime', 'point', 'team_is_safe']
 
 
 class TrackerSerializer(serializers.ModelSerializer):

@@ -115,6 +115,9 @@ export const linkerApi = createApi({
     }),
     getTrackerLogs: build.query<TrackerLog[], number>({
       query: (id) => `/trackers/${id}/logs/`,
+      transformResponse(response: TrackerLog[]) {
+        return response.filter((log) => !log.team_is_safe)
+      }
     }),
     getTrackerTrack: build.query<LineString, number>({
       query: (id) => `/trackers/${id}/track/`,

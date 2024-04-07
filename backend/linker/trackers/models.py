@@ -18,7 +18,7 @@ class Tracker(models.Model):
             return self.tracker_id
 
     def get_track(self, skip_basis: bool = False) -> LineString:
-        queryset = self.tracker_logs
+        queryset = self.tracker_logs.filter(team_is_safe=False)
         if skip_basis:
             basis = Basis.objects.first()
             queryset = queryset.filter(point__distance_gt=(basis.point, D(m=100)))
@@ -31,8 +31,10 @@ class TrackerLog(models.Model):
     gps_datetime = models.DateTimeField(db_index=True)
     point = models.PointField()
 
+    team_is_safe = models.BooleanField(default=False)
+
     # The below fields are less important.
-    fetch_datetime = models.DateTimeField(db_index=True)
+    fetch_datetime = models.DateTimeField()
     local_datetime = models.DateTimeField(blank=True, null=True)
     last_sync_date = models.DateTimeField(blank=True, null=True)
     satellites = models.IntegerField(blank=True, null=True)
