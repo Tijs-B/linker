@@ -32,7 +32,7 @@ def import_geodynamics_data(data: dict, fetch_datetime: Optional[datetime] = Non
             trackers[tracker_id] = Tracker.objects.create(tracker_id=tracker_id)
 
         tracker = trackers[tracker_id]
-        point = Point(last_location['Longitude'], last_location['Latitude'])
+        point = Point(round(last_location['Longitude'], 6), round(last_location['Latitude'], 6))
         if distance(point, tocht_centroid).km > 50:
             continue
 
