@@ -20,7 +20,7 @@ import { notifications } from './config';
 import { store } from './store';
 import AppThemeProvider from './theme/AppThemeProvider.tsx';
 
-import ReloadPrompt from './components/ReloadPrompt.tsx';
+// import ReloadPrompt from './components/ReloadPrompt.tsx';
 
 dayjs.extend(relativeTime);
 dayjs.locale('nl-be');
@@ -36,7 +36,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Navigation />
             </BrowserRouter>
           </MapProvider>
-          <ReloadPrompt/>
+          {/*<ReloadPrompt/>*/}
         </SnackbarProvider>
       </AppThemeProvider>
     </Provider>
