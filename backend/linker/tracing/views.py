@@ -6,7 +6,7 @@ from linker.tracing.serializers import CheckpointLogSerializer
 from linker.tracing.stats import calculate_stats
 
 
-class CheckpointLogViewSet(viewsets.ModelViewSet):
+class CheckpointLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = CheckpointLog.objects.all()
     serializer_class = CheckpointLogSerializer
 
@@ -14,4 +14,3 @@ class CheckpointLogViewSet(viewsets.ModelViewSet):
 def all_stats(request):
     stats = calculate_stats()
     return JsonResponse(stats)
-    # return HttpResponse(f'<html><body>{dumps(stats)}</body></html>')

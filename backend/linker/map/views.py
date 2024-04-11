@@ -14,22 +14,22 @@ from .serializers import (
 )
 
 
-class TochtViewSet(viewsets.ModelViewSet):
+class TochtViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tocht.objects.all().order_by('order')
     serializer_class = TochtSerializer
 
 
-class WeideViewSet(viewsets.ModelViewSet):
+class WeideViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Weide.objects.all().annotate(display_name=F('tocht__identifier')).order_by('tocht__order')
     serializer_class = WeideSerializer
 
 
-class ZijwegViewSet(viewsets.ModelViewSet):
+class ZijwegViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Zijweg.objects.all()
     serializer_class = ZijwegSerializer
 
 
-class FicheViewSet(viewsets.ModelViewSet):
+class FicheViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         Fiche.objects.all()
         .annotate(display_name=Concat(F('tocht__identifier'), F('order'), output_field=CharField()))
@@ -43,11 +43,11 @@ class MapNoteViewSet(viewsets.ModelViewSet):
     serializer_class = MapNoteSerializer
 
 
-class BasisViewSet(viewsets.ModelViewSet):
+class BasisViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Basis.objects.all()
     serializer_class = BasisSerializer
 
 
-class ForbiddenAreaViewSet(viewsets.ModelViewSet):
+class ForbiddenAreaViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ForbiddenArea.objects.all()
     serializer_class = ForbiddenAreaSerializer

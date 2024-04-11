@@ -5,7 +5,7 @@ from linker.tracing.models import CheckpointLog
 
 
 class CheckpointLogSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
-    # fiche = FicheSerializer
     class Meta:
         model = CheckpointLog
-        fields = '__all__'
+        fields = ['id', 'arrived', 'left', 'fiche', 'team']
+        read_only_fields = fields

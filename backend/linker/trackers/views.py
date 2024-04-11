@@ -13,7 +13,7 @@ from linker.trackers.models import Tracker
 from linker.trackers.serializers import TrackerSerializer, TrackerLogSerializer
 
 
-class TrackerViewSet(viewsets.ModelViewSet):
+class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tracker.objects.select_related('last_log').annotate(
         fiche=Subquery(
             Fiche.objects.filter(point__distance_lte=(OuterRef('last_log__point'), D(m=FICHE_MAX_DISTANCE))).values(

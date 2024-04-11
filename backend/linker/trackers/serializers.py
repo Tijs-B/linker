@@ -7,6 +7,7 @@ class TrackerLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrackerLog
         fields = ['id', 'gps_datetime', 'point', 'team_is_safe']
+        read_only_fields = fields
 
 
 class TrackerSerializer(serializers.ModelSerializer):
@@ -19,3 +20,4 @@ class TrackerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tracker
         fields = ['id', 'last_log', 'tracker_id', 'tracker_code', 'fiche', 'weide', 'tocht', 'basis']
+        read_only_fields = fields
