@@ -4,7 +4,8 @@ services:
   linker:
     build:
       context: .
-      target: production
+      target: backend
+    command: gunicorn linker.wsgi --bind 0.0.0.0:8000 --chdir=/app
     depends_on:
       - postgis
       - redis
@@ -27,7 +28,7 @@ services:
   linker_celery:
     build:
       context: .
-      target: production
+      target: backend
     command: celery -A linker worker -l INFO --concurrency=4
     depends_on:
       - postgis
@@ -51,7 +52,7 @@ services:
   linker_celery_beat:
     build:
       context: .
-      target: production
+      target: backend
     command: celery -A linker beat -l INFO
     depends_on:
       - postgis

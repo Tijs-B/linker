@@ -7,7 +7,6 @@ import { defineConfig, loadEnv } from 'vite';
 export default defineConfig(({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
   return {
-    base: mode === 'production' ? '/static/' : '/',
     plugins: [
       react({
         jsxImportSource: '@emotion/react',

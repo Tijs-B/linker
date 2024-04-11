@@ -10,11 +10,6 @@ RUN npm ci
 
 COPY frontend .
 
-########################
-### FRONTEND BUILDER ###
-########################
-FROM frontend AS frontend_builder
-
 RUN npm run build
 
 ###############
@@ -39,31 +34,11 @@ COPY backend/requirements.lock .
 RUN pip install -r requirements.lock
 
 COPY --chmod=0755 backend/docker-entrypoint.sh ./docker-entrypoint.sh
-
 ENTRYPOINT ["./docker-entrypoint.sh"]
 
-###########
-### DEV ###
-###########
-FROM backend AS dev
-
-COPY backend/requirements-dev.lock .
-
-RUN pip install -r requirements-dev.lock
-
 COPY backend .
-
-##################
-### PRODUCTION ###
-##################
-FROM backend AS production
-
-COPY backend .
-COPY --from=frontend_builder /app/dist/ ./static
 
 RUN python manage.py collectstatic --noinput
-
-CMD gunicorn linker.wsgi --bind 0.0.0.0:8000 --chdir=/app
 
 #############
 ### NGINX ###
@@ -73,5 +48,5 @@ FROM nginx AS custom-nginx
 RUN rm /etc/nginx/conf.d/default.conf
 COPY deployment/nginx.conf /etc/nginx/conf.d
 
-COPY --from=production /app/staticfiles /app/staticfiles
-
+COPY --from=frontend /app/dist /app/serve
+COPY --from=backend /app/static /app/serve/static

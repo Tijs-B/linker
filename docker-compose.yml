@@ -4,7 +4,7 @@ services:
   linker:
     build:
       context: .
-      target: dev
+      target: backend
     command: python manage.py runserver 0.0.0.0:8060
     depends_on:
       - postgis
@@ -29,7 +29,7 @@ services:
   linker_celery:
     build:
       context: .
-      target: dev
+      target: backend
     command: watchmedo auto-restart --directory=/app --pattern=*.py --recursive -- celery -A linker worker -B -l INFO
     depends_on:
       - postgis
