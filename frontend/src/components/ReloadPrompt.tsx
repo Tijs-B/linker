@@ -15,15 +15,11 @@ export default function ReloadPrompt() {
   } = useRegisterSW({
     onRegisteredSW(swUrl, r) {
       console.log(`Service Worker at: ${swUrl}`);
-      // @ts-expect-error just ignore
-      if (reloadSW === 'true') {
-        r &&
-          setInterval(() => {
-            console.log('Checking for sw update');
-            r.update();
-          }, 20000 /* 20s for testing purposes */);
-      } else {
-        console.log('SW Registered: ' + r);
+      if (r) {
+        setInterval(() => {
+          console.log('Checking for sw update');
+          r.update();
+        }, 20000 /* 20s for testing purposes */);
       }
     },
     onRegisterError(error) {
@@ -42,10 +38,10 @@ export default function ReloadPrompt() {
           };
           return (
             <>
-              <Button onClick={onClose} color="error">
+              <Button onClick={onClose} color="error" variant="contained">
                 Sluiten
               </Button>
-              <Button color="success" onClick={() => updateServiceWorker(true)}>
+              <Button color="success" onClick={() => updateServiceWorker(true)} variant="contained">
                 Update
               </Button>
             </>
