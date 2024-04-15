@@ -28,6 +28,10 @@ export default defineConfig(({ mode }) => {
               handler: 'NetworkOnly',
             },
             {
+              urlPattern: /^https:\/\/link.tijsb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen)/,
+              handler: 'StaleWhileRevalidate',
+            },
+            {
               urlPattern: /^https:\/\/link.tijsb.be\/api\//,
               handler: 'NetworkFirst',
             },

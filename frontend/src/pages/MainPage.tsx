@@ -56,9 +56,9 @@ export default function MainPage() {
   // Navigate to login page if unauthenticated
   // Check query error for network errors
   useEffect(() => {
-    if (queryError && 'status' in queryError && queryError.status === 404) {
+    if (queryError !== undefined && 'status' in queryError && queryError.status === 404) {
       navigate('/login/');
-    } else if (queryError && !networkErrorNotificationId) {
+    } else if (queryError !== undefined && networkErrorNotificationId === null) {
       console.log(queryError);
       const id = enqueueSnackbar('Geen internetverbinding', {
         variant: 'warning',
@@ -66,7 +66,7 @@ export default function MainPage() {
         persist: true,
       });
       setNetworkErrorNotificationId(id);
-    } else if (!queryError && networkErrorNotificationId) {
+    } else if (queryError === undefined && networkErrorNotificationId !== null) {
       closeSnackbar(networkErrorNotificationId);
       setNetworkErrorNotificationId(null);
       enqueueSnackbar('Internetverbinding hersteld', {
