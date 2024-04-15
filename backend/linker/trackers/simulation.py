@@ -13,6 +13,7 @@ from django.contrib.gis.gdal import DataSource, GDALException
 from django.contrib.gis.geos import GEOSGeometry, LineString, Polygon, Point
 from django.utils.timezone import now
 from openpyxl.reader.excel import load_workbook
+from requests import get
 
 from .constants import SETTING_SIMULATION_START
 from .geodynamics import import_geodynamics_data
@@ -156,6 +157,73 @@ def import_gpkg(filename: Path):
             Zijweg.objects.create(geom=geom)
         except GDALException:
             pass
+
+
+def import_geoserver():
+    params = {
+        'service': 'WFS',
+        'version': '1.0.0',
+        'request': 'GetFeature',
+        'typeName': 'Chirolink:tochten_2024',
+        'maxFeatures': 1000,
+        'outputFormat': 'application/json',
+    }
+    # https://geoserver.tijsb.be/geoserver/Chirolink/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=Chirolink%3Atochten_2024&maxFeatures=1000&outputFormat=application%2Fjson
+    tochten = get('https://geoserver.tijsb.be/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:tochten_2024'})
+    tochten = tochten.json()
+
+    for feature in tochten['features']:
+        if feature.get('geometry') is not None:
+            route = GEOSGeometry(json.dumps(feature['geometry']))
+            letter = feature['properties']['letter']
+            Tocht.objects.update_or_create(
+                identifier=letter,
+                order=ord(letter) - ord('A') + 1,
+                defaults=dict(route=route),
+            )
+
+    weides = get('https://geoserver.tijsb.be/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:weides_2024'})
+    weides = weides.json()
+
+    for feature in weides['features']:
+        if feature.get('geometry') is not None:
+            polygon = GEOSGeometry(json.dumps(feature['geometry']))
+            letter = feature['properties']['letter']
+            if letter == 'X':
+                basis = Basis.objects.first()
+                if basis is None:
+                    Basis.objects.create(point=polygon.centroid)
+                else:
+                    basis.point = polygon.centroid
+                    basis.save()
+                continue
+
+            tocht = Tocht.objects.get(identifier=letter[0].upper())
+            Weide.objects.update_or_create(tocht=tocht, defaults=dict(polygon=polygon))
+
+    fiches = get('https://geoserver.tijsb.be/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:fiches_2024'})
+    fiches = fiches.json()
+
+    for feature in fiches['features']:
+        if feature.get('geometry') is not None:
+            point = GEOSGeometry(json.dumps(feature['geometry']))
+            name = feature['properties']['name']
+            tocht = Tocht.objects.get(identifier=name[0].upper())
+            order = int(name[1:])
+            Fiche.objects.update_or_create(
+                tocht=tocht,
+                order=order,
+                defaults=dict(point=point),
+            )
+
+    zijwegen = get('https://geoserver.tijsb.be/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:zijwegen_2024'})
+    zijwegen = zijwegen.json()
+
+    Zijweg.objects.all().delete()
+    for feature in zijwegen['features']:
+        if feature.get('geometry') is not None:
+            line = GEOSGeometry(json.dumps(feature['geometry']))
+            Zijweg.objects.create(geom=line)
 
 
 def import_groepen_en_deelnemers(filename: Path):

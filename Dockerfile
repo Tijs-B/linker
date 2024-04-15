@@ -38,7 +38,7 @@ ENTRYPOINT ["./docker-entrypoint.sh"]
 
 COPY backend .
 
-RUN python manage.py collectstatic --noinput
+RUN SECRET_KEY=12345 python manage.py collectstatic --noinput
 
 #############
 ### NGINX ###

@@ -14,6 +14,10 @@ asgiref==3.7.2
 billiard==4.2.0
     # via celery
 celery==5.3.6
+certifi==2024.2.2
+    # via requests
+charset-normalizer==3.3.2
+    # via requests
 click==8.1.7
     # via celery
     # via click-didyoumean
@@ -40,6 +44,8 @@ geographiclib==2.0
     # via geopy
 geopy==2.4.1
 gunicorn==21.2.0
+idna==3.7
+    # via requests
 kombu==5.3.5
     # via celery
 openpyxl==3.1.2
@@ -54,6 +60,7 @@ python-dateutil==2.8.2
 pytz==2024.1
     # via djangorestframework
 redis==5.0.1
+requests==2.31.0
 six==1.16.0
     # via python-dateutil
 sqlparse==0.4.4
@@ -63,6 +70,8 @@ typing-extensions==4.9.0
     # via psycopg
 tzdata==2023.4
     # via celery
+urllib3==2.2.1
+    # via requests
 vine==5.1.0
     # via amqp
     # via celery
