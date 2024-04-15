@@ -14,13 +14,11 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         manifest,
         injectRegister: 'auto',
-        devOptions: {
-          enabled: true,
-        },
         pwaAssets: {
           overrideManifestIcons: true,
         },
         workbox: {
+          navigateFallbackDenylist: [/^\/static/, /^\/admin/],
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
           runtimeCaching: [
             {
