@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
           overrideManifestIcons: true,
         },
         workbox: {
-          navigateFallbackDenylist: [/^\/static/, /^\/admin/],
+          navigateFallbackDenylist: [/^\/static/, /^\/admin/, /^\/media/],
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
           runtimeCaching: [
             {
