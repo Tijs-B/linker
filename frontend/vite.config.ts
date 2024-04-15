@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => {
               handler: 'NetworkOnly',
             },
             {
-              urlPattern: /^https:\/\/link.tijsb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen)/,
+              urlPattern: /^https:\/\/link.tijsb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen|forbidden-areas)/,
               handler: 'StaleWhileRevalidate',
             },
             {
