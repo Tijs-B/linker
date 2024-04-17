@@ -10,7 +10,7 @@ from typing import Optional
 from dateutil.parser import isoparse
 from django.conf import settings
 from django.contrib.gis.gdal import DataSource, GDALException
-from django.contrib.gis.geos import GEOSGeometry, LineString, Polygon, Point
+from django.contrib.gis.geos import GEOSGeometry
 from django.utils.timezone import now
 from openpyxl.reader.excel import load_workbook
 from requests import get
@@ -113,18 +113,15 @@ def import_gpkg(filename: Path):
 
     for feature in ds['Tocht']:
         identifier = str(feature['name'])[0].upper()
-        route = GEOSGeometry(feature.geom[0].ewkt)
-        route = LineString([(round(x, 6), round(y, 6)) for x, y in route])
         Tocht.objects.update_or_create(
             identifier=identifier,
             order=ord(identifier) - ord('A') + 1,
-            defaults=dict(route=route),
+            defaults=dict(route=GEOSGeometry(feature.geom[0].ewkt)),
         )
 
     for feature in ds['Weides']:
         name = str(feature['name'])
         geometry = GEOSGeometry(feature.geom[0].ewkt)
-        geometry = Polygon([(round(x, 6), round(y, 6)) for x, y in geometry[0]])
 
         if name.lower() == 'basis':
             basis = Basis.objects.first()
@@ -141,20 +138,16 @@ def import_gpkg(filename: Path):
         name = str(feature['name'])
         tocht = Tocht.objects.get(identifier=name[0].upper())
         order = int(name[1:])
-        point = GEOSGeometry(feature.geom.ewkt)
-        point = Point(round(point[0], 6), round(point[1], 6))
         Fiche.objects.update_or_create(
             tocht=tocht,
             order=order,
-            defaults=dict(point=point),
+            defaults=dict(point=GEOSGeometry(feature.geom.ewkt)),
         )
 
     Zijweg.objects.all().delete()
     for feature in ds['Zijwegen']:
-        geom = GEOSGeometry(feature.geom[0].ewkt)
-        geom = LineString([(round(x, 6), round(y, 6)) for x, y in geom])
         try:
-            Zijweg.objects.create(geom=geom)
+            Zijweg.objects.create(geom=feature.geom[0].ewkt)
         except GDALException:
             pass
 
