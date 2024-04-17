@@ -128,26 +128,8 @@ export const linkerApi = createApi({
         return response[0].point;
       },
     }),
-    updateContactPerson: build.mutation<
-      ContactPerson,
-      Partial<ContactPerson> & Pick<ContactPerson, 'id'>
-    >({
-      query: (contactPerson) => ({
-        url: `/contact-persons/${contactPerson.id}/`,
-        method: 'PATCH',
-        body: contactPerson,
-      }),
-      invalidatesTags: ['Team'],
-    }),
     getStats: build.query<Stats, void>({
       query: () => '/stats/',
-    }),
-    loginUser: build.mutation<void, LoginUser>({
-      query: (body) => ({
-        url: `/login/`,
-        method: 'POST',
-        body,
-      }),
     }),
     getForbiddenAreas: build.query<FeatureCollection<MultiPolygon>, void>({
       query: () => '/forbidden-areas/',
@@ -155,20 +137,15 @@ export const linkerApi = createApi({
         return featureCollection(response.map((area) => feature(area.area, {}, { id: area.id })));
       },
     }),
-    updateTeam: build.mutation<Team, Partial<Team> & Pick<Team, 'id'>>({
-      query: (team) => ({
-        url: `/teams/${team.id}/`,
-        method: 'PATCH',
-        body: team,
-      }),
-      invalidatesTags: ['Team'],
+    getUser: build.query<void, void>({
+      query: () => '/user/',
     }),
-    deleteTeamNote: build.mutation<void, number>({
-      query: (noteId) => ({
-        url: `/team-notes/${noteId}/`,
-        method: 'DELETE',
+    loginUser: build.mutation<void, LoginUser>({
+      query: (body) => ({
+        url: `/login/`,
+        method: 'POST',
+        body,
       }),
-      invalidatesTags: ['Team'],
     }),
     createTeamNote: build.mutation<TeamNote, Omit<TeamNote, 'id' | 'created'>>({
       query: (note) => ({
@@ -186,13 +163,12 @@ export const linkerApi = createApi({
       }),
       invalidatesTags: ['MapNote'],
     }),
-    updateMapNote: build.mutation<MapNote, Partial<MapNote> & Pick<MapNote, 'id'>>({
-      query: (mapNote) => ({
-        url: `/map-notes/${mapNote.id}/`,
-        method: 'PATCH',
-        body: mapNote,
+    deleteTeamNote: build.mutation<void, number>({
+      query: (noteId) => ({
+        url: `/team-notes/${noteId}/`,
+        method: 'DELETE',
       }),
-      invalidatesTags: ['MapNote'],
+      invalidatesTags: ['Team'],
     }),
     deleteMapNote: build.mutation<void, number>({
       query: (noteId) => ({
@@ -201,16 +177,40 @@ export const linkerApi = createApi({
       }),
       invalidatesTags: ['MapNote'],
     }),
-    uploadGroupPicture: build.mutation<void, { id: number; data: FormData }>({
-      query: ({ id, data }) => ({
-        url: `/teams/${id}/group-picture/`,
-        method: 'POST',
-        body: data,
+    updateContactPerson: build.mutation<
+      ContactPerson,
+      Partial<ContactPerson> & Pick<ContactPerson, 'id'>
+    >({
+      query: (contactPerson) => ({
+        url: `/contact-persons/${contactPerson.id}/`,
+        method: 'PATCH',
+        body: contactPerson,
       }),
       invalidatesTags: ['Team'],
     }),
-    getUser: build.query<void, void>({
-      query: () => '/user/',
+    updateTeam: build.mutation<Team, Partial<Team> & Pick<Team, 'id'>>({
+      query: (team) => ({
+        url: `/teams/${team.id}/`,
+        method: 'PATCH',
+        body: team,
+      }),
+      invalidatesTags: ['Team'],
+    }),
+    updateMapNote: build.mutation<MapNote, Partial<MapNote> & Pick<MapNote, 'id'>>({
+      query: (mapNote) => ({
+        url: `/map-notes/${mapNote.id}/`,
+        method: 'PATCH',
+        body: mapNote,
+      }),
+      invalidatesTags: ['MapNote'],
+    }),
+    uploadGroupPicture: build.mutation<void, { id: number; data: FormData }>({
+      query: ({ id, data }) => ({
+        url: `/teams/${id}/group-picture/`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: ['Team'],
     }),
   }),
 });
@@ -228,16 +228,16 @@ export const {
   useGetTrackerTrackQuery,
   useGetBasisQuery,
   useGetWeidesQuery,
-  useUpdateContactPersonMutation,
-  useLoginUserMutation,
   useGetStatsQuery,
   useGetForbiddenAreasQuery,
-  useUpdateTeamMutation,
-  useDeleteTeamNoteMutation,
+  useGetUserQuery,
+  useLoginUserMutation,
   useCreateTeamNoteMutation,
   useCreateMapNoteMutation,
-  useUpdateMapNoteMutation,
+  useDeleteTeamNoteMutation,
   useDeleteMapNoteMutation,
+  useUpdateMapNoteMutation,
+  useUpdateTeamMutation,
+  useUpdateContactPersonMutation,
   useUploadGroupPictureMutation,
-  useGetUserQuery,
 } = linkerApi;

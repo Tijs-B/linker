@@ -58,6 +58,9 @@ class Team(models.Model):
         'map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='safe_teams'
     )
 
+    class Meta:
+        permissions = [('can_upload_picture', 'Can upload a group picture')]
+
     @property
     def last_log(self) -> Optional[TrackerLog]:
         if self.tracker:

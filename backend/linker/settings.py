@@ -179,6 +179,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.DjangoModelPermissions',
     ],
 }
 
@@ -189,3 +190,5 @@ if DEBUG:
     INTERNAL_IPS = [ip[: ip.rfind('.')] + '.1' for ip in ips] + ['127.0.0.1', '10.0.2.2']
 
     CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', 'http://192.168.0.130:5173', 'http://localhost:8060']
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024

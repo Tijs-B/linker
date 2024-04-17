@@ -162,7 +162,9 @@ def import_geoserver():
         'outputFormat': 'application/json',
     }
     # https://geoserver.tijsb.be/geoserver/Chirolink/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=Chirolink%3Atochten_2024&maxFeatures=1000&outputFormat=application%2Fjson
-    tochten = get('https://geoserver.tijsb.be/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:tochten_2024'})
+    tochten = get(
+        'https://geoserver.tijsb.be/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:tochten_2024'}
+    )
     tochten = tochten.json()
 
     for feature in tochten['features']:
@@ -175,7 +177,9 @@ def import_geoserver():
                 defaults=dict(route=route),
             )
 
-    weides = get('https://geoserver.tijsb.be/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:weides_2024'})
+    weides = get(
+        'https://geoserver.tijsb.be/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:weides_2024'}
+    )
     weides = weides.json()
 
     for feature in weides['features']:
@@ -194,7 +198,9 @@ def import_geoserver():
             tocht = Tocht.objects.get(identifier=letter[0].upper())
             Weide.objects.update_or_create(tocht=tocht, defaults=dict(polygon=polygon))
 
-    fiches = get('https://geoserver.tijsb.be/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:fiches_2024'})
+    fiches = get(
+        'https://geoserver.tijsb.be/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:fiches_2024'}
+    )
     fiches = fiches.json()
 
     for feature in fiches['features']:
@@ -209,7 +215,9 @@ def import_geoserver():
                 defaults=dict(point=point),
             )
 
-    zijwegen = get('https://geoserver.tijsb.be/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:zijwegen_2024'})
+    zijwegen = get(
+        'https://geoserver.tijsb.be/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:zijwegen_2024'}
+    )
     zijwegen = zijwegen.json()
 
     Zijweg.objects.all().delete()

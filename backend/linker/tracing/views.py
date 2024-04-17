@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from rest_framework import viewsets
 
@@ -11,6 +12,7 @@ class CheckpointLogViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CheckpointLogSerializer
 
 
+@login_required
 def all_stats(request):
     stats = calculate_stats()
     return JsonResponse(stats)

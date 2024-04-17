@@ -5,8 +5,10 @@ from django.http import HttpResponse
 from django.views import View
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Team, OrganizationMember, TeamNote, ContactPerson
+from .permissions import CanUploadPicture
 from .serializers import (
     TeamSerializer,
     OrganizationMemberSerializer,
@@ -19,15 +21,20 @@ class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.prefetch_related('contact_persons').prefetch_related('team_notes').order_by('number')
     serializer_class = TeamSerializer
 
-    @action(detail=True, methods=['post'], url_path='group-picture')
-    def group_picture(self, request, pk=None):
+    def get_permissions(self):
+        if self.action == 'upload_group_picture':
+            return [IsAuthenticated(), CanUploadPicture()]
+        return super().get_permissions()
+
+    @action(detail=True, methods=['patch'], url_path='group-picture')
+    def upload_group_picture(self, request, pk=None):
         team = self.get_object()
         team.group_picture = request.FILES['picture']
         team.save()
         return HttpResponse(status=200)
 
 
-class OrganizationMemberViewSet(viewsets.ModelViewSet):
+class OrganizationMemberViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = OrganizationMember.objects.order_by('member_type', 'name')
     serializer_class = OrganizationMemberSerializer
 
