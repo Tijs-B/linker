@@ -22,7 +22,7 @@ class ContactPerson(models.Model):
 class OrganizationMember(models.Model):
     tracker = models.OneToOneField(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=5)
+    code = models.CharField(max_length=5, help_text='De letters die op de kaart verschijnen')
     phone_number = models.CharField(max_length=13, blank=True)
     member_type = EnumField(MemberType, max_length=13)
 
@@ -49,11 +49,6 @@ class Team(models.Model):
     tracker = models.OneToOneField(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
     group_picture = models.ImageField(upload_to=group_picture_path, blank=True, null=True)
 
-    start_weide_1 = models.ForeignKey('map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='+')
-    eind_weide_1 = models.ForeignKey('map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='+')
-    start_weide_2 = models.ForeignKey('map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='+')
-    eind_weide_2 = models.ForeignKey('map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='+')
-
     safe_weide = models.ForeignKey(
         'map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='safe_teams'
     )
@@ -76,3 +71,6 @@ class TeamNote(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_notes')
     created = models.DateTimeField(auto_now_add=True)
     text = models.TextField()
+
+    def __str__(self):
+        return f'{self.team}: {self.text}'

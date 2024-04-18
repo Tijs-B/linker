@@ -28,7 +28,7 @@ class Weide(models.Model):
     polygon = models.PolygonField()
 
     def __str__(self):
-        return self.tocht.identifier
+        return f'Weide {self.tocht.identifier}'
 
 
 class Basis(models.Model):
@@ -57,7 +57,17 @@ class MapNote(models.Model):
     content = models.TextField()
     point = models.PointField()
 
+    def __str__(self):
+        if len(self.content) > 30:
+            return f'{self.content[:30]}...'
+        return self.content
+
 
 class ForbiddenArea(models.Model):
     description = models.TextField(blank=True)
     area = models.MultiPolygonField()
+
+    def __str__(self):
+        if len(self.description) > 30:
+            return f'{self.description[:30]}...'
+        return self.description
