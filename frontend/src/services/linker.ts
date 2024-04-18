@@ -20,6 +20,7 @@ import {
   Tocht,
   Tracker,
   TrackerLog,
+  User,
   Weide,
   Zijweg,
 } from './types';
@@ -116,8 +117,8 @@ export const linkerApi = createApi({
     getTrackerLogs: build.query<TrackerLog[], number>({
       query: (id) => `/trackers/${id}/logs/`,
       transformResponse(response: TrackerLog[]) {
-        return response.filter((log) => !log.team_is_safe)
-      }
+        return response.filter((log) => !log.team_is_safe);
+      },
     }),
     getTrackerTrack: build.query<LineString, number>({
       query: (id) => `/trackers/${id}/track/`,
@@ -137,7 +138,7 @@ export const linkerApi = createApi({
         return featureCollection(response.map((area) => feature(area.area, {}, { id: area.id })));
       },
     }),
-    getUser: build.query<void, void>({
+    getUser: build.query<User, void>({
       query: () => '/user/',
     }),
     loginUser: build.mutation<void, LoginUser>({

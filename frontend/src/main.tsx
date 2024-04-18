@@ -16,11 +16,10 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { SnackbarProvider } from 'notistack';
 
 import Navigation from './Navigation';
+import ReloadPrompt from './components/ReloadPrompt.tsx';
 import { notifications } from './config';
 import { store } from './store';
 import AppThemeProvider from './theme/AppThemeProvider.tsx';
-
-import ReloadPrompt from './components/ReloadPrompt.tsx';
 
 dayjs.extend(relativeTime);
 dayjs.locale('nl-be');
@@ -36,7 +35,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Navigation />
             </BrowserRouter>
           </MapProvider>
-          <ReloadPrompt/>
+          <ReloadPrompt />
         </SnackbarProvider>
       </AppThemeProvider>
     </Provider>
