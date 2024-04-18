@@ -1,7 +1,8 @@
 from json import loads
 
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponse
+from django.contrib.auth.models import Permission
+from django.http import HttpResponse, JsonResponse
 from django.views import View
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -64,5 +65,15 @@ class LoginView(View):
 class UserView(View):
     def get(self, request):
         if self.request.user.is_authenticated:
-            return HttpResponse(status=200)
+            if self.request.user.is_superuser:
+                all_permissions = Permission.objects.all()
+            else:
+                all_permissions = self.request.user.user_permissions.all() | Permission.objects.filter(
+                    group__user=request.user
+                )
+            data = {
+                'username': request.user.username,
+                'permissions': list(all_permissions.values_list('codename', flat=True)),
+            }
+            return JsonResponse(data)
         return HttpResponse(status=404)
