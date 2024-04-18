@@ -236,7 +236,6 @@ def import_groepen_en_deelnemers(filename: Path):
     id_col = first_row.index('G_ID')
     name_col = first_row.index('Teamnaam')
     chiro_col = first_row.index('Chirogroep')
-    weide_col = first_row.index('StartWei')
     richting_col = first_row.index('Richting')
 
     for row in teams.iter_rows(min_row=2):
@@ -248,12 +247,11 @@ def import_groepen_en_deelnemers(filename: Path):
             continue
         name = name[0].upper() + name[1:]
         chiro = row[chiro_col].value
-        weide = Weide.objects.get(tocht__identifier=row[weide_col].value[0].upper())
         richting = Direction(row[richting_col].value)
 
         Team.objects.update_or_create(
             number=id,
-            defaults=dict(direction=richting, name=name, chiro=chiro, start_weide_1=weide),
+            defaults=dict(direction=richting, name=name, chiro=chiro),
         )
 
     personen = wb['LIJST Inschrijvingen personen']

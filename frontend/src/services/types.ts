@@ -53,10 +53,6 @@ export interface Team {
   number: number;
   name: string;
   chiro: string;
-  start_weide_1: number | null;
-  start_weide_2: number | null;
-  eind_weide_1: number | null;
-  eind_weide_2: number | null;
   tracker: number | null;
   contact_persons: ContactPerson[];
   team_notes: TeamNote[];
