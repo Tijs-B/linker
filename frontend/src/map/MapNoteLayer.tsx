@@ -160,6 +160,7 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
             autoFocus
             multiline
             inputProps={{ spellCheck: 'false' }}
+            required
           />
           <DialogContentText>
             Toegevoegd: {dayjs(selectedNote?.created).fromNow()}

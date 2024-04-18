@@ -276,6 +276,7 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
             fullWidth
             margin="dense"
             autoFocus
+            required
           />
         </DialogContent>
         <DialogActions>

@@ -68,6 +68,8 @@ class ForbiddenArea(models.Model):
     area = models.MultiPolygonField()
 
     def __str__(self):
+        if not self.description:
+            return super().__str__()
         if len(self.description) > 30:
             return f'{self.description[:30]}...'
         return self.description
