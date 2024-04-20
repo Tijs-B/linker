@@ -231,8 +231,8 @@ const StatusCard = memo(function StatusCard() {
     const last_log = tracker && tracker.last_log;
     const [longitude, latitude] = last_log ? last_log.point.coordinates : [null, null];
     return isMobile({ tablet: true, featureDetect: true })
-      ? `https://www.google.com/maps/search/?api=1&query=${latitude}%2C${longitude}`
-      : `geo:${latitude},${longitude}`;
+      ? `geo:${latitude},${longitude}`
+      : `https://www.google.com/maps/search/?api=1&query=${latitude}%2C${longitude}`;
   }, [selectedId, trackers]);
 
   const lastUpdate = last_log ? new Date(last_log.gps_datetime).toLocaleTimeString() : '-';
