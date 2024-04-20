@@ -51,7 +51,7 @@ export const linkerApi = createApi({
   refetchOnFocus: true,
   refetchOnReconnect: true,
   refetchOnMountOrArgChange: 30,
-  tagTypes: ['Team', 'MapNote'],
+  tagTypes: ['Team', 'MapNote', 'User'],
   endpoints: (build) => ({
     getTrackers: build.query<EntityState<Tracker, number>, void>({
       query: () => '/trackers/',
@@ -140,12 +140,20 @@ export const linkerApi = createApi({
     }),
     getUser: build.query<User, void>({
       query: () => '/user/',
+      providesTags: ['User'],
     }),
     loginUser: build.mutation<void, LoginUser>({
       query: (body) => ({
         url: `/login/`,
         method: 'POST',
         body,
+      }),
+      invalidatesTags: ['User'],
+    }),
+    logoutUser: build.mutation<void, void>({
+      query: () => ({
+        url: '/logout/',
+        method: 'POST',
       }),
     }),
     createTeamNote: build.mutation<TeamNote, Omit<TeamNote, 'id' | 'created'>>({
@@ -233,6 +241,7 @@ export const {
   useGetForbiddenAreasQuery,
   useGetUserQuery,
   useLoginUserMutation,
+  useLogoutUserMutation,
   useCreateTeamNoteMutation,
   useCreateMapNoteMutation,
   useDeleteTeamNoteMutation,

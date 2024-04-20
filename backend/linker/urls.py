@@ -37,6 +37,7 @@ from linker.people.views import (
     ContactPersonViewSet,
     LoginView,
     UserView,
+    LogoutView,
 )
 from linker.tracing.views import CheckpointLogViewSet, all_stats
 from linker.trackers.views import TrackerViewSet
@@ -64,6 +65,7 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/stats/', all_stats),
     path('api/login/', csrf_exempt(LoginView.as_view())),
+    path('api/logout/', LogoutView.as_view()),
     path('api/user/', UserView.as_view()),
     path('admin/', admin.site.urls),
 ]

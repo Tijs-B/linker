@@ -1,6 +1,6 @@
 from json import loads
 
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Permission
 from django.http import HttpResponse, JsonResponse
 from django.views import View
@@ -59,6 +59,12 @@ class LoginView(View):
         if user is None:
             return HttpResponse(status=404)
         login(request, user)
+        return HttpResponse(status=200)
+
+
+class LogoutView(View):
+    def post(self, request):
+        logout(request)
         return HttpResponse(status=200)
 
 

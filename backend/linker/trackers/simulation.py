@@ -272,6 +272,7 @@ def import_groepen_en_deelnemers(filename: Path):
             continue
         name = str(row[name_col].value.title())
         email = str(row[email_col].value)
+        # TODO: telefoonnummer parsing
         phone = ''.join(c for c in str(row[phone_col].value) if c.isdigit() or c == '+')
         is_favorite = int(row[volgnr_col].value) == 1
 
