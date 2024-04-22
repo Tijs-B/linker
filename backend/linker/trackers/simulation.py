@@ -272,7 +272,6 @@ def import_groepen_en_deelnemers(filename: Path):
             continue
         name = str(row[name_col].value.title())
         email = str(row[email_col].value)
-        # TODO: telefoonnummer parsing
         phone = ''.join(c for c in str(row[phone_col].value) if c.isdigit() or c == '+')
         is_favorite = int(row[volgnr_col].value) == 1
 
@@ -286,7 +285,10 @@ def import_groepen_en_deelnemers(filename: Path):
         if phone is not None and phone.startswith('032'):
             phone = '+' + phone[1:]
 
-        if phone is not None and not re.match(r'(\+?32|0032|0)4\d{8}', phone):
+        if phone is not None:
+            phone = re.sub(r'^(?:\+?32|0032|0)4', '+32', phone)
+
+        if phone is not None and not re.match(r'\+324\d{8}', phone):
             print(f'Warning: phone number not correct: {phone} from {name}')
 
         team = Team.objects.get(number=id)

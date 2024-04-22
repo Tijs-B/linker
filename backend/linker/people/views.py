@@ -2,6 +2,7 @@ from json import loads
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Permission
+from django.db.models import Prefetch
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from rest_framework import viewsets
@@ -19,7 +20,10 @@ from .serializers import (
 
 
 class TeamViewSet(viewsets.ModelViewSet):
-    queryset = Team.objects.prefetch_related('contact_persons').prefetch_related('team_notes').order_by('number')
+    queryset = Team.objects.prefetch_related(
+        Prefetch('contact_persons', queryset=ContactPerson.objects.order_by('name')),
+        Prefetch('team_notes', queryset=TeamNote.objects.order_by('created'))
+    ).order_by('number')
     serializer_class = TeamSerializer
 
     def get_permissions(self):
