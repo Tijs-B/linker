@@ -21,9 +21,9 @@
     "@turf/distance": "^7.0.0-alpha.113",
     "@turf/helpers": "^7.0.0-alpha.113",
     "dayjs": "^1.11.10",
-    "fuse.js": "^6.6.2",
+    "fuse.js": "^7.0.0",
     "is-mobile": "^4.0.0",
-    "maplibre-gl": "^3.6.2",
+    "maplibre-gl": "^4.1.3",
     "notistack": "^3.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -43,14 +43,14 @@
     "@typescript-eslint/parser": "^7.1.1",
     "@vite-pwa/assets-generator": "^0.2.4",
     "@vitejs/plugin-react-swc": "^3.6.0",
-    "esbuild": "^0.18.6",
+    "esbuild": "^0.20.0",
     "eslint": "^8.38.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
     "prettier": "^2.8.8",
     "typescript": "^5.4.2",
-    "vite": "^4.3.9",
+    "vite": "^5.2.10",
     "vite-plugin-pwa": "^0.19.7"
   }
 }
