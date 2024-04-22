@@ -167,8 +167,8 @@ def import_groepen_en_deelnemers(filename: Path):
         if row[team_col].value == '#N/A' or row[team_col].value.lower() == 'annulatie':
             continue
         if row[name_col].value is None:
-            print(f"Empty name at the end, we're at g_id {g_id}")
-            break
+            print(f'Warning: empty name in row {row}. Skipping')
+            continue
         name = str(row[name_col].value.title())
         email = str(row[email_col].value)
         phone = ''.join(c for c in str(row[phone_col].value) if c.isdigit() or c == '+')
