@@ -59,6 +59,8 @@ export interface Team {
   team_notes: TeamNote[];
   group_picture: string | null;
   safe_weide: number | null;
+  safe_weide_updated_at: string | null;
+  safe_weide_updated_by: string | null;
   code: string;
 }
 

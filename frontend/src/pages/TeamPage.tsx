@@ -28,6 +28,8 @@ import {
   styled,
 } from '@mui/material';
 
+import dayjs from 'dayjs';
+
 import SafeSelector from '../components/SafeSelector.jsx';
 import ContactPersonsList from '../components/team/ContactPersonsList.jsx';
 import {
@@ -179,6 +181,12 @@ const TeamPage = memo(function TeamPage() {
                         <TableCell>Safe?</TableCell>
                         <TableCell>
                           <SafeSelector team={team} />
+                          {team.safe_weide_updated_at && team.safe_weide_updated_by && (
+                            <>
+                              {dayjs(team.safe_weide_updated_at).fromNow()} door{' '}
+                              {team.safe_weide_updated_by}
+                            </>
+                          )}
                         </TableCell>
                       </TableRow>
                     </TableBody>

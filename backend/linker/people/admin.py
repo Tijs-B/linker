@@ -43,8 +43,18 @@ class TeamAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'chiro', 'safe_weide')
     list_filter = ('safe_weide',)
     search_fields = ('name', 'number', 'chiro')
-    fields = ('direction', 'number', 'name', 'chiro', 'tracker', 'group_picture', 'safe_weide', 'checkpoints')
-    readonly_fields = ('checkpoints',)
+    fields = (
+        'direction',
+        'number',
+        'name',
+        'chiro',
+        'tracker',
+        'group_picture',
+        'safe_weide',
+        'safe_weide_updated_at',
+        'checkpoints',
+    )
+    readonly_fields = ('checkpoints', 'safe_weide_updated_at')
 
     @admin.display()
     def checkpoints(self, obj: Team):

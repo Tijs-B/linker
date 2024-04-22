@@ -53,6 +53,8 @@ class Team(models.Model):
     safe_weide = models.ForeignKey(
         'map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='safe_teams'
     )
+    safe_weide_updated_at = models.DateTimeField(blank=True, null=True)
+    safe_weide_updated_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         permissions = [('can_upload_picture', 'Can upload a group picture')]

@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Permission
 from django.db.models import Prefetch
 from django.http import HttpResponse, JsonResponse
+from django.utils.timezone import now
 from django.views import View
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -30,6 +31,12 @@ class TeamViewSet(viewsets.ModelViewSet):
         if self.action == 'upload_group_picture':
             return [IsAuthenticated(), CanUploadPicture()]
         return super().get_permissions()
+
+    def perform_update(self, serializer: TeamSerializer):
+        if serializer.validated_data.get('safe_weide') is not None:
+            serializer.save(safe_weide_updated_at=now(), safe_weide_updated_by=self.request.user)
+        else:
+            serializer.save()
 
     @action(detail=True, methods=['patch'], url_path='group-picture')
     def upload_group_picture(self, request, pk=None):

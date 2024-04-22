@@ -28,6 +28,7 @@ class TeamSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
     contact_persons = ContactPersonSerializer(many=True)
     team_notes = TeamNoteSerializer(many=True)
     code = serializers.SerializerMethodField('get_code')
+    safe_weide_updated_by = serializers.StringRelatedField(read_only=True)
 
     def get_code(self, obj):
         return f'{obj.number:02d}'
@@ -45,5 +46,8 @@ class TeamSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
             'team_notes',
             'group_picture',
             'safe_weide',
+            'safe_weide_updated_at',
+            'safe_weide_updated_by',
             'code',
         ]
+        read_only_fields = ['safe_weide_updated_at']
