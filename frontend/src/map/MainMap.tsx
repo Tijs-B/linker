@@ -46,7 +46,7 @@ import TrackerLayer from './TrackerLayer.jsx';
 
 const BOUNDS_OPTIONS = { padding: { top: 30, left: 30, right: 30, bottom: 30 } };
 const DEFAULT_INITIAL_BOUNDS = {
-  bounds: [5.9011, 50.313, 6.0151, 50.3805] as [number, number, number, number],
+  bounds: [5.552625, 50.217043, 5.68067, 50.295693] as [number, number, number, number],
   fitBoundsOptions: BOUNDS_OPTIONS,
 };
 
