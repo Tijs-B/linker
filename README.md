@@ -33,6 +33,8 @@ docker compose run --rm linker python manage.py createsuperuser
 
 #### 5. Start de containers
 
+Je moet de frontend container nog un-commenten als je hem in een docker container wilt draaien in `docker-compose.yml`
+
 ```bash
 docker compose up -d
 ```
