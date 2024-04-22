@@ -46,8 +46,8 @@ De frontend draait nu op [localhost:8061](http://localhost:8060) en de backend o
 - [x] Doorlooptijden
   - [x] Per tocht en richting
   - [ ] Voor een bepaald stuk, mbv markers/sections
-  - [ ] Per groep
-    - [ ] Op team pagina per tocht zetten
+  - [x] Per groep
+    - [x] Op team pagina per tocht zetten
 - [ ] Verboden zones
   - [x] Basis implementatie
   - [ ] Melding wanneer groep in verboden zone loopt
@@ -65,13 +65,13 @@ De frontend draait nu op [localhost:8061](http://localhost:8060) en de backend o
 - [x] Groepsfoto's
   - [x] Backend
   - [x] Retrieve / update in frontend
-- [ ] Frontend polling & offline data management
-  - [ ] Auto refetch tracker data. Werkt dat nu zelfs?
-  - [ ] Melding bij offline
-  - [ ] Lokale cache van data (telefoonnummers bijvoorbeeld!) bij offline
+- [x] Frontend polling & offline data management
+  - [x] Auto refetch tracker data. Werkt dat nu zelfs?
+  - [x] Melding bij offline
+  - [x] Lokale cache van data (telefoonnummers bijvoorbeeld!) bij offline
 - [ ] Flag aandacht vragende teams?
 - [ ] Meldingen?
   - [ ] Tracker health: wanneer een tracker uit staat of al even geen updates meer heeft gekregen
   - [ ] Wanneer een groep echt heel ver van de route zit
   - [ ] Wanneer een groep al een hele tijd stil staat
-- [ ] Heatmap
+- [x] Heatmap
