@@ -213,3 +213,5 @@ LOGGING = {
         }
     },
 }
+
+GEODYNAMICS_URL = env('GEODYNAMICS_URL', default=None)

@@ -1,8 +1,11 @@
 from datetime import datetime
 from logging import getLogger
+from time import time
 from typing import Optional
 
+import requests
 from dateutil.parser import isoparse
+from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.utils.timezone import now
 from geopy.distance import distance
@@ -84,3 +87,16 @@ def import_geodynamics_data(data: dict, fetch_datetime: Optional[datetime] = Non
         )
 
     TrackerLog.objects.bulk_create(new_tracker_logs, ignore_conflicts=True)
+
+
+def fetch_geodynamics_data():
+    url = settings.GEODYNAMICS_URL
+    if url is None:
+        logger.warning('Geodynamics URL is not configured in the settings')
+    logger.info('Fetching tracker data from geodynamics...')
+    response = requests.get(
+        url, params={'_': round(time() * 1000)}, headers={'User-Agent': 'https://github.com/Tijs-B/linker'}
+    )
+    logger.info(f'Geodynamics status code {response.status_code}')
+
+    import_geodynamics_data(data=response.json())
