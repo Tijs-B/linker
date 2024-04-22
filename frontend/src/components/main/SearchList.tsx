@@ -14,6 +14,7 @@ import {
   useGetWeidesQuery,
 } from '../../services/linker.ts';
 import { OrganizationMember, Team } from '../../services/types.ts';
+import { trackersActions, useAppDispatch } from '../../store';
 import { getPositionDescription } from '../../utils/data';
 import PersonAvatar from '../PersonAvatar';
 
@@ -24,17 +25,24 @@ type TrackerRowDataItem = (OrganizationMember | Team) & {
 interface TrackerRowProps {
   index: number;
   style: CSSProperties;
-  data: { onClick: (tracker: number) => void; items: TrackerRowDataItem[] };
+  data: { items: TrackerRowDataItem[]; onTrackerClick: (tracker: number) => void };
 }
 
 const TrackerRow = ({ data, index, style }: TrackerRowProps) => {
   const item = data.items[index];
+  const dispatch = useAppDispatch();
+
   const onClick = useCallback(() => {
-    const tracker = data.items[index].tracker;
-    if (tracker) {
-      data.onClick(tracker);
+    const item = data.items[index];
+    if ('member_type' in item) {
+      dispatch(trackersActions.selectMember(item.id));
+    } else {
+      dispatch(trackersActions.selectTeam(item.id));
     }
-  }, [index, data]);
+    if (item.tracker) {
+      data.onTrackerClick(item.tracker);
+    }
+  }, [data, dispatch, index]);
 
   return (
     <div style={style}>
@@ -77,7 +85,9 @@ export default memo(function SearchList({ members, teams, onClick }: SearchListP
     const allItems = [...teams, ...members];
     return allItems.map((item: Team | OrganizationMember) => {
       const result = { secondary: '', safe_weide: '', ...item };
-      if (fiches && tochten && weides && basis && trackers && item.tracker) {
+      if (!item.tracker) {
+        result.secondary = '⚠️ Geen tracker gekoppeld';
+      } else if (fiches && tochten && weides && basis && trackers && item.tracker) {
         const tracker = trackers.entities[item.tracker];
         if (tracker.last_log) {
           result.secondary = getPositionDescription(tracker, fiches, tochten, weides);
@@ -101,7 +111,7 @@ export default memo(function SearchList({ members, teams, onClick }: SearchListP
           width={width}
           height={height}
           itemCount={items.length}
-          itemData={{ items, onClick }}
+          itemData={{ items, onTrackerClick: onClick }}
           itemSize={60}
         >
           {TrackerRow}

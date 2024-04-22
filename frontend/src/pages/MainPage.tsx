@@ -78,21 +78,22 @@ export default function MainPage() {
 
   // Close the list on mobile when team is selected
   useEffect(() => {
-    if (!desktop && selectedId) {
+    if (!desktop && selectedId !== null) {
       setListOpen(false);
     }
   }, [desktop, selectedId]);
 
-  const showItem = useCallback(
-    (tracker: number) => {
-      dispatch(trackersActions.setSelectedId(tracker));
-      mainMap?.easeTo({
-        // @ts-expect-error there are always 2 coordinates here
-        center: trackers?.entities[tracker].last_log?.point.coordinates,
-        zoom: 14,
-      });
+  const showTracker = useCallback(
+    (tracker: number | null) => {
+      if (tracker !== null) {
+        mainMap?.easeTo({
+          // @ts-expect-error there are always 2 coordinates here
+          center: trackers?.entities[tracker].last_log?.point.coordinates,
+          zoom: 14,
+        });
+      }
     },
-    [dispatch, mainMap, trackers],
+    [mainMap, trackers],
   );
 
   // Create fuse objects for search
@@ -140,28 +141,31 @@ export default function MainPage() {
     }
   }, [filterMembers, keyword, memberFuse, organizationMembers]);
 
-  const filteredTrackers = useMemo(
-    () =>
-      filteredTeams
-        .map((t) => t.tracker)
-        .concat(filteredMembers.map((m) => m.tracker))
-        .flatMap((tracker) => (tracker ? [tracker] : [])),
-    [filteredTeams, filteredMembers],
-  );
-
   const onSearchEnter = useCallback(
     (keyword: string) => {
       if (keyword && teamFuse && memberFuse) {
-        const results = teamFuse.search(keyword).concat(memberFuse.search(keyword));
-        if (results.length > 0) {
-          const highest = results.sort((a, b) => a.score! - b.score!)[0].item;
-          if (highest.tracker) {
-            showItem(highest.tracker);
+        const teamResults = teamFuse.search(keyword);
+        const memberResults = memberFuse.search(keyword);
+        if (teamResults.length === 0 && memberResults.length === 0) {
+          return;
+        } else if (teamResults.length === 0) {
+          showTracker(memberResults[0].item.tracker);
+          dispatch(trackersActions.selectMember(memberResults[0].item.id));
+        } else if (memberResults.length === 0) {
+          showTracker(teamResults[0].item.tracker);
+          dispatch(trackersActions.selectTeam(teamResults[0].item.id));
+        } else {
+          if (teamResults[0].score! > memberResults[0].score!) {
+            showTracker(teamResults[0].item.tracker);
+            dispatch(trackersActions.selectTeam(teamResults[0].item.id));
+          } else {
+            showTracker(memberResults[0].item.tracker);
+            dispatch(trackersActions.selectMember(memberResults[0].item.id));
           }
         }
       }
     },
-    [memberFuse, teamFuse, showItem],
+    [teamFuse, memberFuse, showTracker, dispatch],
   );
 
   const onChangeKeyword = useCallback((keyword: string) => {
@@ -224,7 +228,7 @@ export default function MainPage() {
         height: 100%;
       `}
     >
-      {desktop && <MainMap trackers={filteredTrackers} />}
+      {desktop && <MainMap filteredTeams={filteredTeams} filteredMembers={filteredMembers} />}
 
       <div css={sidebar}>
         <Paper elevation={3} square css={header}>
@@ -243,11 +247,11 @@ export default function MainPage() {
         <div css={middle}>
           {!desktop && (
             <div css={contentMap}>
-              <MainMap trackers={filteredTrackers} />
+              <MainMap filteredTeams={filteredTeams} filteredMembers={filteredMembers} />
             </div>
           )}
           <Paper css={contentList} sx={{ visibility: listOpen ? 'visible' : 'hidden' }} square>
-            <SearchList members={filteredMembers} teams={filteredTeams} onClick={showItem} />
+            <SearchList members={filteredMembers} teams={filteredTeams} onClick={showTracker} />
           </Paper>
         </div>
         {desktop && (
@@ -256,8 +260,8 @@ export default function MainPage() {
           </div>
         )}
       </div>
-      {selectedId && !showHistory && <StatusCard />}
-      {selectedId && showHistory && <HistoryCard />}
+      {selectedId !== null && !showHistory && <StatusCard />}
+      {selectedId !== null && showHistory && <HistoryCard />}
     </div>
   );
 }

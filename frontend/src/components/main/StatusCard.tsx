@@ -34,13 +34,11 @@ import isMobile from 'is-mobile';
 import {
   useGetCheckpointLogsQuery,
   useGetFichesQuery,
-  useGetOrganizationMembersQuery,
   useGetStatsQuery,
-  useGetTeamsQuery,
   useGetTrackersQuery,
 } from '../../services/linker.ts';
 import { Team } from '../../services/types.ts';
-import { trackersActions, useAppDispatch, useAppSelector } from '../../store';
+import { selectSelectedItem, trackersActions, useAppDispatch, useAppSelector } from '../../store';
 import { getLastCheckpointLog } from '../../utils/data';
 import { secondsToHoursMinutes } from '../../utils/time';
 import PersonAvatar from '../PersonAvatar';
@@ -113,14 +111,8 @@ function TeamRows({ team }: { team: Team }) {
 }
 
 const TeamCallButton = memo(function () {
-  const selectedId = useAppSelector((state) => state.trackers.selectedId);
-  const { data: teams } = useGetTeamsQuery();
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-
-  const team = useMemo(
-    () => teams && Object.values(teams.entities).find((t) => t.tracker === selectedId),
-    [selectedId, teams],
-  );
+  const selectedItem = useAppSelector(selectSelectedItem);
 
   const onClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(e.currentTarget),
@@ -128,35 +120,26 @@ const TeamCallButton = memo(function () {
   );
   const onClose = useCallback(() => setAnchorEl(null), []);
 
-  const items = useMemo(
-    () =>
-      team
-        ? team.contact_persons
-            .filter((p) => p.phone_number)
-            .map((person) => (
-              <MenuItem key={person.id} component="a" href={`tel:${person.phone_number}`}>
-                {person.is_favorite && (
-                  <ListItemIcon>
-                    <StarIcon />
-                  </ListItemIcon>
-                )}
-                <ListItemText>{person.name}</ListItemText>
-              </MenuItem>
-            ))
-        : null,
-    [team],
-  );
-
-  if (!team) {
+  if (!selectedItem || !('contact_persons' in selectedItem)) {
     return null;
   }
+
   return (
     <>
       <IconButton onClick={onClick}>
         <CallIcon />
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={onClose}>
-        {items}
+        {selectedItem.contact_persons.map((person) => (
+          <MenuItem key={person.id} component="a" href={`tel:${person.phone_number}`}>
+            {person.is_favorite && (
+              <ListItemIcon>
+                <StarIcon />
+              </ListItemIcon>
+            )}
+            <ListItemText>{person.name}</ListItemText>
+          </MenuItem>
+        ))}
       </Menu>
     </>
   );
@@ -167,11 +150,9 @@ const StatusCard = memo(function StatusCard() {
   const { mainMap } = useMap();
 
   const dispatch = useAppDispatch();
-  const selectedId = useAppSelector((state) => state.trackers.selectedId);
+  const selectedItem = useAppSelector(selectSelectedItem);
 
   const { data: trackers } = useGetTrackersQuery();
-  const { data: teams } = useGetTeamsQuery();
-  const { data: organizationMembers } = useGetOrganizationMembersQuery();
 
   const root = css`
     pointer-events: none;
@@ -218,27 +199,24 @@ const StatusCard = memo(function StatusCard() {
     padding-top: ${theme.spacing(0.5)};
   `;
 
-  const tracker = trackers && selectedId && trackers.entities[selectedId];
-  const team = teams && Object.values(teams.entities).find((t) => t.tracker === selectedId);
-  const member =
-    organizationMembers &&
-    Object.values(organizationMembers.entities).find((m) => m.tracker === selectedId);
-
-  const last_log = tracker && tracker.last_log;
+  const tracker =
+    trackers && selectedItem?.tracker ? trackers.entities[selectedItem.tracker] : null;
+  const lastLog = tracker && tracker.last_log;
+  const lastUpdate = lastLog ? new Date(lastLog.gps_datetime).toLocaleTimeString() : '-';
 
   const navigateUrl = useMemo(() => {
-    const tracker = trackers && selectedId && trackers.entities[selectedId];
+    const tracker =
+      trackers && selectedItem?.tracker ? trackers.entities[selectedItem.tracker] : null;
     const last_log = tracker && tracker.last_log;
     const [longitude, latitude] = last_log ? last_log.point.coordinates : [null, null];
     return isMobile({ tablet: true, featureDetect: true })
       ? `geo:${latitude},${longitude}`
       : `https://www.google.com/maps/search/?api=1&query=${latitude}%2C${longitude}`;
-  }, [selectedId, trackers]);
-
-  const lastUpdate = last_log ? new Date(last_log.gps_datetime).toLocaleTimeString() : '-';
+  }, [selectedItem, trackers]);
 
   const focusMap = useCallback(() => {
-    const tracker = trackers && selectedId && trackers.entities[selectedId];
+    const tracker =
+      trackers && selectedItem?.tracker ? trackers.entities[selectedItem.tracker] : null;
     const last_log = tracker && tracker.last_log;
     if (mainMap && last_log) {
       mainMap.easeTo({
@@ -247,19 +225,19 @@ const StatusCard = memo(function StatusCard() {
         zoom: 14,
       });
     }
-  }, [mainMap, selectedId, trackers]);
+  }, [mainMap, selectedItem, trackers]);
 
   return (
     <div css={root}>
       <Card css={card}>
         <CardHeader
-          avatar={<PersonAvatar item={team || member} />}
-          title={team?.name || member?.name}
+          avatar={<PersonAvatar item={selectedItem} />}
+          title={selectedItem?.name}
           titleTypographyProps={{ noWrap: true }}
-          subheader={team?.chiro}
+          subheader={selectedItem && 'chiro' in selectedItem ? selectedItem.chiro : ''}
           subheaderTypographyProps={{ noWrap: true }}
           action={
-            <IconButton size="small" onClick={() => dispatch(trackersActions.setSelectedId(null))}>
+            <IconButton size="small" onClick={() => dispatch(trackersActions.deselect())}>
               <CloseIcon />
             </IconButton>
           }
@@ -279,39 +257,42 @@ const StatusCard = memo(function StatusCard() {
                   </Typography>
                 </TableCell>
               </TableRow>
-              {team && <TeamRows team={team} />}
+              {selectedItem && 'chiro' in selectedItem && <TeamRows team={selectedItem} />}
             </TableBody>
           </Table>
         </CardContent>
 
         <CardActions css={actions} disableSpacing>
-          <IconButton target="_blank" href={navigateUrl} disabled={!last_log}>
+          <IconButton target="_blank" href={navigateUrl} disabled={!lastLog}>
             <DirectionsIcon />
           </IconButton>
 
-          <IconButton onClick={focusMap}>
+          <IconButton onClick={focusMap} disabled={!lastLog}>
             <SearchIcon />
           </IconButton>
 
-          <IconButton onClick={() => dispatch(trackersActions.setShowHistory(true))}>
+          <IconButton
+            onClick={() => dispatch(trackersActions.setShowHistory(true))}
+            disabled={!lastLog}
+          >
             <HistoryIcon />
           </IconButton>
 
           <TeamCallButton />
 
-          {member && (
+          {selectedItem && 'phone_number' in selectedItem && (
             <IconButton
               component="a"
-              href={`tel:${member.phone_number}`}
-              disabled={!member.phone_number}
+              href={`tel:${selectedItem.phone_number}`}
+              disabled={!selectedItem.phone_number}
             >
               <CallIcon />
             </IconButton>
           )}
 
-          {team && (
-            <IconButton component={RouterLink} to={`/team/${team.id}/`}>
-              <Badge badgeContent={team.team_notes.length} color="primary">
+          {selectedItem && 'team_notes' in selectedItem && (
+            <IconButton component={RouterLink} to={`/team/${selectedItem.id}/`}>
+              <Badge badgeContent={selectedItem.team_notes.length} color="primary">
                 <InfoIcon />
               </Badge>
             </IconButton>

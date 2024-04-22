@@ -67,7 +67,7 @@ export interface Team {
 
 export interface OrganizationMember {
   id: number;
-  tracker: number;
+  tracker: number | null;
   name: string;
   code: string;
   phone_number: string;

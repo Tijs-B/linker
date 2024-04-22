@@ -4,12 +4,14 @@ import { TrackerLog } from '../services/types.ts';
 
 interface TrackerState {
   selectedId: number | null;
+  selectedItemType: 'team' | 'member' | null;
   showHistory: boolean;
   historyLog: TrackerLog | null;
 }
 
 const initialState: TrackerState = {
   selectedId: null,
+  selectedItemType: null,
   showHistory: false,
   historyLog: null,
 };
@@ -18,8 +20,17 @@ const { reducer, actions } = createSlice({
   name: 'trackers',
   initialState,
   reducers: {
-    setSelectedId: (state, action: PayloadAction<number | null>) => {
+    selectTeam: (state, action: PayloadAction<number>) => {
       state.selectedId = action.payload;
+      state.selectedItemType = 'team';
+    },
+    selectMember: (state, action: PayloadAction<number>) => {
+      state.selectedId = action.payload;
+      state.selectedItemType = 'member';
+    },
+    deselect: (state) => {
+      state.selectedId = null;
+      state.selectedItemType = null;
     },
     setShowHistory: (state, action: PayloadAction<boolean>) => {
       state.showHistory = action.payload;

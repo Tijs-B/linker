@@ -4,7 +4,7 @@ import { OrganizationMember, Team } from '../services/types.ts';
 import { itemColor } from '../theme/colors.ts';
 
 interface PersonAvatarProps {
-  item: OrganizationMember | Team | undefined;
+  item: OrganizationMember | Team | undefined | null;
   width?: number;
 }
 

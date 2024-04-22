@@ -6,11 +6,13 @@ import { red } from '@mui/material/colors';
 import { skipToken } from '@reduxjs/toolkit/query';
 
 import { useGetTrackerTrackQuery } from '../services/linker.ts';
-import { useAppSelector } from '../store';
+import { selectSelectedItem, useAppSelector } from '../store';
 
 const TrackerHistoryLayer = memo(function TrackerHistoryLayer({ visible }: { visible: boolean }) {
-  const selectedId = useAppSelector((state) => state.trackers.selectedId);
-  const { currentData: track } = useGetTrackerTrackQuery(selectedId ? selectedId : skipToken);
+  const selectedItem = useAppSelector(selectSelectedItem);
+  const { currentData: track } = useGetTrackerTrackQuery(
+    selectedItem?.tracker ? selectedItem.tracker : skipToken,
+  );
 
   return (
     <>
@@ -23,7 +25,7 @@ const TrackerHistoryLayer = memo(function TrackerHistoryLayer({ visible }: { vis
             paint={{
               'line-color': red[500],
               'line-width': 4,
-              'line-opacity': selectedId && track ? 1 : 0,
+              'line-opacity': selectedItem && track ? 1 : 0,
               // 'line-opacity-transition': { duration: 200 },
             }}
             layout={{ visibility: visible ? 'visible' : 'none' }}
@@ -35,7 +37,7 @@ const TrackerHistoryLayer = memo(function TrackerHistoryLayer({ visible }: { vis
             paint={{
               'line-color': '#fff',
               'line-width': 6,
-              'line-opacity': selectedId && track ? 1 : 0,
+              'line-opacity': selectedItem && track ? 1 : 0,
               // 'line-opacity-transition': { duration: 200 },
             }}
             layout={{ visibility: visible ? 'visible' : 'none' }}

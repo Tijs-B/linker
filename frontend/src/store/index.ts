@@ -1,6 +1,6 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, createSelector } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
 import { linkerApi } from '../services/linker.ts';
@@ -23,3 +23,30 @@ export type AppDispatch = typeof store.dispatch;
 
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
+export const selectSelectedItem = createSelector(
+  [
+    (state: RootState) => state.trackers.selectedId,
+    (state: RootState) => state.trackers.selectedItemType,
+    linkerApi.endpoints.getTeams.select(undefined),
+    linkerApi.endpoints.getOrganizationMembers.select(undefined),
+  ],
+  (selectedId, selectedItemType, teams, members) => {
+    if (selectedId === null || selectedItemType === null) {
+      return null;
+    }
+    if (selectedItemType === 'team') {
+      if (!teams.data) {
+        return null;
+      }
+      return teams.data.entities[selectedId];
+    }
+    if (selectedItemType === 'member') {
+      if (!members.data) {
+        return null;
+      }
+      return members.data.entities[selectedId];
+    }
+    return null;
+  },
+);

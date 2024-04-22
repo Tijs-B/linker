@@ -35,6 +35,7 @@ import {
   useGetTeamsQuery,
   useGetTochtenQuery,
 } from '../services/linker.ts';
+import { OrganizationMember, Team } from '../services/types.ts';
 import { trackersActions, useAppDispatch } from '../store/index.js';
 import { generateAllIcons } from '../utils/icons.ts';
 import BackgroundLayers from './BackgroundLayers';
@@ -50,7 +51,12 @@ const DEFAULT_INITIAL_BOUNDS = {
   fitBoundsOptions: BOUNDS_OPTIONS,
 };
 
-const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
+interface MainMapProps {
+  filteredTeams: Team[];
+  filteredMembers: OrganizationMember[];
+}
+
+const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMapProps) {
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const dispatch = useAppDispatch();
@@ -156,7 +162,7 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
         setCreateMapNoteDialogOpen(true);
       } else {
         dispatch(trackersActions.setShowHistory(false));
-        dispatch(trackersActions.setSelectedId(null));
+        dispatch(trackersActions.deselect());
       }
     },
     [creatingMarker, dispatch],
@@ -220,7 +226,11 @@ const MainMap = memo(function MainMap({ trackers }: { trackers: number[] }) {
         <BackgroundLayers showHeatmap={showHeatmap} />
 
         <MapNoteLayer visible={!showHeatmap} />
-        <TrackerLayer visible={!showHeatmap} trackers={trackers} />
+        <TrackerLayer
+          visible={!showHeatmap}
+          filteredTeams={filteredTeams}
+          filteredMembers={filteredMembers}
+        />
         <TrackerHistoryLayer visible={!showHeatmap} />
 
         <NavigationControl />

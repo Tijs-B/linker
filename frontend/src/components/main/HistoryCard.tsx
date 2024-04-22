@@ -24,12 +24,13 @@ import { skipToken } from '@reduxjs/toolkit/query';
 import bbox from '@turf/bbox';
 import { feature, featureCollection } from '@turf/helpers';
 
+import { useGetTrackerLogsQuery } from '../../services/linker.ts';
 import {
-  useGetOrganizationMembersQuery,
-  useGetTeamsQuery,
-  useGetTrackerLogsQuery,
-} from '../../services/linker.ts';
-import { trackersActions, useAppDispatch, useAppSelector } from '../../store/index.ts';
+  selectSelectedItem,
+  trackersActions,
+  useAppDispatch,
+  useAppSelector,
+} from '../../store/index.ts';
 import { itemColor } from '../../theme/colors.ts';
 
 const HistoryCard = memo(function HistoryCard() {
@@ -71,24 +72,17 @@ const HistoryCard = memo(function HistoryCard() {
   `;
 
   const dispatch = useAppDispatch();
-  const selectedId = useAppSelector((state) => state.trackers.selectedId);
   const showHistory = useAppSelector((state) => state.trackers.showHistory);
 
-  const { data: teams } = useGetTeamsQuery();
-  const { data: organizationMembers } = useGetOrganizationMembersQuery();
+  const item = useAppSelector(selectSelectedItem);
 
   const [index, setIndex] = useState(0);
   const { mainMap } = useMap();
 
-  const team = teams && Object.values(teams.entities).find((t) => t.tracker === selectedId);
-  const member =
-    organizationMembers &&
-    Object.values(organizationMembers.entities).find((m) => m.tracker === selectedId);
-
-  const code = (team || member)?.code;
+  const code = item?.code;
 
   const { currentData: logs } = useGetTrackerLogsQuery(
-    selectedId && showHistory ? selectedId : skipToken,
+    item && item.tracker && showHistory ? item.tracker : skipToken,
   );
 
   const currentLog = logs?.[index];
@@ -125,16 +119,16 @@ const HistoryCard = memo(function HistoryCard() {
             avatar={
               <Avatar
                 sx={{
-                  bgcolor: team || member ? itemColor((team || member)!) : '#000',
+                  bgcolor: item ? itemColor(item) : '#000',
                   fontSize: code && code.length > 2 ? '16px' : '20px',
                 }}
               >
                 {code}
               </Avatar>
             }
-            title={team?.name || member?.name}
+            title={item?.name}
             titleTypographyProps={{ noWrap: true }}
-            subheader={team?.chiro}
+            subheader={item && 'chiro' in item ? item.chiro : ''}
             action={
               <IconButton
                 size="small"

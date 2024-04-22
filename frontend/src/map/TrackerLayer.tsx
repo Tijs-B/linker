@@ -3,28 +3,33 @@ import { Layer, MapLayerMouseEvent, Source, useMap } from 'react-map-gl/maplibre
 
 import { feature, featureCollection } from '@turf/helpers';
 
+import { useGetTrackersQuery } from '../services/linker.ts';
+import { OrganizationMember, Team } from '../services/types.ts';
 import {
-  useGetOrganizationMembersQuery,
-  useGetTeamsQuery,
-  useGetTrackersQuery,
-} from '../services/linker.ts';
-import { trackersActions, useAppDispatch, useAppSelector } from '../store/index.js';
+  selectSelectedItem,
+  trackersActions,
+  useAppDispatch,
+  useAppSelector,
+} from '../store/index.js';
 import { itemColor } from '../theme/colors.ts';
 
 interface TrackerLayerProps {
   visible: boolean;
-  trackers: number[];
+  filteredTeams: Team[];
+  filteredMembers: OrganizationMember[];
 }
 
-const TrackerLayer = memo(function TrackerLayer({ visible, trackers }: TrackerLayerProps) {
+const TrackerLayer = memo(function TrackerLayer({
+  visible,
+  filteredTeams,
+  filteredMembers,
+}: TrackerLayerProps) {
   const dispatch = useAppDispatch();
-  const selectedId = useAppSelector((state) => state.trackers.selectedId);
+  const selectedItem = useAppSelector(selectSelectedItem);
   const showHistory = useAppSelector((state) => state.trackers.showHistory);
 
   const historyLog = useAppSelector((state) => state.trackers.historyLog);
 
-  const { data: teams } = useGetTeamsQuery();
-  const { data: organizationMembers } = useGetOrganizationMembersQuery();
   const { data: allTrackers } = useGetTrackersQuery();
 
   const { mainMap } = useMap();
@@ -37,9 +42,9 @@ const TrackerLayer = memo(function TrackerLayer({ visible, trackers }: TrackerLa
       if (event.features) {
         const features = [...event.features];
         features.sort((a, b) => b.properties.sortKey - a.properties.sortKey);
-        if (features[0] && features[0].id) {
-          // @ts-expect-error id is always a number here
-          dispatch(trackersActions.setSelectedId(features[0].id));
+        if (features[0]) {
+          // See https://github.com/maplibre/maplibre-gl-js/issues/1325
+          dispatch(JSON.parse(features[0].properties.action));
         }
       }
     };
@@ -52,45 +57,47 @@ const TrackerLayer = memo(function TrackerLayer({ visible, trackers }: TrackerLa
   }, [mainMap, dispatch]);
 
   const geoJsonData = useMemo(() => {
-    if (!teams || !organizationMembers || !allTrackers || !trackers) {
+    if (!allTrackers) {
       return featureCollection([]);
     }
-    const trackerIds = historyLog && selectedId ? [selectedId] : trackers;
-    const features = trackerIds.flatMap((trackerId) => {
-      const lastLog = allTrackers?.entities[trackerId]?.last_log;
-      if (!lastLog) {
-        return [];
-      }
-      const team = Object.values(teams.entities).find((t) => t.tracker === trackerId);
-      const member = Object.values(organizationMembers.entities).find(
-        (m) => m.tracker === trackerId,
-      );
-      const item = team || member;
-      if (!item) {
-        return [];
-      }
-      const point = historyLog ? historyLog.point : lastLog.point;
-      const props = {
-        image: `tracker-${item.code}-${itemColor(item)}`,
-        sortKey: selectedId === item.tracker ? 100 : 100 - point.coordinates[1],
-      };
-      return [feature(point, props, { id: item.tracker! })];
-    });
+    const allItems =
+      historyLog && selectedItem?.tracker ? [selectedItem] : [...filteredMembers, ...filteredTeams];
+    const features = allItems
+      .filter((item) => item.tracker !== null)
+      .flatMap((item) => {
+        const lastLog = allTrackers!.entities[item.tracker!]?.last_log;
+        const currentLog = historyLog || lastLog;
+        if (!currentLog) {
+          return [];
+        }
+        const props = {
+          image: `tracker-${item.code}-${itemColor(item)}`,
+          sortKey: selectedItem === item ? 100 : 100 - currentLog.point.coordinates[1],
+          action:
+            'member_type' in item
+              ? trackersActions.selectMember(item.id)
+              : trackersActions.selectTeam(item.id),
+        };
+        return [feature(currentLog.point, props)];
+      });
+
     return featureCollection(features);
-  }, [teams, organizationMembers, allTrackers, selectedId, historyLog, trackers]);
+  }, [allTrackers, filteredMembers, filteredTeams, historyLog, selectedItem]);
 
   const selectedData = useMemo(() => {
     if (
       !showHistory &&
-      selectedId &&
+      selectedItem?.tracker &&
       allTrackers &&
-      allTrackers.entities[selectedId].last_log !== null
+      allTrackers.entities[selectedItem.tracker].last_log !== null
     ) {
-      return featureCollection([feature(allTrackers.entities[selectedId].last_log!.point)]);
+      return featureCollection([
+        feature(allTrackers.entities[selectedItem.tracker].last_log!.point),
+      ]);
     } else {
       return featureCollection([]);
     }
-  }, [allTrackers, selectedId, showHistory]);
+  }, [allTrackers, selectedItem, showHistory]);
 
   return (
     <>
