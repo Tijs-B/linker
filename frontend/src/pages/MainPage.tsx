@@ -120,7 +120,7 @@ export default function MainPage() {
     if (teamFuse && keyword) {
       return teamFuse.search(keyword).map((item) => item.item);
     } else if (teams) {
-      return Object.values(teams.entities).filter((team) => filterSafe || !team.safe_weide);
+      return teams.ids.map((id) => teams.entities[id]).filter((team) => filterSafe || !team.safe_weide);
     } else {
       return [];
     }
@@ -132,7 +132,7 @@ export default function MainPage() {
     } else if (memberFuse && keyword) {
       return memberFuse.search(keyword).map((item) => item.item);
     } else if (organizationMembers) {
-      return Object.values(organizationMembers.entities);
+      return organizationMembers.ids.map((id) => organizationMembers.entities[id]);
     } else {
       return [];
     }
