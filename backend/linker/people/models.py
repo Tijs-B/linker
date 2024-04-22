@@ -1,5 +1,6 @@
 from typing import Optional
 
+from django.contrib.auth.models import User
 from django.db import models
 from enumfields import EnumField
 
@@ -71,6 +72,7 @@ class TeamNote(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_notes')
     created = models.DateTimeField(auto_now_add=True)
     text = models.TextField()
+    author = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f'{self.team}: {self.text}'

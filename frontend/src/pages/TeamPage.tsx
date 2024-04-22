@@ -231,7 +231,10 @@ const TeamPage = memo(function TeamPage() {
                           >
                             <ListItemText
                               primary={note.text}
-                              secondary={new Date(note.created).toLocaleString()}
+                              secondary={
+                                new Date(note.created).toLocaleString() +
+                                (note.author ? ` door ${note.author}` : '')
+                              }
                             />
                           </ListItem>
                         ))}

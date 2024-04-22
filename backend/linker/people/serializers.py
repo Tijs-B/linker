@@ -17,6 +17,8 @@ class OrganizationMemberSerializer(EnumSupportSerializerMixin, serializers.Model
 
 
 class TeamNoteSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = TeamNote
         fields = '__all__'

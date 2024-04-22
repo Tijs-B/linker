@@ -36,10 +36,12 @@ class ZijwegSerializer(serializers.ModelSerializer):
 
 
 class MapNoteSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = MapNote
-        fields = ['id', 'created', 'updated', 'content', 'point']
-        read_only_fields = ['created', 'updated']
+        fields = ['id', 'created', 'updated', 'content', 'point', 'author']
+        read_only_fields = ['created', 'updated', 'author']
 
 
 class BasisSerializer(serializers.ModelSerializer):

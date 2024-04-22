@@ -42,6 +42,9 @@ class MapNoteViewSet(viewsets.ModelViewSet):
     queryset = MapNote.objects.all()
     serializer_class = MapNoteSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
 
 class BasisViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Basis.objects.all()

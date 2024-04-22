@@ -45,6 +45,7 @@ export interface TeamNote {
   team: number;
   created: string;
   text: string;
+  author: string | null;
 }
 
 export interface Team {
@@ -103,6 +104,7 @@ export interface MapNote {
   updated: string;
   content: string;
   point: Point;
+  author: string | null;
 }
 
 export interface Basis {

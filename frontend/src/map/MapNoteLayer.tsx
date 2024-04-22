@@ -14,6 +14,7 @@ import {
   IconButton,
   TextField,
 } from '@mui/material';
+import { grey } from '@mui/material/colors';
 
 import { feature, featureCollection } from '@turf/helpers';
 import dayjs from 'dayjs';
@@ -25,7 +26,6 @@ import {
   useUpdateMapNoteMutation,
 } from '../services/linker.ts';
 import { MapNote } from '../services/types.ts';
-import { grey } from '@mui/material/colors';
 
 type HoverInfo = {
   x: number;
@@ -151,8 +151,11 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
       </Source>
       <Dialog open={!!selectedNote} onClose={onDialogClose} fullWidth>
         <DialogTitle>Kaartnotitie</DialogTitle>
-        <IconButton onClick={onDialogClose} sx={{position: 'absolute', right: 8, top: 8, color: grey[500]}}>
-          <CloseIcon/>
+        <IconButton
+          onClick={onDialogClose}
+          sx={{ position: 'absolute', right: 8, top: 8, color: grey[500] }}
+        >
+          <CloseIcon />
         </IconButton>
         <DialogContent>
           <TextField
@@ -168,6 +171,12 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
             required
           />
           <DialogContentText>
+            {selectedNote?.author && (
+              <>
+                Van: {selectedNote.author}
+                <br />
+              </>
+            )}
             Toegevoegd: {dayjs(selectedNote?.created).fromNow()}
             <br />
             Aangepast: {dayjs(selectedNote?.created).fromNow()}

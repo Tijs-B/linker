@@ -156,7 +156,7 @@ export const linkerApi = createApi({
         method: 'POST',
       }),
     }),
-    createTeamNote: build.mutation<TeamNote, Omit<TeamNote, 'id' | 'created'>>({
+    createTeamNote: build.mutation<TeamNote, Omit<TeamNote, 'id' | 'created' | 'author'>>({
       query: (note) => ({
         url: '/team-notes/',
         method: 'POST',

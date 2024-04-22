@@ -9,7 +9,10 @@ export function toHoursMinutes(dateTime: string | undefined): string {
   return '';
 }
 
-export function secondsToHoursMinutes(seconds: number | null | undefined, showPrefix: boolean = true): string {
+export function secondsToHoursMinutes(
+  seconds: number | null | undefined,
+  showPrefix: boolean = true,
+): string {
   if (seconds === null || seconds === undefined) {
     return '-';
   }

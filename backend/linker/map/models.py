@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models import Collect
 from django.contrib.gis.db.models.functions import Centroid
@@ -56,6 +57,7 @@ class MapNote(models.Model):
     updated = models.DateTimeField(auto_now=True)
     content = models.TextField()
     point = models.PointField()
+    author = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         if len(self.content) > 30:

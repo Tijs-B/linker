@@ -48,6 +48,9 @@ class TeamNoteViewSet(viewsets.ModelViewSet):
     queryset = TeamNote.objects.all()
     serializer_class = TeamNoteSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
 
 class ContactPersonViewSet(viewsets.ModelViewSet):
     queryset = ContactPerson.objects.all()
