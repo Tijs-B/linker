@@ -1,6 +1,7 @@
 import { ChangeEvent, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Layer, MapLayerMouseEvent, Source, useMap } from 'react-map-gl/maplibre';
 
+import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DirectionsIcon from '@mui/icons-material/Directions';
 import {
@@ -24,6 +25,7 @@ import {
   useUpdateMapNoteMutation,
 } from '../services/linker.ts';
 import { MapNote } from '../services/types.ts';
+import { grey } from '@mui/material/colors';
 
 type HoverInfo = {
   x: number;
@@ -149,6 +151,9 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
       </Source>
       <Dialog open={!!selectedNote} onClose={onDialogClose} fullWidth>
         <DialogTitle>Kaartnotitie</DialogTitle>
+        <IconButton onClick={onDialogClose} sx={{position: 'absolute', right: 8, top: 8, color: grey[500]}}>
+          <CloseIcon/>
+        </IconButton>
         <DialogContent>
           <TextField
             value={selectedNote?.content}

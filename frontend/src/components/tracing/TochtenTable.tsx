@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 
 import {
   Paper,
@@ -28,37 +28,35 @@ const TochtenTable = memo(function TochtenTable({
   stats,
   showFull,
 }: TochtenTableProps) {
-  const rows = useMemo(() => {
-    const theStats = showFull ? stats.fullTochten : stats.partialTochten;
-    return tochten.ids.map((tochtId) => {
-      const tocht = tochten.entities[tochtId];
-      const nextTocht = tochten.ids[(tochten.ids.indexOf(tochtId) + 1) % tochten.ids.length];
+  const theStats = showFull ? stats.fullTochten : stats.partialTochten;
+  const rows = tochten.ids.map((tochtId) => {
+    const tocht = tochten.entities[tochtId];
+    const nextTocht = tochten.ids[(tochten.ids.indexOf(tochtId) + 1) % tochten.ids.length];
 
-      const nextFiche = Object.values(fiches.entities).find(
-        (fiche) => fiche.tocht === nextTocht && fiche.order === 1,
-      )!;
-      const allFiches = fiches.ids
-        .map((ficheId) => fiches.entities[ficheId])
-        .filter((fiche) => fiche.tocht === tochtId)
-        .map((fiche) => fiche.display_name);
+    const nextFiche = Object.values(fiches.entities).find(
+      (fiche) => fiche.tocht === nextTocht && fiche.order === 1,
+    )!;
+    const allFiches = fiches.ids
+      .map((ficheId) => fiches.entities[ficheId])
+      .filter((fiche) => fiche.tocht === tochtId)
+      .map((fiche) => fiche.display_name);
 
-      const start = showFull ? allFiches[0] : allFiches[1];
-      const end = showFull ? nextFiche.display_name : allFiches[allFiches.length - 1];
+    const start = showFull ? allFiches[0] : allFiches[1];
+    const end = showFull ? nextFiche.display_name : allFiches[allFiches.length - 1];
 
-      return (
-        <TableRow key={tochtId}>
-          <TableCell>
-            {tocht.identifier} Rood ({start}&rarr;{end})
-          </TableCell>
-          <TableCell>{secondsToHoursMinutes(theStats[tochtId].R.average)}</TableCell>
-          <TableCell>
-            {tocht.identifier} Blauw ({end}&rarr;{start})
-          </TableCell>
-          <TableCell>{secondsToHoursMinutes(theStats[tochtId].B.average)}</TableCell>
-        </TableRow>
-      );
-    });
-  }, [tochten, fiches, stats, showFull]);
+    return (
+      <TableRow key={tochtId}>
+        <TableCell>
+          {tocht.identifier} Rood ({start}&rarr;{end})
+        </TableCell>
+        <TableCell>{secondsToHoursMinutes(theStats[tochtId].R.average, false)}</TableCell>
+        <TableCell>
+          {tocht.identifier} Blauw ({end}&rarr;{start})
+        </TableCell>
+        <TableCell>{secondsToHoursMinutes(theStats[tochtId].B.average, false)}</TableCell>
+      </TableRow>
+    );
+  });
 
   return (
     <TableContainer component={Paper}>

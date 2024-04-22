@@ -9,7 +9,7 @@ export function toHoursMinutes(dateTime: string | undefined): string {
   return '';
 }
 
-export function secondsToHoursMinutes(seconds: number | null | undefined): string {
+export function secondsToHoursMinutes(seconds: number | null | undefined, showPrefix: boolean = true): string {
   if (seconds === null || seconds === undefined) {
     return '-';
   }
@@ -18,9 +18,9 @@ export function secondsToHoursMinutes(seconds: number | null | undefined): strin
   const hours = Math.floor(totalMinutes / 60);
 
   const hoursText = hours > 0 ? `${hours} uur ` : '';
-  const prefix = seconds < 0 ? '- ' : '+ ';
+  const prefix = showPrefix ? (seconds < 0 ? '- ' : '+ ') : '';
 
-  if (minutes > 0) {
+  if (hours > 0 || minutes > 0) {
     return `${prefix}${hoursText}${minutes} minuten`;
   } else {
     return `${prefix}${Math.abs(seconds)} seconden`;
