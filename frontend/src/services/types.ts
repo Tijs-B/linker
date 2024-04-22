@@ -11,6 +11,7 @@ export enum MemberType {
   RODE_KRUIS = 'Rode Kruis',
   HANDIGE_HARRY = 'Handige Harry',
   WEIDE = 'Weide',
+  BUS = 'Bus',
 }
 
 export interface TrackerLog {

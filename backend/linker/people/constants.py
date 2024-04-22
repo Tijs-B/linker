@@ -17,6 +17,7 @@ class MemberType(Enum):
     RODE_KRUIS = 'Rode Kruis'
     HANDIGE_HARRY = 'Handige Harry'
     WEIDE = 'Weide'
+    BUS = 'Bus'
 
     def __str__(self) -> str:
         return self.value
