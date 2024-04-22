@@ -13,8 +13,9 @@ class TochtAdmin(admin.GISModelAdmin):
 
 @admin.register(MapNote)
 class MapNoteAdmin(admin.GISModelAdmin):
-    readonly_fields = ('created', 'updated')
+    readonly_fields = ('created', 'updated', 'author')
     search_fields = ('content',)
+    list_display = ('__str__', 'created', 'author')
 
 
 @admin.register(ForbiddenArea)
