@@ -7,13 +7,13 @@ from linker.map.models import Basis
 
 class Tracker(models.Model):
     tracker_id = models.CharField(max_length=50, db_index=True, unique=True)
-    tracker_code = models.CharField(max_length=50, blank=True, null=True)
+    tracker_name = models.CharField(max_length=50, blank=True, null=True)
 
     last_log = models.OneToOneField('TrackerLog', on_delete=models.SET_NULL, blank=True, null=True, related_name='+')
 
     def __str__(self):
-        if self.tracker_code:
-            return self.tracker_code
+        if self.tracker_name:
+            return self.tracker_name
         else:
             return self.tracker_id
 

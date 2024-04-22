@@ -19,5 +19,5 @@ class TrackerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tracker
-        fields = ['id', 'last_log', 'tracker_id', 'tracker_code', 'fiche', 'weide', 'tocht', 'basis']
+        fields = ['id', 'last_log', 'tracker_id', 'tracker_name', 'fiche', 'weide', 'tocht', 'basis']
         read_only_fields = fields

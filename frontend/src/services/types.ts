@@ -24,7 +24,7 @@ export interface Tracker {
   id: number;
   last_log: TrackerLog | null;
   tracker_id: string;
-  tracker_code: string;
+  tracker_name: string;
   fiche: number | null;
   weide: number | null;
   tocht: number | null;
