@@ -164,7 +164,7 @@ export const linkerApi = createApi({
       }),
       invalidatesTags: ['Team'],
     }),
-    createMapNote: build.mutation<MapNote, Omit<MapNote, 'id' | 'created' | 'updated'>>({
+    createMapNote: build.mutation<MapNote, Omit<MapNote, 'id' | 'created' | 'updated' | 'author'>>({
       query: (mapNote) => ({
         url: '/map-notes/',
         method: 'POST',
