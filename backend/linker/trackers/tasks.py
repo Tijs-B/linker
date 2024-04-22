@@ -1,3 +1,4 @@
+from logging import getLogger
 from pathlib import Path
 
 from celery import shared_task
@@ -11,6 +12,9 @@ from .utils import generate_heatmap_tiles
 from ..config.models import Switch
 
 
+logger = getLogger(__name__)
+
+
 @shared_task
 def download_tracker_data():
     if Switch.switch_is_active(SWITCH_SIMULATE):
@@ -22,4 +26,5 @@ def download_tracker_data():
 
 @shared_task
 def update_heatmap():
+    logger.info('Updating heatmap')
     generate_heatmap_tiles(Path(settings.HEATMAP_PATH))

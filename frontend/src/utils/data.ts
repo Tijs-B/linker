@@ -64,16 +64,3 @@ export function getNextFiche(fiche: number, fiches: EntityState<Fiche, number>):
     return fiches.ids[index + 1];
   }
 }
-
-export function getCheckpointLog(
-  team: number,
-  fiche: number,
-  checkpointLogs: EntityState<CheckpointLog, number>,
-) {
-  for (const log of Object.values(checkpointLogs.entities)) {
-    if (log.fiche === fiche && log.team === team) {
-      return log;
-    }
-  }
-  return null;
-}

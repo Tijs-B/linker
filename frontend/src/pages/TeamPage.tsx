@@ -163,7 +163,9 @@ const TeamPage = memo(function TeamPage() {
                     <TableBody>
                       <TableRow>
                         <TableCell>Gem. afwijking voor tochten</TableCell>
-                        <TableCell>{secondsToHoursMinutes(teamStats?.avgTochtDeviation)}</TableCell>
+                        <TableCell>
+                          {secondsToHoursMinutes(teamStats?.avgPartialTochtDeviation)}
+                        </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell>Gem. afwijking voor fiches</TableCell>

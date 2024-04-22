@@ -120,7 +120,9 @@ export default function MainPage() {
     if (teamFuse && keyword) {
       return teamFuse.search(keyword).map((item) => item.item);
     } else if (teams) {
-      return teams.ids.map((id) => teams.entities[id]).filter((team) => filterSafe || !team.safe_weide);
+      return teams.ids
+        .map((id) => teams.entities[id])
+        .filter((team) => filterSafe || !team.safe_weide);
     } else {
       return [];
     }

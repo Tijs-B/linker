@@ -22,7 +22,7 @@ from .serializers import (
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.prefetch_related(
         Prefetch('contact_persons', queryset=ContactPerson.objects.order_by('name')),
-        Prefetch('team_notes', queryset=TeamNote.objects.order_by('created'))
+        Prefetch('team_notes', queryset=TeamNote.objects.order_by('created')),
     ).order_by('number')
     serializer_class = TeamSerializer
 

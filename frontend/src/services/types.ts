@@ -131,14 +131,17 @@ interface SingleStat {
 
 interface TeamStat {
   fiches: Record<number, number>;
-  tochten: Record<number, number>;
+  fullTochten: Record<number, number>;
+  partialTochten: Record<number, number>;
   avgFicheDeviation: number | null;
-  avgTochtDeviation: number | null;
+  avgFullTochtDeviation: number | null;
+  avgPartialTochtDeviation: number | null;
 }
 
 export interface Stats {
   fiches: Record<number, Record<Direction, SingleStat>>;
-  tochten: Record<number, Record<Direction, SingleStat>>;
+  fullTochten: Record<number, Record<Direction, SingleStat>>;
+  partialTochten: Record<number, Record<Direction, SingleStat>>;
   teams: Record<number, TeamStat>;
 }
 

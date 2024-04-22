@@ -1,4 +1,5 @@
 from datetime import datetime
+from logging import getLogger
 from typing import Optional
 
 from dateutil.parser import isoparse
@@ -9,6 +10,16 @@ from geopy.distance import distance
 from linker.map.models import Tocht
 from linker.people.models import Team
 from linker.trackers.models import Tracker, TrackerLog
+
+
+logger = getLogger(__name__)
+
+
+def try_parse_date(date_str: str) -> datetime | None:
+    try:
+        return isoparse(date_str)
+    except Exception:
+        return None
 
 
 def import_geodynamics_data(data: dict, fetch_datetime: Optional[datetime] = None) -> None:
@@ -27,37 +38,48 @@ def import_geodynamics_data(data: dict, fetch_datetime: Optional[datetime] = Non
         last_location = tracker_data['LastLocation']
 
         tracker_id = tracker_data['Id']
+        tracker_name = tracker_data['Name']
 
         if tracker_id not in trackers:
-            trackers[tracker_id] = Tracker.objects.create(tracker_id=tracker_id)
+            logger.info(f'Tracker id {tracker_id} not yet in tracker list. Creating new tracker')
+            trackers[tracker_id] = Tracker.objects.create(tracker_id=tracker_id, tracker_name=tracker_name)
 
         tracker = trackers[tracker_id]
+
+        gps_datetime = try_parse_date(last_location.get('GpsDateTime'))
+        if gps_datetime is None:
+            logger.info(
+                f'GPS datetime is None or can not be parsed. Skipping adding log. {last_location.get("GpsDateTime")}'
+            )
+            continue
+
         point = Point(round(last_location['Longitude'], 6), round(last_location['Latitude'], 6))
         if distance(point, tocht_centroid).km > 50:
+            logger.info('Location too far away from tocht. Skipping adding log')
             continue
 
         new_tracker_logs.append(
             TrackerLog(
                 tracker=tracker,
-                gps_datetime=isoparse(last_location['GpsDateTime']),
+                gps_datetime=gps_datetime,
                 fetch_datetime=fetch_datetime,
                 team_is_safe=tracker_id in safe_trackers,
-                local_datetime=isoparse(last_location['LocalDateTime']) if last_location['LocalDateTime'] else None,
-                last_sync_date=isoparse(tracker_data['LastSyncDate']) if tracker_data['LastSyncDate'] else None,
-                satellites=last_location['Satellites'],
-                input_acc=last_location['InputAcc'],
-                voltage=last_location['VoltageString'],
+                local_datetime=try_parse_date(last_location.get('LocalDateTime')),
+                last_sync_date=try_parse_date(last_location.get('LastSyncDate')),
+                satellites=last_location.get('Satellites'),
+                input_acc=last_location.get('InputAcc'),
+                voltage=last_location.get('VoltageString'),
                 point=point,
-                analog_input=last_location['AnalogInput1'],
-                tracker_type=last_location['Type'],
-                heading=last_location['Heading'],
-                speed=last_location['Speed'],
-                is_online=tracker_data['IsOnline'],
-                has_gps=tracker_data['HasGps'],
-                has_power=tracker_data['HasPower'],
-                is_online_threshold=tracker_data['IsOnlineTreshold'],
-                name=tracker_data['Name'],
-                code=tracker_data['Code'],
+                analog_input=last_location.get('AnalogInput1'),
+                tracker_type=last_location.get('Type'),
+                heading=last_location.get('Heading'),
+                speed=last_location.get('Speed'),
+                is_online=tracker_data.get('IsOnline'),
+                has_gps=tracker_data.get('HasGps'),
+                has_power=tracker_data.get('HasPower'),
+                is_online_threshold=tracker_data.get('IsOnlineTreshold'),
+                name=tracker_data.get('Name'),
+                code=tracker_data.get('Code'),
             )
         )
 

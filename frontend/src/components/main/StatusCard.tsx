@@ -82,8 +82,8 @@ function TeamRows({ team }: { team: Team }) {
         </TableCell>
         <TableCell css={cell}>
           <Typography variant="body2" color="textSecondary">
-            {teamStats && teamStats.avgTochtDeviation
-              ? secondsToHoursMinutes(teamStats.avgTochtDeviation)
+            {teamStats && teamStats.avgPartialTochtDeviation
+              ? secondsToHoursMinutes(teamStats.avgPartialTochtDeviation)
               : '-'}
           </Typography>
         </TableCell>

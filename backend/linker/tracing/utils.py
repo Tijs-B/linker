@@ -1,4 +1,5 @@
 from datetime import timedelta
+from logging import getLogger
 
 from django.contrib.gis.measure import D
 from django.db.models import Subquery, OuterRef, Q
@@ -10,7 +11,11 @@ from linker.tracing.models import CheckpointLog
 from linker.trackers.models import TrackerLog
 
 
+logger = getLogger(__name__)
+
+
 def trace_team(team: Team):
+    logger.info(f'Tracing team {team}')
     closest_fiche = Subquery(
         Fiche.objects.filter(point__distance_lte=(OuterRef('point'), D(m=FICHE_MAX_DISTANCE))).values('pk')[:1]
     )
@@ -37,9 +42,12 @@ def trace_team(team: Team):
                     .first()
                 )
                 if matching is not None:
-                    matching.left = max(current_left, matching.left) if matching.left is not None else current_left
+                    new_left = max(current_left, matching.left) if matching.left is not None else current_left
+                    logger.info(f'Updating existing checkpointlog {matching} with new left {new_left}')
+                    matching.left = new_left
                     matching.save()
                 else:
+                    logger.info(f'Creating new checkpointlog {current_arrived}-{current_left} at {current_fiche}')
                     CheckpointLog.objects.create(
                         arrived=current_arrived,
                         left=current_left,
@@ -57,6 +65,7 @@ def trace_team(team: Team):
             .filter(Q(left=None) | Q(left__gte=current_arrived))
             .exists()
         ):
+            logger.info(f'Creating new checkpointlog {current_arrived}-{current_left} at {current_fiche}')
             CheckpointLog.objects.create(
                 arrived=current_arrived,
                 left=current_left,

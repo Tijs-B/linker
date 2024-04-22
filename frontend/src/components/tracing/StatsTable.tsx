@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 
 import {
   Paper,
@@ -13,7 +13,6 @@ import {
 import { EntityState } from '@reduxjs/toolkit';
 
 import { CheckpointLog, Fiche, Stats, Team, Tocht } from '../../services/types.ts';
-import { getCheckpointLog, getNextFiche } from '../../utils/data.ts';
 import { toHoursMinutes } from '../../utils/time.ts';
 import PersonAvatar from '../PersonAvatar.jsx';
 
@@ -23,6 +22,15 @@ function ficheTimeToColor(time: number, min: number, max: number): string {
   const highestColor = 180;
   const value = Math.round(lowestColor + (highestColor - lowestColor) * percentage);
   return `rgb(255, ${value}, ${value})`;
+}
+
+function getCheckpointLog(team: number, fiche: number, checkpointLogs: CheckpointLog[]) {
+  for (const log of checkpointLogs) {
+    if (log.fiche === fiche && log.team === team) {
+      return log;
+    }
+  }
+  return null;
 }
 
 interface StatsTableProps {
@@ -44,12 +52,23 @@ const StatsTable = memo(function StatsTable({
     id,
     nbFiches: Object.values(fiches.entities).filter((fiche) => fiche.tocht === id).length,
   }));
-  const ficheTimes = fiches.ids.flatMap((id) => [
-    stats.fiches[id].R.average,
-    stats.fiches[id].B.average,
-  ]);
-  const minFicheTime = Math.min(...ficheTimes);
-  const maxFicheTime = Math.max(...ficheTimes);
+
+  const [minFicheTime, maxFicheTime] = useMemo(() => {
+    const ficheTimes = fiches.ids.flatMap((id) => [
+      stats.fiches[id].R.average,
+      stats.fiches[id].B.average,
+    ]);
+    const minFicheTime = Math.min(...ficheTimes);
+    const maxFicheTime = Math.max(...ficheTimes);
+    return [minFicheTime, maxFicheTime];
+  }, [fiches, stats]);
+
+  const sortedCheckpoints = useMemo(() => {
+    return Object.values(checkpointLogs.entities).sort(
+      (a, b) => new Date(a.arrived).valueOf() - new Date(b.arrived).valueOf(),
+    );
+  }, [checkpointLogs]);
+
   return (
     <TableContainer component={Paper}>
       <Table stickyHeader size="small">
@@ -66,8 +85,7 @@ const StatsTable = memo(function StatsTable({
             <TableCell />
             {fiches.ids.map((id) => (
               <TableCell key={id} sx={{ pl: 1, pr: 1 }}>
-                {fiches.entities[id].display_name}&#8209;
-                {fiches.entities[getNextFiche(id, fiches)].display_name}
+                {fiches.entities[id].display_name}
               </TableCell>
             ))}
           </TableRow>
@@ -88,7 +106,7 @@ const StatsTable = memo(function StatsTable({
                 key={id}
                 sx={{ pl: 1, pr: 1 }}
               >
-                {Math.round(stats.fiches[id].R.average / 60)}m
+                {Math.round(stats.fiches[id].R.average / 60)} min
               </TableCell>
             ))}
           </TableRow>
@@ -107,7 +125,7 @@ const StatsTable = memo(function StatsTable({
                 key={id}
                 sx={{ pl: 1, pr: 1 }}
               >
-                {Math.round(stats.fiches[id].B.average / 60)}m
+                {Math.round(stats.fiches[id].B.average / 60)} min
               </TableCell>
             ))}
           </TableRow>
@@ -118,7 +136,7 @@ const StatsTable = memo(function StatsTable({
               </TableCell>
               {fiches.ids.map((ficheId) => (
                 <TableCell key={ficheId}>
-                  {toHoursMinutes(getCheckpointLog(id, ficheId, checkpointLogs)?.arrived)}
+                  {toHoursMinutes(getCheckpointLog(id, ficheId, sortedCheckpoints)?.arrived)}
                 </TableCell>
               ))}
             </TableRow>

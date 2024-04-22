@@ -43,14 +43,24 @@ interface TeamRowProps {
   weides: EntityState<Weide, number>;
   stats: Stats;
   trackers: EntityState<Tracker, number>;
+  showFull: boolean;
 }
 
-const TeamRow = function ({ id, teams, fiches, tochten, weides, stats, trackers }: TeamRowProps) {
+const TeamRow = function ({
+  id,
+  teams,
+  fiches,
+  tochten,
+  weides,
+  stats,
+  trackers,
+  showFull,
+}: TeamRowProps) {
   const team = teams.entities[id];
   const tracker = team.tracker === null ? null : trackers.entities[team.tracker];
   const description = tracker && getPositionDescription(tracker, fiches, tochten, weides);
   const teamStats = stats.teams[id];
-  const tochtDev = teamStats.avgTochtDeviation;
+  const tochtDev = showFull ? teamStats.avgFullTochtDeviation : teamStats.avgPartialTochtDeviation;
   const ficheDev = teamStats.avgFicheDeviation;
   const tochtDevColor = tochtDev !== null ? getColorProps(tochtDev, 1.5 * 60 * 60) : {};
   const ficheDevColor = ficheDev !== null ? getColorProps(ficheDev, 15 * 60) : {};
@@ -79,6 +89,7 @@ interface TeamsTableProps {
   weides: EntityState<Weide, number>;
   stats: Stats;
   trackers: EntityState<Tracker, number>;
+  showFull: boolean;
 }
 
 const TeamsTable = memo(function TeamTable({
@@ -88,6 +99,7 @@ const TeamsTable = memo(function TeamTable({
   weides,
   stats,
   trackers,
+  showFull,
 }: TeamsTableProps) {
   return (
     <TableContainer>
@@ -112,6 +124,7 @@ const TeamsTable = memo(function TeamTable({
               fiches={fiches}
               trackers={trackers}
               weides={weides}
+              showFull={showFull}
             />
           ))}
         </TableBody>

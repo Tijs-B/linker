@@ -1,8 +1,19 @@
-import { memo } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { AppBar, Box, Container, IconButton, Stack, Toolbar, Typography } from '@mui/material';
+import {
+  AppBar,
+  Box,
+  Container,
+  FormControlLabel,
+  IconButton,
+  Switch,
+  Tab,
+  Tabs,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 
 import StatsTable from '../components/tracing/StatsTable.jsx';
 import TeamsTable from '../components/tracing/TeamsTable.jsx';
@@ -26,6 +37,17 @@ const TracingPage = memo(function TracingPage() {
   const { data: teams } = useGetTeamsQuery();
   const { data: trackers } = useGetTrackersQuery();
 
+  const [showFull, setShowFull] = useState(false);
+  const [currentTab, setCurrentTab] = useState('tochten');
+
+  const onSwitchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setShowFull(e.target.checked);
+  }, []);
+
+  const onTabChange = useCallback((_: React.SyntheticEvent, newValue: string) => {
+    setCurrentTab(newValue);
+  }, []);
+
   return (
     <>
       <AppBar position="sticky" color="inherit">
@@ -38,39 +60,47 @@ const TracingPage = memo(function TracingPage() {
         </Toolbar>
       </AppBar>
       <Container sx={{ pt: 2 }}>
-        <Stack spacing={2}>
-          {tochten && stats && (
-            <Box>
-              <h2>Tochten</h2>
-              <TochtenTable stats={stats} tochten={tochten} />
-            </Box>
-          )}
-          {tochten && fiches && weides && teams && stats && trackers && (
-            <Box>
-              <h2>Teams</h2>
-              <TeamsTable
-                teams={teams}
-                tochten={tochten}
-                fiches={fiches}
-                weides={weides}
-                stats={stats}
-                trackers={trackers}
-              />
-            </Box>
-          )}
-          {fiches && tochten && stats && checkpointLogs && teams && (
-            <Box>
-              <h2>Fiches</h2>
-              <StatsTable
-                stats={stats}
-                fiches={fiches}
-                tochten={tochten}
-                checkpointLogs={checkpointLogs}
-                teams={teams}
-              />
-            </Box>
-          )}
-        </Stack>
+        <FormControlLabel
+          control={<Switch onChange={onSwitchChange} />}
+          label="Gebruik statistieken op basis van volledige tocht (A1-B1 i.p.v. A2-A9)"
+        />
+        <Tabs value={currentTab} onChange={onTabChange}>
+          <Tab value="tochten" label="tochten" />
+          <Tab value="teams" label="teams" />
+          <Tab value="fiches" label="den hele excel" />
+        </Tabs>
+        {currentTab === 'tochten' && tochten && stats && fiches && (
+          <Box>
+            <h2>Tochten</h2>
+            <TochtenTable stats={stats} tochten={tochten} fiches={fiches} showFull={showFull} />
+          </Box>
+        )}
+        {currentTab === 'teams' && tochten && fiches && weides && teams && stats && trackers && (
+          <Box>
+            <h2>Teams</h2>
+            <TeamsTable
+              teams={teams}
+              tochten={tochten}
+              fiches={fiches}
+              weides={weides}
+              stats={stats}
+              trackers={trackers}
+              showFull={showFull}
+            />
+          </Box>
+        )}
+        {currentTab === 'fiches' && fiches && tochten && stats && checkpointLogs && teams && (
+          <Box>
+            <h2>Fiches</h2>
+            <StatsTable
+              stats={stats}
+              fiches={fiches}
+              tochten={tochten}
+              checkpointLogs={checkpointLogs}
+              teams={teams}
+            />
+          </Box>
+        )}
       </Container>
     </>
   );

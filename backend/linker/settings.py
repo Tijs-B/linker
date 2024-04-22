@@ -192,3 +192,24 @@ if DEBUG:
     CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', 'http://192.168.0.130:5173', 'http://localhost:8060']
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': env('DJANGO_LOG_LEVEL', default='INFO'),
+            'propagate': False,
+        }
+    },
+}
