@@ -52,7 +52,7 @@ export default function MainPage() {
   });
 
   const { error: queryError } = useGetUserQuery(undefined, {
-    pollingInterval: 3000,
+    pollingInterval: 5000,
   });
 
   // Navigate to login page if unauthenticated

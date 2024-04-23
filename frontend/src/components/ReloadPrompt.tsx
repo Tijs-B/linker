@@ -20,7 +20,7 @@ export default function ReloadPrompt() {
         setInterval(() => {
           console.log('Checking for sw update');
           r.update();
-        }, 20000 /* 20s for testing purposes */);
+        }, 1000 * 60 * 5 /* 20s for testing purposes */);
       }
     },
     onRegisterError(error) {
