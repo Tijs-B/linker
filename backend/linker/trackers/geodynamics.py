@@ -35,10 +35,6 @@ def import_geodynamics_data(data: dict, fetch_datetime: Optional[datetime] = Non
     safe_trackers = set(Team.objects.exclude(safe_weide__isnull=True).values_list('tracker__tracker_id', flat=True))
 
     for tracker_data in data['Data']:
-        if tracker_data['LastLocation'] is None:
-            continue
-        last_location = tracker_data['LastLocation']
-
         tracker_id = tracker_data['Id']
         tracker_name = tracker_data['Name']
 
@@ -47,6 +43,10 @@ def import_geodynamics_data(data: dict, fetch_datetime: Optional[datetime] = Non
             trackers[tracker_id] = Tracker.objects.create(tracker_id=tracker_id, tracker_name=tracker_name)
 
         tracker = trackers[tracker_id]
+
+        if tracker_data.get('LastLocation') is None:
+            continue
+        last_location = tracker_data['LastLocation']
 
         gps_datetime = try_parse_date(last_location.get('GpsDateTime'))
         if gps_datetime is None:
