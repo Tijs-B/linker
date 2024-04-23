@@ -135,6 +135,8 @@ const TeamPage = memo(function TeamPage() {
     }
   }, [uploadedFile, teamId, uploadGroupPicture]);
 
+  const trackerCode = trackers && team?.tracker ? trackers.entities[team.tracker].tracker_name : '';
+
   if (!team) {
     return <div>Team not found</div>;
   }
@@ -188,6 +190,10 @@ const TeamPage = memo(function TeamPage() {
                             </>
                           )}
                         </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>Trackercode</TableCell>
+                        <TableCell>{trackerCode}</TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
