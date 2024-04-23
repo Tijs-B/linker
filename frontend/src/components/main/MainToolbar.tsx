@@ -88,19 +88,19 @@ const MainToolbar = memo(function MainToolbar({
       >
         <MenuItem onClick={() => dispatch(filterActions.toggleShowSafe())}>
           <ListItemIcon>{showSafe && <CheckIcon />}</ListItemIcon>
-          Safe teams
+          Toon safe teams
         </MenuItem>
         <MenuItem onClick={() => dispatch(filterActions.toggleShowMembers())}>
           <ListItemIcon>{showMembers && <CheckIcon />}</ListItemIcon>
-          Organisatie
+          Toon organisatie
         </MenuItem>
         <MenuItem onClick={() => dispatch(filterActions.toggleShowBlue())}>
           <ListItemIcon>{showBlue && <CheckIcon />}</ListItemIcon>
-          Blauwe teams
+          Toon blauwe teams
         </MenuItem>
         <MenuItem onClick={() => dispatch(filterActions.toggleShowRed())}>
           <ListItemIcon>{showRed && <CheckIcon />}</ListItemIcon>
-          Rode teams
+          Toon rode teams
         </MenuItem>
       </Menu>
       <OutlinedInput
