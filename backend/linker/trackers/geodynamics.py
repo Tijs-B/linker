@@ -8,9 +8,7 @@ from dateutil.parser import isoparse
 from django.conf import settings
 from django.contrib.gis.geos import Point
 from django.utils.timezone import now
-from geopy.distance import distance
 
-from linker.map.models import Tocht
 from linker.people.models import Team
 from linker.trackers.models import Tracker, TrackerLog
 
@@ -29,7 +27,7 @@ def import_geodynamics_data(data: dict, fetch_datetime: Optional[datetime] = Non
     if fetch_datetime is None:
         fetch_datetime = now()
 
-    tocht_centroid = Tocht.centroid()
+    # tocht_centroid = Tocht.centroid()
 
     new_tracker_logs = []
     trackers = {tracker.tracker_id: tracker for tracker in Tracker.objects.all()}
@@ -57,9 +55,9 @@ def import_geodynamics_data(data: dict, fetch_datetime: Optional[datetime] = Non
             continue
 
         point = Point(round(last_location['Longitude'], 6), round(last_location['Latitude'], 6))
-        if distance(point, tocht_centroid).km > 50:
-            logger.info('Location too far away from tocht. Skipping adding log')
-            continue
+        # if distance(point, tocht_centroid).km > 50:
+        #     logger.info('Location too far away from tocht. Skipping adding log')
+        #     continue
 
         new_tracker_logs.append(
             TrackerLog(
