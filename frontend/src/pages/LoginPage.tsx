@@ -45,7 +45,14 @@ export default function LoginPage() {
         <Grid item xs={8} md={4}>
           <Paper>
             <form onSubmit={submitForm}>
-              <TextField required label="Gebruikersnaam" name="username" autoFocus />
+              <TextField
+                required
+                label="Gebruikersnaam"
+                name="username"
+                autoFocus
+                inputProps={{ style: { textTransform: 'none' } }}
+                autoCapitalize="off"
+              />
               <TextField required label="Wachtwoord" type="password" name="password" />
               <Button type="submit">Login</Button>
             </form>
