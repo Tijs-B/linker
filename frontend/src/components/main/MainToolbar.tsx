@@ -45,8 +45,6 @@ const MainToolbar = memo(function MainToolbar({
   const filterActive = useAppSelector(selectFilterActive);
   const dispatch = useAppDispatch();
 
-  console.log(filterActive);
-
   const [menuAnchorEl, setMenuAnchorEl] = useState<Element | null>(null);
 
   const onSearchChange = useCallback(

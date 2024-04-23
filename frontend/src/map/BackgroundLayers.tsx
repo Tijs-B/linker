@@ -60,9 +60,6 @@ function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
     return [weidesData, labelData];
   }, [weides]);
 
-  console.log('weides', weidesData);
-  console.log('labels', weidesLabelData);
-
   return (
     <>
       <Source
