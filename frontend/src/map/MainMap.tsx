@@ -234,7 +234,7 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
         <TrackerHistoryLayer visible={!showHeatmap} />
 
         <NavigationControl />
-        <GeolocateControl />
+        <GeolocateControl trackUserLocation positionOptions={{enableHighAccuracy: true}} />
         <ScaleControl position="bottom-right" />
 
         <CustomOverlay>
