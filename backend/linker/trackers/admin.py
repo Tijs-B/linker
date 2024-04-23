@@ -9,6 +9,10 @@ from linker.trackers.models import Tracker, TrackerLog
 class TrackerAdmin(admin.ModelAdmin):
     readonly_fields = ('last_log',)
     list_display = ('tracker_id', 'tracker_name', 'used_by')
+    ordering = (
+        'tracker_name',
+        'tracker_id',
+    )
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
