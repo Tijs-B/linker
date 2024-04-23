@@ -182,7 +182,7 @@ function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
           beforeId="weides-labels"
           paint={{
             'fill-color': green[800],
-            'fill-opacity': 0.5,
+            'fill-opacity': 0.8,
             'fill-outline-color': green[900],
           }}
           layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
