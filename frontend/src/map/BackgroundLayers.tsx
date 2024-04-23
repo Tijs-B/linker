@@ -1,14 +1,16 @@
 import { memo, useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
-import { grey, red } from '@mui/material/colors';
+import { green, grey, red } from '@mui/material/colors';
 
+import centroid from '@turf/centroid';
 import { feature, featureCollection } from '@turf/helpers';
 
 import {
   useGetFichesQuery,
   useGetForbiddenAreasQuery,
   useGetTochtenQuery,
+  useGetWeidesQuery,
   useGetZijwegenQuery,
 } from '../services/linker.ts';
 
@@ -21,6 +23,7 @@ function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
   const { data: fiches } = useGetFichesQuery();
   const { data: zijwegen } = useGetZijwegenQuery();
   const { data: forbiddenAreas } = useGetForbiddenAreasQuery();
+  const { data: weides } = useGetWeidesQuery();
 
   const tochtenData = useMemo(() => {
     if (!tochten) {
@@ -41,6 +44,24 @@ function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
       ),
     );
   }, [fiches]);
+
+  const [weidesData, weidesLabelData] = useMemo(() => {
+    if (!weides) {
+      return [featureCollection([]), featureCollection([])];
+    }
+    const weidesData = featureCollection(
+      Object.values(weides.entities).map((weide) => feature(weide.polygon, {}, { id: weide.id })),
+    );
+    const labelData = featureCollection(
+      Object.values(weides.entities).map((weide) =>
+        centroid(weide.polygon, { properties: { name: weide.display_name } }),
+      ),
+    );
+    return [weidesData, labelData];
+  }, [weides]);
+
+  console.log('weides', weidesData);
+  console.log('labels', weidesLabelData);
 
   return (
     <>
@@ -135,11 +156,43 @@ function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
           layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
         />
       </Source>
+      <Source type="geojson" data={weidesLabelData}>
+        <Layer
+          id="weides-labels"
+          beforeId="zijwegen-outline"
+          type="symbol"
+          layout={{
+            'icon-allow-overlap': true,
+            'text-field': ['get', 'name'],
+            'text-size': 12,
+            'text-font': ['D-DIN DIN-Bold', 'Arial Unicode MS Regular'],
+            visibility: showHeatmap ? 'none' : 'visible',
+          }}
+          paint={{
+            'text-opacity': showHeatmap ? 0 : 1,
+            'text-color': grey[800],
+          }}
+          minzoom={13}
+        />
+      </Source>
+      <Source type="geojson" data={weidesData}>
+        <Layer
+          id="weides"
+          type="fill"
+          beforeId="weides-labels"
+          paint={{
+            'fill-color': green[800],
+            'fill-opacity': 0.5,
+            'fill-outline-color': green[900],
+          }}
+          layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
+        />
+      </Source>
       <Source type="geojson" data={forbiddenAreas || featureCollection([])}>
         <Layer
           id="forbidden-areas"
           type="fill"
-          beforeId="zijwegen-outline"
+          beforeId="weides"
           paint={{
             'fill-color': red[500],
             'fill-opacity': 0.5,

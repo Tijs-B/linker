@@ -18,6 +18,7 @@
     "@mui/material": "^5.13.5",
     "@reduxjs/toolkit": "^2.2.1",
     "@turf/bbox": "^7.0.0-alpha.113",
+    "@turf/centroid": "^7.0.0-alpha.113",
     "@turf/distance": "^7.0.0-alpha.113",
     "@turf/helpers": "^7.0.0-alpha.113",
     "dayjs": "^1.11.10",
