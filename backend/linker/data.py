@@ -85,7 +85,8 @@ def import_geoserver(base_url: str | None = None):
     for feature in weides['features']:
         if feature.get('geometry') is not None:
             polygon = GEOSGeometry(json.dumps(feature['geometry']))
-            letter = feature['properties']['letter']
+            letter = feature['properties']['letter'][0].upper()
+            name = feature['properties']['name']
             if letter == 'X':
                 basis = Basis.objects.first()
                 if basis is None:
@@ -95,8 +96,8 @@ def import_geoserver(base_url: str | None = None):
                     basis.save()
                 continue
 
-            tocht = Tocht.objects.get(identifier=letter[0].upper())
-            Weide.objects.update_or_create(tocht=tocht, defaults=dict(polygon=polygon))
+            tocht = Tocht.objects.get(identifier=letter)
+            Weide.objects.update_or_create(tocht=tocht, defaults=dict(polygon=polygon, identifier=letter, name=name))
 
     fiches = get(base_url + '/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:fiches_2024'})
     fiches = fiches.json()
