@@ -1,5 +1,7 @@
 import { EntityState } from '@reduxjs/toolkit';
 import distance from '@turf/distance';
+import { Point } from 'geojson';
+import isMobile from 'is-mobile';
 
 import { CheckpointLog, Fiche, Tocht, Tracker, Weide } from '../services/types.ts';
 
@@ -63,4 +65,11 @@ export function getNextFiche(fiche: number, fiches: EntityState<Fiche, number>):
   } else {
     return fiches.ids[index + 1];
   }
+}
+
+export function getNavigationUrl(point: Point | null | undefined): string {
+  const [longitude, latitude] = point ? point.coordinates : [null, null];
+  return isMobile({ tablet: true, featureDetect: true })
+    ? `geo:${latitude},${longitude}`
+    : `https://www.google.com/maps/search/?api=1&query=${latitude}%2C${longitude}`;
 }

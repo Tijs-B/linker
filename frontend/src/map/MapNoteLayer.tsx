@@ -18,7 +18,6 @@ import { grey } from '@mui/material/colors';
 
 import { feature, featureCollection } from '@turf/helpers';
 import dayjs from 'dayjs';
-import isMobile from 'is-mobile';
 
 import {
   useDeleteMapNoteMutation,
@@ -26,6 +25,7 @@ import {
   useUpdateMapNoteMutation,
 } from '../services/linker.ts';
 import { MapNote } from '../services/types.ts';
+import { getNavigationUrl } from '../utils/data.ts';
 
 type HoverInfo = {
   x: number;
@@ -122,16 +122,7 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
     setSelectedNote((note) => note && { ...note, content: e.target.value });
   }, []);
 
-  const navigateUrl = useMemo(() => {
-    if (!selectedNote) {
-      return '';
-    }
-    const [longitude, latitude] = selectedNote.point.coordinates;
-
-    return isMobile({ tablet: true, featureDetect: true })
-      ? `geo:${latitude},${longitude}`
-      : `https://www.google.com/maps/search/?api=1&query=${latitude}%2C${longitude}`;
-  }, [selectedNote]);
+  const navigateUrl = getNavigationUrl(selectedNote?.point);
 
   return (
     <>

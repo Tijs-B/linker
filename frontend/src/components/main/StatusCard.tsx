@@ -29,7 +29,6 @@ import {
 } from '@mui/material';
 
 import { css } from '@emotion/react';
-import isMobile from 'is-mobile';
 
 import {
   useGetCheckpointLogsQuery,
@@ -39,7 +38,7 @@ import {
 } from '../../services/linker.ts';
 import { Team } from '../../services/types.ts';
 import { selectSelectedItem, trackersActions, useAppDispatch, useAppSelector } from '../../store';
-import { getLastCheckpointLog } from '../../utils/data';
+import { getLastCheckpointLog, getNavigationUrl } from '../../utils/data';
 import { secondsToHoursMinutes } from '../../utils/time';
 import PersonAvatar from '../PersonAvatar';
 import SafeSelector from '../SafeSelector';
@@ -208,10 +207,7 @@ const StatusCard = memo(function StatusCard() {
     const tracker =
       trackers && selectedItem?.tracker ? trackers.entities[selectedItem.tracker] : null;
     const last_log = tracker && tracker.last_log;
-    const [longitude, latitude] = last_log ? last_log.point.coordinates : [null, null];
-    return isMobile({ tablet: true, featureDetect: true })
-      ? `geo:${latitude},${longitude}`
-      : `https://www.google.com/maps/search/?api=1&query=${latitude}%2C${longitude}`;
+    return getNavigationUrl(last_log?.point);
   }, [selectedItem, trackers]);
 
   const focusMap = useCallback(() => {
