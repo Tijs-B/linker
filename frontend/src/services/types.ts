@@ -91,9 +91,10 @@ export interface Fiche {
 
 export interface Weide {
   id: number;
-  tocht: number;
+  identifier: string;
+  name: string;
+  tocht: number | null;
   polygon: Polygon;
-  display_name: string;
 }
 
 export interface Zijweg {

@@ -30,4 +30,4 @@ class FicheAdmin(admin.GISModelAdmin):
 
 @admin.register(Weide)
 class WeideAdmin(admin.GISModelAdmin):
-    ordering = ('tocht__order',)
+    ordering = ('identifier',)

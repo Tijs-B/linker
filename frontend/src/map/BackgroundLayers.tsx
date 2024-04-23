@@ -54,7 +54,7 @@ function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
     );
     const labelData = featureCollection(
       Object.values(weides.entities).map((weide) =>
-        centroid(weide.polygon, { properties: { name: weide.display_name } }),
+        centroid(weide.polygon, { properties: { name: weide.identifier } }),
       ),
     );
     return [weidesData, labelData];

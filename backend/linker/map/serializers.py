@@ -20,11 +20,9 @@ class FicheSerializer(serializers.ModelSerializer):
 
 
 class WeideSerializer(serializers.ModelSerializer):
-    display_name = serializers.CharField()
-
     class Meta:
         model = Weide
-        fields = ['id', 'tocht', 'polygon', 'display_name']
+        fields = ['id', 'identifier', 'name', 'polygon', 'tocht']
         read_only_fields = fields
 
 

@@ -20,7 +20,7 @@ class TochtViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class WeideViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Weide.objects.all().annotate(display_name=F('tocht__identifier')).order_by('tocht__order')
+    queryset = Weide.objects.all().order_by('identifier')
     serializer_class = WeideSerializer
 
 

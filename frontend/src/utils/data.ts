@@ -32,7 +32,7 @@ export function getPositionDescription(
     return 'Basis';
   }
   if (tracker.weide !== null) {
-    return `Weide ${weides.entities[tracker.weide].display_name}`;
+    return `Weide ${weides.entities[tracker.weide].identifier}`;
   }
   if (tracker.fiche !== null) {
     return `Fiche ${fiches.entities[tracker.fiche].display_name}`;

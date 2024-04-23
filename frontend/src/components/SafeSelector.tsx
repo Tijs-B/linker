@@ -27,7 +27,7 @@ const SafeSelector = memo(function SafeSelector({ team }: SafeSelectorProps) {
     if (team.safe_weide === null || weides === undefined) {
       return 'Unsafe';
     } else {
-      return weides.entities[team.safe_weide].display_name;
+      return weides.entities[team.safe_weide].name;
     }
   }
 
@@ -41,7 +41,7 @@ const SafeSelector = memo(function SafeSelector({ team }: SafeSelectorProps) {
         {weides &&
           weides.ids.map((id) => (
             <MenuItem key={id} value={id}>
-              {weides.entities[id].display_name}
+              {weides.entities[id].name}
             </MenuItem>
           ))}
       </Select>

@@ -94,7 +94,7 @@ export default memo(function SearchList({ members, teams, onClick }: SearchListP
         }
       }
       if (weides && tochten && 'safe_weide' in item && item.safe_weide) {
-        result.safe_weide = weides.entities[item.safe_weide].display_name;
+        result.safe_weide = weides.entities[item.safe_weide].identifier;
       }
       return result;
     });
