@@ -20,7 +20,7 @@ import {
   useGetTrackersQuery,
   useGetUserQuery,
 } from '../services/linker';
-import { Team } from '../services/types.ts';
+import { Direction, Team } from '../services/types.ts';
 import { trackersActions, useAppDispatch, useAppSelector } from '../store/index.ts';
 
 export default function MainPage() {
@@ -29,8 +29,6 @@ export default function MainPage() {
 
   const [keyword, setKeyword] = useState('');
   const [listOpen, setListOpen] = useState(desktop);
-  const [filterSafe, setFilterSafe] = useState(true);
-  const [filterMembers, setFilterMembers] = useState(true);
   const [networkErrorNotificationId, setNetworkErrorNotificationId] = useState<SnackbarKey | null>(
     null,
   );
@@ -41,6 +39,10 @@ export default function MainPage() {
   const dispatch = useAppDispatch();
   const selectedId = useAppSelector((state) => state.trackers.selectedId);
   const showHistory = useAppSelector((state) => state.trackers.showHistory);
+  const showSafe = useAppSelector((state) => state.filter.showSafe);
+  const showMembers = useAppSelector((state) => state.filter.showMembers);
+  const showRed = useAppSelector((state) => state.filter.showRed);
+  const showBlue = useAppSelector((state) => state.filter.showBlue);
 
   const { data: teams } = useGetTeamsQuery();
   const { data: organizationMembers } = useGetOrganizationMembersQuery();
@@ -123,14 +125,16 @@ export default function MainPage() {
     } else if (teams) {
       return teams.ids
         .map((id) => teams.entities[id])
-        .filter((team) => filterSafe || !team.safe_weide);
+        .filter((team) => showSafe || !team.safe_weide)
+        .filter((team) => showRed || team.direction !== Direction.RED)
+        .filter((team) => showBlue || team.direction !== Direction.BLUE);
     } else {
       return [];
     }
-  }, [keyword, teams, teamFuse, filterSafe]);
+  }, [teamFuse, keyword, teams, showSafe, showRed, showBlue]);
 
   const filteredMembers = useMemo(() => {
-    if (!filterMembers) {
+    if (!showMembers) {
       return [];
     } else if (memberFuse && keyword) {
       return memberFuse.search(keyword).map((item) => item.item);
@@ -139,7 +143,7 @@ export default function MainPage() {
     } else {
       return [];
     }
-  }, [filterMembers, keyword, memberFuse, organizationMembers]);
+  }, [keyword, memberFuse, organizationMembers, showMembers]);
 
   const onSearchEnter = useCallback(
     (keyword: string) => {
@@ -238,10 +242,6 @@ export default function MainPage() {
             onSearchEnter={onSearchEnter}
             listOpen={listOpen}
             setListOpen={setListOpen}
-            filterSafe={filterSafe}
-            setFilterSafe={setFilterSafe}
-            filterMembers={filterMembers}
-            setFilterMembers={setFilterMembers}
           />
         </Paper>
         <div css={middle}>

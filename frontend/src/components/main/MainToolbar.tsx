@@ -6,6 +6,7 @@ import FilterIcon from '@mui/icons-material/FilterAlt';
 import MapIcon from '@mui/icons-material/Map';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import {
+  Badge,
   IconButton,
   InputAdornment,
   ListItemIcon,
@@ -18,16 +19,14 @@ import {
 
 import { css } from '@emotion/react';
 
+import { filterActions, selectFilterActive, useAppDispatch, useAppSelector } from '../../store';
+
 interface MainToolbarProps {
   keyword: string;
   onChangeKeyword: (value: string) => void;
   onSearchEnter: (value: string) => void;
   listOpen: boolean;
   setListOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  filterSafe: boolean;
-  setFilterSafe: React.Dispatch<React.SetStateAction<boolean>>;
-  filterMembers: boolean;
-  setFilterMembers: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const MainToolbar = memo(function MainToolbar({
@@ -36,12 +35,17 @@ const MainToolbar = memo(function MainToolbar({
   onSearchEnter,
   listOpen,
   setListOpen,
-  filterSafe,
-  setFilterSafe,
-  filterMembers,
-  setFilterMembers,
 }: MainToolbarProps) {
   const theme = useTheme();
+
+  const showSafe = useAppSelector((state) => state.filter.showSafe);
+  const showMembers = useAppSelector((state) => state.filter.showMembers);
+  const showRed = useAppSelector((state) => state.filter.showRed);
+  const showBlue = useAppSelector((state) => state.filter.showBlue);
+  const filterActive = useAppSelector(selectFilterActive);
+  const dispatch = useAppDispatch();
+
+  console.log(filterActive);
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<Element | null>(null);
 
@@ -75,20 +79,30 @@ const MainToolbar = memo(function MainToolbar({
         {listOpen ? <MapIcon /> : <ViewListIcon />}
       </IconButton>
       <IconButton edge="start" onClick={(e) => setMenuAnchorEl(e.currentTarget)}>
-        <FilterIcon />
+        <Badge variant="dot" invisible={!filterActive} color="primary">
+          <FilterIcon />
+        </Badge>
       </IconButton>
       <Menu
         anchorEl={menuAnchorEl}
         open={Boolean(menuAnchorEl)}
         onClose={() => setMenuAnchorEl(null)}
       >
-        <MenuItem onClick={() => setFilterSafe(!filterSafe)}>
-          <ListItemIcon>{filterSafe && <CheckIcon />}</ListItemIcon>
+        <MenuItem onClick={() => dispatch(filterActions.toggleShowSafe())}>
+          <ListItemIcon>{showSafe && <CheckIcon />}</ListItemIcon>
           Safe teams
         </MenuItem>
-        <MenuItem onClick={() => setFilterMembers(!filterMembers)}>
-          <ListItemIcon>{filterMembers && <CheckIcon />}</ListItemIcon>
+        <MenuItem onClick={() => dispatch(filterActions.toggleShowMembers())}>
+          <ListItemIcon>{showMembers && <CheckIcon />}</ListItemIcon>
           Organisatie
+        </MenuItem>
+        <MenuItem onClick={() => dispatch(filterActions.toggleShowBlue())}>
+          <ListItemIcon>{showBlue && <CheckIcon />}</ListItemIcon>
+          Blauwe teams
+        </MenuItem>
+        <MenuItem onClick={() => dispatch(filterActions.toggleShowRed())}>
+          <ListItemIcon>{showRed && <CheckIcon />}</ListItemIcon>
+          Rode teams
         </MenuItem>
       </Menu>
       <OutlinedInput

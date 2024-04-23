@@ -4,14 +4,17 @@ import { configureStore, createSelector } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
 import { linkerApi } from '../services/linker.ts';
+import { filterReducer as filter } from './filters.ts';
 import { trackersReducer as trackers } from './trackers';
 
 export { trackersActions } from './trackers';
+export { filterActions } from './filters.ts';
 
 export const store = configureStore({
   reducer: {
     [linkerApi.reducerPath]: linkerApi.reducer,
     trackers: trackers,
+    filter: filter,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(linkerApi.middleware),
 });
@@ -50,3 +53,7 @@ export const selectSelectedItem = createSelector(
     return null;
   },
 );
+
+export const selectFilterActive = createSelector([(state: RootState) => state.filter], (filter) => {
+  return !filter.showMembers || !filter.showSafe || !filter.showRed || !filter.showBlue;
+});
