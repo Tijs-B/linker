@@ -7,6 +7,7 @@ import requests
 from dateutil.parser import isoparse
 from django.conf import settings
 from django.contrib.gis.geos import Point
+from django.db.models import OuterRef, Subquery
 from django.utils.timezone import now
 
 from linker.people.models import Team
@@ -84,7 +85,12 @@ def import_geodynamics_data(data: dict, fetch_datetime: Optional[datetime] = Non
             )
         )
 
-    TrackerLog.objects.bulk_create(new_tracker_logs, ignore_conflicts=True)
+    result = TrackerLog.objects.bulk_create(new_tracker_logs, ignore_conflicts=True)
+    logger.info(f'Created {len(result)} tracker logs')
+
+    subquery = TrackerLog.objects.filter(tracker=OuterRef('pk')).order_by('-gps_datetime')
+    trackers_updated = Tracker.objects.update(last_log_id=Subquery(subquery.values('id')[:1]))
+    logger.info(f'Updated last lof of {trackers_updated} trackers')
 
 
 def fetch_geodynamics_data():
