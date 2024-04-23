@@ -27,7 +27,7 @@ class Tocht(models.Model):
 class Weide(models.Model):
     identifier = models.CharField(max_length=1, unique=True)
     name = models.CharField(max_length=20)
-    tocht = models.OneToOneField(Tocht, null=True, on_delete=models.SET_NULL)
+    tocht = models.OneToOneField(Tocht, null=True, blank=True, on_delete=models.SET_NULL)
     polygon = models.PolygonField()
 
     def __str__(self):
