@@ -3,6 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
+  Alert,
   AppBar,
   Box,
   Container,
@@ -25,6 +26,7 @@ import {
   useGetTeamsQuery,
   useGetTochtenQuery,
   useGetTrackersQuery,
+  useGetUserQuery,
   useGetWeidesQuery,
 } from '../services/linker.ts';
 
@@ -39,6 +41,7 @@ const TracingPage = memo(function TracingPage() {
   const { data: checkpointLogs } = useGetCheckpointLogsQuery();
   const { data: teams } = useGetTeamsQuery();
   const { data: trackers } = useGetTrackersQuery();
+  const { data: user } = useGetUserQuery();
 
   const [showFull, setShowFull] = useState(false);
   const [currentTab, setCurrentTab] = useState('tochten');
@@ -63,6 +66,11 @@ const TracingPage = memo(function TracingPage() {
         </Toolbar>
       </AppBar>
       <Container sx={{ pt: 2 }}>
+        {(!user || !user.permissions.includes('change_team')) && (
+          <Alert severity="warning">
+            Maak geen beslissingen op basis van deze gegevens. Contacteer altijd de basis.
+          </Alert>
+        )}
         <FormControlLabel
           control={<Switch onChange={onSwitchChange} />}
           label="Gebruik statistieken op basis van volledige tocht (A1-B1 i.p.v. A2-A9)"

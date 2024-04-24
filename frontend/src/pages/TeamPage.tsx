@@ -5,6 +5,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
+  Alert,
   AppBar,
   Avatar,
   Box,
@@ -41,6 +42,7 @@ import {
   useGetTeamsQuery,
   useGetTochtenQuery,
   useGetTrackersQuery,
+  useGetUserQuery,
   useGetWeidesQuery,
   useUploadGroupPictureMutation,
 } from '../services/linker.ts';
@@ -70,6 +72,7 @@ const TeamPage = memo(function TeamPage() {
   const { data: weides } = useGetWeidesQuery();
   const { data: stats } = useGetStatsQuery();
   const { data: trackers } = useGetTrackersQuery();
+  const { data: user } = useGetUserQuery();
   const deleteTeamNote = useDeleteTeamNoteMutation()[0];
   const createTeamNote = useCreateTeamNoteMutation()[0];
   const uploadGroupPicture = useUploadGroupPictureMutation()[0];
@@ -163,6 +166,11 @@ const TeamPage = memo(function TeamPage() {
               <Paper>
                 <Container sx={{ pt: 2, pb: 2 }}>
                   <Typography variant="h6">Tracing</Typography>
+                  {(!user || !user.permissions.includes('change_team')) && (
+                    <Alert severity="warning">
+                      Maak geen beslissingen op basis van deze gegevens. Contacteer altijd de basis.
+                    </Alert>
+                  )}
                   <Table>
                     <TableBody>
                       <TableRow>
