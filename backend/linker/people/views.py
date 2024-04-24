@@ -27,6 +27,20 @@ class TeamViewSet(viewsets.ModelViewSet):
     ).order_by('number')
     serializer_class = TeamSerializer
 
+    def get_queryset(self):
+        queryset = Team.objects.prefetch_related(
+            Prefetch('team_notes', queryset=TeamNote.objects.order_by('created')),
+        ).order_by('number')
+        if self.request.user.has_perm('people.view_contactperson'):
+            queryset = queryset.prefetch_related(
+                Prefetch('contact_persons', queryset=ContactPerson.objects.order_by('name')),
+            )
+        else:
+            queryset = queryset.prefetch_related(
+                Prefetch('contact_persons', queryset=ContactPerson.objects.none()),
+            )
+        return queryset
+
     def get_permissions(self):
         if self.action == 'upload_group_picture':
             return [IsAuthenticated(), CanUploadPicture()]
