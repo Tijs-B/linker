@@ -9,6 +9,7 @@ from linker.trackers.models import Tracker, TrackerLog
 class TrackerAdmin(admin.ModelAdmin):
     readonly_fields = ('last_log',)
     list_display = ('tracker_id', 'tracker_name', 'used_by')
+    search_fields = ('tracker_id', 'tracker_name')
     ordering = (
         'tracker_name',
         'tracker_id',
