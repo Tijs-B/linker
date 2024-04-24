@@ -53,5 +53,7 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
         if hasattr(tracker, 'team'):
             queryset = queryset.filter(point__distance_gt=(basis, D(m=SKIP_BASIS_DISTANCE)))
 
+        queryset = queryset.values('id', 'gps_datetime', 'point', 'team_is_safe')
+
         serializer = TrackerLogSerializer(queryset, many=True)
         return Response(serializer.data)
