@@ -19,39 +19,43 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TrackerSerializer
 
     def get_queryset(self):
-        return Tracker.objects.select_related('last_log').annotate(
-            fiche=Subquery(
-                Fiche.objects.filter(point__distance_lte=(OuterRef('last_log__point'), D(m=FICHE_MAX_DISTANCE))).values(
-                    'pk'
-                )[:1]
-            ),
-            tocht=Subquery(
-                Tocht.objects.filter(route__distance_lte=(OuterRef('last_log__point'), D(m=TOCHT_MAX_DISTANCE))).values(
-                    'pk'
-                )[:1]
-            ),
-            weide=Subquery(
-                Weide.objects.filter(
-                    polygon__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))
-                ).values('pk')[:1]
-            ),
-            basis=Subquery(
-                Basis.objects.filter(point__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))).values(
-                    'pk'
-                )[:1]
-            ),
-            battery_low=Exists(
-                TrackerLog.objects.filter(
-                    tracker=OuterRef('pk'),
-                    gps_datetime__gte=now() - timedelta(minutes=TRACKER_BATTERY_LOW_MINUTES),
-                    tracker_type__in=(1000, 1001, 1002),
-                )
-            ),
-            sos_sent=Subquery(
-                TrackerLog.objects.filter(tracker=OuterRef('pk'), tracker_type=17006)
-                .order_by('-gps_datetime')
-                .values('gps_datetime')[:1]
-            ),
+        return (
+            Tracker.objects.select_related('last_log')
+            .order_by('tracker_name')
+            .annotate(
+                fiche=Subquery(
+                    Fiche.objects.filter(
+                        point__distance_lte=(OuterRef('last_log__point'), D(m=FICHE_MAX_DISTANCE))
+                    ).values('pk')[:1]
+                ),
+                tocht=Subquery(
+                    Tocht.objects.filter(
+                        route__distance_lte=(OuterRef('last_log__point'), D(m=TOCHT_MAX_DISTANCE))
+                    ).values('pk')[:1]
+                ),
+                weide=Subquery(
+                    Weide.objects.filter(
+                        polygon__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))
+                    ).values('pk')[:1]
+                ),
+                basis=Subquery(
+                    Basis.objects.filter(
+                        point__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))
+                    ).values('pk')[:1]
+                ),
+                battery_low=Exists(
+                    TrackerLog.objects.filter(
+                        tracker=OuterRef('pk'),
+                        gps_datetime__gte=now() - timedelta(minutes=TRACKER_BATTERY_LOW_MINUTES),
+                        tracker_type__in=(1000, 1001, 1002),
+                    )
+                ),
+                sos_sent=Subquery(
+                    TrackerLog.objects.filter(tracker=OuterRef('pk'), tracker_type=17006)
+                    .order_by('-gps_datetime')
+                    .values('gps_datetime')[:1]
+                ),
+            )
         )
 
     @action(detail=True, methods=['get'])

@@ -19,9 +19,11 @@ import {
 import StatsTable from '../components/tracing/StatsTable.jsx';
 import TeamsTable from '../components/tracing/TeamsTable.jsx';
 import TochtenTable from '../components/tracing/TochtenTable.jsx';
+import TrackersTable from '../components/tracing/TrackersTable.tsx';
 import {
   useGetCheckpointLogsQuery,
   useGetFichesQuery,
+  useGetOrganizationMembersQuery,
   useGetStatsQuery,
   useGetTeamsQuery,
   useGetTochtenQuery,
@@ -40,6 +42,7 @@ const TracingPage = memo(function TracingPage() {
   });
   const { data: checkpointLogs } = useGetCheckpointLogsQuery();
   const { data: teams } = useGetTeamsQuery();
+  const { data: members } = useGetOrganizationMembersQuery();
   const { data: trackers } = useGetTrackersQuery();
   const { data: user } = useGetUserQuery();
 
@@ -78,6 +81,7 @@ const TracingPage = memo(function TracingPage() {
         <Tabs value={currentTab} onChange={onTabChange}>
           <Tab value="tochten" label="tochten" />
           <Tab value="teams" label="teams" />
+          <Tab value="trackers" label="trackers" />
           <Tab value="fiches" label="den hele excel" />
         </Tabs>
         {currentTab === 'tochten' && tochten && stats && fiches && (
@@ -98,6 +102,12 @@ const TracingPage = memo(function TracingPage() {
               trackers={trackers}
               showFull={showFull}
             />
+          </Box>
+        )}
+        {currentTab === 'trackers' && trackers && teams && members && (
+          <Box>
+            <h2>Trackers</h2>
+            <TrackersTable teams={teams} trackers={trackers} members={members} />
           </Box>
         )}
         {currentTab === 'fiches' && fiches && tochten && stats && checkpointLogs && teams && (

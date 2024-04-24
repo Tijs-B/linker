@@ -138,7 +138,7 @@ const TeamPage = memo(function TeamPage() {
     }
   }, [uploadedFile, teamId, uploadGroupPicture]);
 
-  const trackerCode = trackers && team?.tracker ? trackers.entities[team.tracker].tracker_name : '';
+  const tracker = trackers && team?.tracker ? trackers.entities[team.tracker] : null;
 
   if (!team) {
     return <div>Team not found</div>;
@@ -199,9 +199,54 @@ const TeamPage = memo(function TeamPage() {
                           )}
                         </TableCell>
                       </TableRow>
+                    </TableBody>
+                  </Table>
+                </Container>
+              </Paper>
+              <Paper>
+                <Container sx={{ pt: 2, pb: 2 }}>
+                  <Typography variant="h6">Tracker</Typography>
+                  <Table>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell>Tracker online</TableCell>
+                        <TableCell>
+                          {tracker?.is_online ? (
+                            <Alert severity="success">
+                              Laatste update {dayjs(tracker?.last_log?.gps_datetime).fromNow()}
+                            </Alert>
+                          ) : (
+                            <Alert severity="warning">
+                              Laatste update {dayjs(tracker?.last_log?.gps_datetime).fromNow()}
+                            </Alert>
+                          )}
+                        </TableCell>
+                      </TableRow>
                       <TableRow>
                         <TableCell>Trackercode</TableCell>
-                        <TableCell>{trackerCode}</TableCell>
+                        <TableCell>{tracker?.tracker_name}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>Tracker SOS</TableCell>
+                        <TableCell>
+                          {tracker?.sos_sent ? (
+                            <Alert severity="error">
+                              Verstuurd op {new Date(tracker.sos_sent).toLocaleString()}
+                            </Alert>
+                          ) : (
+                            '-'
+                          )}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>Batterijniveau</TableCell>
+                        <TableCell>
+                          {tracker?.battery_low ? (
+                            <Alert>Laag batterijniveau</Alert>
+                          ) : (
+                            <Alert>OK</Alert>
+                          )}
+                        </TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
