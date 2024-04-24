@@ -11,6 +11,8 @@ amqp==5.2.0
     # via kombu
 asgiref==3.7.2
     # via django
+asttokens==2.4.1
+    # via stack-data
 billiard==4.2.0
     # via celery
 celery==5.3.6
@@ -29,6 +31,8 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
+decorator==5.1.1
+    # via ipython
 django==5.0.1
     # via django-debug-toolbar
     # via django-extensions
@@ -42,21 +46,39 @@ djangorestframework==3.14.0
 djangorestframework-gis==1.0
 et-xmlfile==1.1.0
     # via openpyxl
+executing==2.0.1
+    # via stack-data
 geographiclib==2.0
     # via geopy
 geopy==2.4.1
 gunicorn==21.2.0
 idna==3.7
     # via requests
+ipython==8.23.0
+jedi==0.19.1
+    # via ipython
 kombu==5.3.5
     # via celery
+matplotlib-inline==0.1.7
+    # via ipython
 openpyxl==3.1.2
 packaging==23.2
     # via gunicorn
+parso==0.8.4
+    # via jedi
+pexpect==4.9.0
+    # via ipython
 pillow==10.2.0
 prompt-toolkit==3.0.43
     # via click-repl
+    # via ipython
 psycopg==3.1.18
+ptyprocess==0.7.0
+    # via pexpect
+pure-eval==0.2.2
+    # via stack-data
+pygments==2.17.2
+    # via ipython
 python-dateutil==2.8.2
     # via celery
 pytz==2024.1
@@ -64,11 +86,18 @@ pytz==2024.1
 redis==5.0.1
 requests==2.31.0
 six==1.16.0
+    # via asttokens
     # via python-dateutil
 sqlparse==0.4.4
     # via django
     # via django-debug-toolbar
+stack-data==0.6.3
+    # via ipython
+traitlets==5.14.3
+    # via ipython
+    # via matplotlib-inline
 typing-extensions==4.9.0
+    # via ipython
     # via psycopg
 tzdata==2023.4
     # via celery

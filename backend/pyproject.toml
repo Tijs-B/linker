@@ -18,6 +18,7 @@ dependencies = [
     "watchdog>=3.0.0",
     "requests>=2.31.0",
     "django-extensions>=3.2.3",
+    "ipython>=8.23.0",
 ]
 
 [tool.rye]
