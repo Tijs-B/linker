@@ -66,7 +66,7 @@ const TracingPage = memo(function TracingPage() {
         </Toolbar>
       </AppBar>
       <Container sx={{ pt: 2 }}>
-        {(!user || !user.permissions.includes('change_team')) && (
+        {user && !user.permissions.includes('change_team') && (
           <Alert severity="warning">
             Maak geen beslissingen op basis van deze gegevens. Contacteer altijd de basis.
           </Alert>

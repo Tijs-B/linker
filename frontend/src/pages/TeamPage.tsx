@@ -166,7 +166,7 @@ const TeamPage = memo(function TeamPage() {
               <Paper>
                 <Container sx={{ pt: 2, pb: 2 }}>
                   <Typography variant="h6">Tracing</Typography>
-                  {(!user || !user.permissions.includes('change_team')) && (
+                  {user && !user.permissions.includes('change_team') && (
                     <Alert severity="warning">
                       Maak geen beslissingen op basis van deze gegevens. Contacteer altijd de basis.
                     </Alert>
