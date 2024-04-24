@@ -32,7 +32,10 @@ const TracingPage = memo(function TracingPage() {
   const { data: fiches } = useGetFichesQuery();
   const { data: tochten } = useGetTochtenQuery();
   const { data: weides } = useGetWeidesQuery();
-  const { data: stats } = useGetStatsQuery();
+  const { data: stats } = useGetStatsQuery(undefined, {
+    pollingInterval: 60000,
+    skipPollingIfUnfocused: true,
+  });
   const { data: checkpointLogs } = useGetCheckpointLogsQuery();
   const { data: teams } = useGetTeamsQuery();
   const { data: trackers } = useGetTrackersQuery();
