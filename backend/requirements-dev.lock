@@ -16,6 +16,7 @@ asttokens==2.4.1
 billiard==4.2.0
     # via celery
 celery==5.3.6
+    # via django-celery-beat
 certifi==2024.2.2
     # via requests
 charset-normalizer==3.3.2
@@ -31,16 +32,23 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
+cron-descriptor==1.4.3
+    # via django-celery-beat
 decorator==5.1.1
     # via ipython
 django==5.0.1
+    # via django-celery-beat
     # via django-debug-toolbar
     # via django-extensions
+    # via django-timezone-field
     # via djangorestframework
+django-celery-beat==2.6.0
 django-debug-toolbar==4.3.0
 django-enumfields==2.1.1
 django-environ==0.11.2
 django-extensions==3.2.3
+django-timezone-field==6.1.0
+    # via django-celery-beat
 djangorestframework==3.14.0
     # via djangorestframework-gis
 djangorestframework-gis==1.0
@@ -79,8 +87,11 @@ pure-eval==0.2.2
     # via stack-data
 pygments==2.17.2
     # via ipython
+python-crontab==3.0.0
+    # via django-celery-beat
 python-dateutil==2.8.2
     # via celery
+    # via python-crontab
 pytz==2024.1
     # via djangorestframework
 redis==5.0.1
@@ -102,6 +113,7 @@ typing-extensions==4.9.0
     # via psycopg
 tzdata==2023.4
     # via celery
+    # via django-celery-beat
 urllib3==2.2.1
     # via requests
 vine==5.1.0

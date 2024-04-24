@@ -10,7 +10,7 @@ from django.conf import settings
 from django.utils.timezone import now
 
 from .constants import SETTING_SIMULATION_START
-from .geodynamics import import_geodynamics_data
+from .geodynamics import import_geodynamics_minisite_data
 from .models import TrackerLog, Tracker
 from ..config.models import Setting
 from ..people.models import Team, OrganizationMember
@@ -60,7 +60,7 @@ def simulate_download_tracker_data(until: Optional[datetime.datetime] = None):
     for filename in files_to_do:
         with gzip.open(filename, 'rb') as file:
             data = json.load(file)
-        import_geodynamics_data(data, _get_timestamp_from_file_name(filename))
+        import_geodynamics_minisite_data(data, _get_timestamp_from_file_name(filename))
 
     for tracker in Tracker.objects.all():
         tracker.last_log = tracker.tracker_logs.order_by('-gps_datetime').first()

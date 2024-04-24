@@ -18,7 +18,6 @@ export interface TrackerLog {
   id: number;
   gps_datetime: string;
   point: Point;
-  team_is_safe: boolean;
 }
 
 export interface Tracker {
@@ -30,6 +29,9 @@ export interface Tracker {
   weide: number | null;
   tocht: number | null;
   basis: number | null;
+  is_online: boolean;
+  battery_low: boolean;
+  sos_sent: string | null;
 }
 
 export interface ContactPerson {

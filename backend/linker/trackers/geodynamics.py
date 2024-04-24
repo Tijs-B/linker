@@ -1,8 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from logging import getLogger
 from time import time
 from typing import Optional
 
+import pytz
 import requests
 from dateutil.parser import isoparse
 from django.conf import settings
@@ -10,21 +11,31 @@ from django.contrib.gis.geos import Point
 from django.db.models import OuterRef, Subquery
 from django.utils.timezone import now
 
+from linker.config.models import Setting
 from linker.people.models import Team
+from linker.trackers.constants import SETTING_GEODYNAMICS_API_HISTORY_SECONDS
 from linker.trackers.models import Tracker, TrackerLog
 
 
 logger = getLogger(__name__)
 
 
-def try_parse_date(date_str: str) -> datetime | None:
+def try_parse_date(date_str: str | None) -> datetime | None:
+    if date_str is None:
+        return None
     try:
         return isoparse(date_str)
     except Exception:
         return None
 
 
-def import_geodynamics_data(data: dict, fetch_datetime: Optional[datetime] = None) -> None:
+def post_import_actions() -> None:
+    subquery = TrackerLog.objects.filter(tracker=OuterRef('pk')).order_by('-gps_datetime')
+    trackers_updated = Tracker.objects.update(last_log_id=Subquery(subquery.values('id')[:1]))
+    logger.info(f'Updated last log of {trackers_updated} trackers')
+
+
+def import_geodynamics_minisite_data(data: dict, fetch_datetime: Optional[datetime] = None) -> None:
     if fetch_datetime is None:
         fetch_datetime = now()
 
@@ -69,38 +80,91 @@ def import_geodynamics_data(data: dict, fetch_datetime: Optional[datetime] = Non
                 local_datetime=try_parse_date(last_location.get('LocalDateTime')),
                 last_sync_date=try_parse_date(tracker_data.get('LastSyncDate')),
                 satellites=last_location.get('Satellites'),
-                input_acc=last_location.get('InputAcc'),
-                voltage=last_location.get('VoltageString'),
                 point=point,
                 analog_input=last_location.get('AnalogInput1'),
                 tracker_type=last_location.get('Type'),
                 heading=last_location.get('Heading'),
                 speed=last_location.get('Speed'),
-                is_online=tracker_data.get('IsOnline'),
                 has_gps=tracker_data.get('HasGps'),
                 has_power=tracker_data.get('HasPower'),
-                is_online_threshold=tracker_data.get('IsOnlineTreshold'),
-                name=tracker_data.get('Name'),
-                code=tracker_data.get('Code'),
             )
         )
 
     result = TrackerLog.objects.bulk_create(new_tracker_logs, ignore_conflicts=True)
     logger.info(f'Created {len(result)} tracker logs')
 
-    subquery = TrackerLog.objects.filter(tracker=OuterRef('pk')).order_by('-gps_datetime')
-    trackers_updated = Tracker.objects.update(last_log_id=Subquery(subquery.values('id')[:1]))
-    logger.info(f'Updated last lof of {trackers_updated} trackers')
+    post_import_actions()
 
 
-def fetch_geodynamics_data():
-    url = settings.GEODYNAMICS_URL
+def fetch_geodynamics_minisite_data():
+    url = settings.GEODYNAMICS_MINISITE_URL
     if url is None:
-        logger.warning('Geodynamics URL is not configured in the settings')
-    logger.info('Fetching tracker data from geodynamics...')
+        logger.warning('GEODYNAMICS_MINISITE_URL is not configured in the settings')
+        return
+    logger.info('Fetching tracker data from geodynamics minisite...')
     response = requests.get(
         url, params={'_': round(time() * 1000)}, headers={'User-Agent': 'https://github.com/Tijs-B/linker'}
     )
-    logger.info(f'Geodynamics status code {response.status_code}')
+    logger.info(f'Geodynamics minisite status {response.status_code}, length {len(response.content)}')
 
-    import_geodynamics_data(data=response.json())
+    import_geodynamics_minisite_data(data=response.json())
+
+
+def import_geodynamics_api_data(data: list) -> None:
+    new_tracker_logs = []
+    trackers = {tracker.tracker_id: tracker for tracker in Tracker.objects.all()}
+
+    for item in data:
+        tracker_id = item['ResourceId']
+
+        if tracker_id not in trackers:
+            logger.warning(f'Tracker with id {tracker_id} not found')
+            continue
+
+        tracker = trackers[tracker_id]
+
+        for position in item['Positions']:
+            gps_datetime = try_parse_date(position.get('GpsDateTime'))
+            if gps_datetime is None:
+                continue
+            point = Point(round(position['Longitude'], 6), round(position['Latitude'], 6))
+            new_tracker_logs.append(
+                TrackerLog(
+                    tracker=tracker,
+                    tracker_type=position.get('Type'),
+                    local_datetime=try_parse_date(position.get('RtcDateTime')),
+                    gps_datetime=gps_datetime,
+                    speed=position.get('Speed'),
+                    heading=position.get('Heading'),
+                    point=point,
+                    satellites=position.get('Satellites'),
+                )
+            )
+
+    result = TrackerLog.objects.bulk_create(new_tracker_logs, ignore_conflicts=True)
+    logger.info(f'Created {len(result)} tracker logs')
+
+    post_import_actions()
+
+
+def fetch_geodynamics_api_data():
+    auth = settings.GEODYNAMICS_API_AUTH
+    base_url = settings.GEODYNAMICS_API_BASE_URL
+    if base_url is None:
+        logger.warning('GEODYNAMICS_API_BASE_URL is not configured in the settings')
+        return
+
+    url = base_url.rstrip('/') + '/api/v1/location/position'
+
+    history_seconds = float(Setting.get_value_for_key(SETTING_GEODYNAMICS_API_HISTORY_SECONDS, default='300'))
+    from_ts = (now() - timedelta(seconds=history_seconds + 5)).astimezone(pytz.UTC).isoformat()
+    to_ts = (now() - timedelta(seconds=5)).astimezone(pytz.UTC).isoformat()
+    params = {'from': from_ts, 'to': to_ts}
+
+    tracker_ids = list(Tracker.objects.values_list('tracker_id', flat=True))
+
+    logger.info(f'Fetching tracker data from geodynamics API... range {from_ts} - {to_ts}')
+    response = requests.post(url, params=params, json=tracker_ids, auth=auth)
+    logger.info(f'Geodynamics api status {response.status_code}, length {len(response.content)}')
+
+    import_geodynamics_api_data(data=response.json())

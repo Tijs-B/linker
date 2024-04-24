@@ -1,3 +1,9 @@
 SETTING_SIMULATION_START = 'simulation_start'
+SETTING_GEODYNAMICS_API_HISTORY_SECONDS = 'geodynamics_api_history_seconds'
+
 SWITCH_SIMULATE = 'simulate'
-SWITCH_FETCH_TRACKERS = 'fetch_trackers'
+SWITCH_FETCH_TRACKERS_MINISITE = 'fetch_trackers_minisite'
+SWITCH_FETCH_TRACKERS_API = 'fetch_trackers_api'
+
+TRACKER_OFFLINE_MINUTES = 12
+TRACKER_BATTERY_LOW_MINUTES = 60

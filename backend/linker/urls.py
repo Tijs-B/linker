@@ -58,7 +58,7 @@ router.register('forbidden-areas', ForbiddenAreaViewSet)
 
 router.register('checkpoint-logs', CheckpointLogViewSet)
 
-router.register('trackers', TrackerViewSet)
+router.register('trackers', TrackerViewSet, basename='tracker')
 
 
 urlpatterns = [

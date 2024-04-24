@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-import datetime
 from pathlib import Path
 
 import environ
@@ -49,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_gis',
     'django_extensions',
+    'django_celery_beat',
     'linker.map',
     'linker.people',
     'linker.tracing',
@@ -155,20 +155,25 @@ HEATMAP_PATH = env('HEATMAP_PATH', default=None)
 
 CELERY_BROKER_URL = env('CACHE_URL', default='redis://localhost:6379')
 CELERY_TIMEZONE = 'Europe/Brussels'
-CELERY_BEAT_SCHEDULE = {
-    'download-tracker-data': {
-        'task': 'linker.trackers.tasks.download_tracker_data',
-        'schedule': datetime.timedelta(seconds=5),
-    },
-    'trace-teams': {
-        'task': 'linker.tracing.tasks.trace_teams',
-        'schedule': datetime.timedelta(minutes=1),
-    },
-    'update-heatmap': {
-        'task': 'linker.trackers.tasks.update_heatmap',
-        'schedule': datetime.timedelta(minutes=10),
-    },
-}
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+# CELERY_BEAT_SCHEDULE = {
+#     'download-tracker-data-minisite': {
+#         'task': 'linker.trackers.tasks.download_tracker_data_minisite',
+#         'schedule': datetime.timedelta(seconds=5),
+#     },
+#     'download-tracker-data-api': {
+#         'task': 'linker.trackers.tasks.download_tracker_data_api',
+#         'schedule': datetime.timedelta(minutes=1),
+#     },
+#     'trace-teams': {
+#         'task': 'linker.tracing.tasks.trace_teams',
+#         'schedule': datetime.timedelta(minutes=1),
+#     },
+#     'update-heatmap': {
+#         'task': 'linker.trackers.tasks.update_heatmap',
+#         'schedule': datetime.timedelta(minutes=10),
+#     },
+# }
 
 INTERNAL_IPS = ['127.0.0.1']
 
@@ -215,4 +220,6 @@ LOGGING = {
     },
 }
 
-GEODYNAMICS_URL = env('GEODYNAMICS_URL', default=None)
+GEODYNAMICS_MINISITE_URL = env('GEODYNAMICS_MINISITE_URL', default=None)
+GEODYNAMICS_API_BASE_URL = env('GEODYNAMICS_API_BASE_URL', default=None)
+GEODYNAMICS_API_AUTH = env.tuple('GEODYNAMICS_API_AUTH', default=None)

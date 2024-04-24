@@ -19,7 +19,7 @@ def generate_heatmap_tiles(result_path: Path):
     for tracker in Tracker.objects.all():
         if not hasattr(tracker, 'team'):
             continue
-        line_strings.append(tracker.get_track(skip_basis=True))
+        line_strings.append(tracker.get_track())
 
     if len(line_strings) == 0:
         return
