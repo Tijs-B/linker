@@ -3,7 +3,7 @@ from django.contrib.gis.db import models
 from django.contrib.gis.measure import D
 
 from linker.map.models import Basis, Tocht
-from linker.tracing.constants import GEBIED_MAX_DISTANCE
+from linker.tracing.constants import GEBIED_MAX_DISTANCE, SKIP_BASIS_DISTANCE
 
 
 class Tracker(models.Model):
@@ -24,7 +24,7 @@ class Tracker(models.Model):
         queryset = queryset.filter(point__distance_lt=(tocht_centroid, D(km=GEBIED_MAX_DISTANCE)))
         if skip_basis:
             basis = Basis.objects.first()
-            queryset = queryset.filter(point__distance_gt=(basis.point, D(m=100)))
+            queryset = queryset.filter(point__distance_gt=(basis.point, D(m=SKIP_BASIS_DISTANCE)))
         queryset = queryset.order_by('gps_datetime')
         return LineString(list(queryset.values_list('point', flat=True)))
 

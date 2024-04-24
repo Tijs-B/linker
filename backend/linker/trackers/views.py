@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from linker.map.models import Fiche, Tocht, Weide, Basis
-from linker.tracing.constants import FICHE_MAX_DISTANCE, TOCHT_MAX_DISTANCE, WEIDE_MAX_DISTANCE
+from linker.tracing.constants import FICHE_MAX_DISTANCE, TOCHT_MAX_DISTANCE, WEIDE_MAX_DISTANCE, SKIP_BASIS_DISTANCE
 from linker.trackers.models import Tracker
 from linker.trackers.serializers import TrackerSerializer, TrackerLogSerializer
 
@@ -51,7 +51,7 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
         basis = Point(5.920033, 50.354934)
         queryset = tracker.tracker_logs.order_by('gps_datetime')
         if hasattr(tracker, 'team'):
-            queryset = queryset.filter(point__distance_gt=(basis, D(m=50)))
+            queryset = queryset.filter(point__distance_gt=(basis, D(m=SKIP_BASIS_DISTANCE)))
 
         serializer = TrackerLogSerializer(queryset, many=True)
         return Response(serializer.data)
