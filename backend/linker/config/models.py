@@ -23,6 +23,7 @@ class Setting(models.Model):
 
 class Switch(models.Model):
     name = models.CharField(max_length=50)
+    description = models.TextField(blank=True)
     active = models.BooleanField(default=False)
 
     @classmethod
