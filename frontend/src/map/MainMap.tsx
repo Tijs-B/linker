@@ -8,6 +8,7 @@ import Map, {
   ScaleControl,
 } from 'react-map-gl/maplibre';
 
+import CallSplitIcon from '@mui/icons-material/CallSplit';
 import FlagIcon from '@mui/icons-material/Flag';
 import SatelliteIcon from '@mui/icons-material/Satellite';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
@@ -71,6 +72,7 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
   const [createMapNoteDialogOpen, setCreateMapNoteDialogOpen] = useState(false);
   const [initialBounds, setInitialBounds] = useState(DEFAULT_INITIAL_BOUNDS);
   const [iconsAdded, setIconsAdded] = useState(true);
+  const [showZijwegen, setShowZijwegen] = useState(false);
 
   const mapRef = useRef<MapRef>(null);
   const { data: tochten } = useGetTochtenQuery();
@@ -203,6 +205,8 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
 
   const onMapLoad = useCallback(() => setIconsAdded(false), []);
 
+  const onToggleZijwegen = useCallback(() => setShowZijwegen((s) => !s), []);
+
   return (
     <>
       <Map
@@ -223,7 +227,7 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
         onLoad={onMapLoad}
         attributionControl={false}
       >
-        <BackgroundLayers showHeatmap={showHeatmap} />
+        <BackgroundLayers showHeatmap={showHeatmap} showZijwegen={showZijwegen} />
 
         <MapNoteLayer visible={!showHeatmap} />
         <TrackerLayer
@@ -266,6 +270,15 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
             <FlagIcon
               color={'primary'}
               sx={{ color: creatingMarker ? '' : '#000', marginTop: '2px' }}
+            />
+          </IconButton>
+        </CustomOverlay>
+
+        <CustomOverlay>
+          <IconButton onClick={onToggleZijwegen}>
+            <CallSplitIcon
+              color={'primary'}
+              sx={{ color: showZijwegen ? '' : '#000', marginTop: '2px' }}
             />
           </IconButton>
         </CustomOverlay>

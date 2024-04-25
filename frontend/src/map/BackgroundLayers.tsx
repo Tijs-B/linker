@@ -16,9 +16,10 @@ import {
 
 interface BackgroundLayersProps {
   showHeatmap: boolean;
+  showZijwegen: boolean;
 }
 
-function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
+function BackgroundLayers({ showHeatmap, showZijwegen }: BackgroundLayersProps) {
   const { data: tochten } = useGetTochtenQuery();
   const { data: fiches } = useGetFichesQuery();
   const { data: zijwegen } = useGetZijwegenQuery();
@@ -140,7 +141,7 @@ function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
             'line-width': 3,
             'line-color': grey[800],
           }}
-          layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
+          layout={{ visibility: showHeatmap || !showZijwegen ? 'none' : 'visible' }}
         />
         <Layer
           id="zijwegen-outline"
@@ -150,7 +151,7 @@ function BackgroundLayers({ showHeatmap }: BackgroundLayersProps) {
             'line-width': 5,
             'line-color': '#fff',
           }}
-          layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
+          layout={{ visibility: showHeatmap || !showZijwegen ? 'none' : 'visible' }}
         />
       </Source>
       <Source type="geojson" data={weidesLabelData}>
