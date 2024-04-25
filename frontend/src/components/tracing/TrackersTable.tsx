@@ -3,8 +3,8 @@ import { memo } from 'react';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckIcon from '@mui/icons-material/Check';
 import {
+  Alert,
   Paper,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -76,12 +76,9 @@ const TrackersTable = memo(function TrackersTable({
                 </TableCell>
                 <TableCell>
                   {tracker.sos_sent ? (
-                    <Stack direction="row" spacing={1}>
-                      <CancelIcon color="error" fontSize="small" />
-                      {new Date(tracker.sos_sent).toLocaleString()}
-                    </Stack>
+                    <Alert severity="warning">{new Date(tracker.sos_sent).toLocaleString()}</Alert>
                   ) : (
-                    <CheckIcon color="success" fontSize="small" />
+                    '-'
                   )}
                 </TableCell>
                 <TableCell>
