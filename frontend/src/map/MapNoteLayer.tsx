@@ -38,7 +38,10 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
   const [selectedNote, setSelectedNote] = useState<MapNote | null>(null);
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
 
-  const { data: mapNotes } = useGetMapNotesQuery();
+  const { data: mapNotes } = useGetMapNotesQuery(undefined, {
+    pollingInterval: 60000,
+    skipPollingIfUnfocused: true,
+  });
   const deleteMapNote = useDeleteMapNoteMutation()[0];
   const updateMapNote = useUpdateMapNoteMutation()[0];
 

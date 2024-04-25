@@ -44,15 +44,21 @@ export default function MainPage() {
   const showRed = useAppSelector((state) => state.filter.showRed);
   const showBlue = useAppSelector((state) => state.filter.showBlue);
 
-  const { data: teams } = useGetTeamsQuery();
-  const { data: organizationMembers } = useGetOrganizationMembersQuery();
-  const { data: trackers } = useGetTrackersQuery(undefined, {
-    pollingInterval: 15000,
+  const { data: teams } = useGetTeamsQuery(undefined, {
+    pollingInterval: 60_000,
     skipPollingIfUnfocused: true,
   });
-
+  const { data: organizationMembers } = useGetOrganizationMembersQuery(undefined, {
+    pollingInterval: 60_000,
+    skipPollingIfUnfocused: true,
+  });
+  const { data: trackers } = useGetTrackersQuery(undefined, {
+    pollingInterval: 15_000,
+    skipPollingIfUnfocused: true,
+  });
   const { error: queryError } = useGetUserQuery(undefined, {
-    pollingInterval: 5000,
+    pollingInterval: 5_000,
+    skipPollingIfUnfocused: true,
   });
 
   // Navigate to login page if unauthenticated
