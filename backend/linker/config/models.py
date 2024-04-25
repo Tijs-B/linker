@@ -1,6 +1,10 @@
+from logging import getLogger
 from typing import Optional
 
 from django.db import models
+
+
+logger = getLogger(__name__)
 
 
 class Setting(models.Model):
@@ -22,7 +26,7 @@ class Setting(models.Model):
 
 
 class Switch(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, db_index=True, unique=True)
     description = models.TextField(blank=True)
     active = models.BooleanField(default=False)
 
@@ -31,4 +35,5 @@ class Switch(models.Model):
         try:
             return cls.objects.get(name=name).active
         except cls.DoesNotExist:
+            logger.warning(f'Switch {name} does not exist')
             return False

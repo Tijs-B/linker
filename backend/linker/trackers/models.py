@@ -2,8 +2,10 @@ from django.contrib.gis.geos import LineString
 from django.contrib.gis.db import models
 from django.contrib.gis.measure import D
 
+from linker.config.models import Switch
 from linker.map.models import Basis, Tocht
 from linker.tracing.constants import GEBIED_MAX_DISTANCE, SKIP_BASIS_DISTANCE
+from linker.trackers.constants import SWITCH_EXCLUDE_BASIS_FROM_TRACK
 
 
 class Tracker(models.Model):
@@ -21,8 +23,8 @@ class Tracker(models.Model):
     def get_track(self) -> LineString:
         tocht_centroid = Tocht.centroid()
         queryset = self.tracker_logs.filter(team_is_safe=False)
-        queryset = queryset.filter(point__distance_lt=(tocht_centroid, D(km=GEBIED_MAX_DISTANCE)))
-        if hasattr(self, 'team'):
+        queryset = queryset.filter(point__distance_lt=(tocht_centroid, D(m=GEBIED_MAX_DISTANCE)))
+        if hasattr(self, 'team') and Switch.switch_is_active(SWITCH_EXCLUDE_BASIS_FROM_TRACK):
             basis = Basis.objects.first()
             queryset = queryset.filter(point__distance_gt=(basis.point, D(m=SKIP_BASIS_DISTANCE)))
         queryset = queryset.filter(team_is_safe=False)
