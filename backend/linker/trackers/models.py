@@ -29,7 +29,10 @@ class Tracker(models.Model):
             queryset = queryset.filter(point__distance_gt=(basis.point, D(m=SKIP_BASIS_DISTANCE)))
         queryset = queryset.filter(team_is_safe=False)
         queryset = queryset.order_by('gps_datetime')
-        return LineString(list(queryset.values_list('point', flat=True)))
+        points = list(queryset.values_list('point', flat=True))
+        if len(points) == 1:
+            points = []
+        return LineString(points)
 
 
 class TrackerLog(models.Model):
