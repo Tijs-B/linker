@@ -9,7 +9,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from linker.map.models import Fiche, Tocht, Weide, Basis
-from linker.tracing.constants import FICHE_MAX_DISTANCE, TOCHT_MAX_DISTANCE, WEIDE_MAX_DISTANCE
+from linker.tracing.constants import FICHE_MAX_DISTANCE, TOCHT_MAX_DISTANCE, WEIDE_MAX_DISTANCE, GEBIED_MAX_DISTANCE
 from linker.trackers.constants import TRACKER_BATTERY_LOW_MINUTES
 from linker.trackers.models import Tracker, TrackerLog
 from linker.trackers.serializers import TrackerSerializer, TrackerLogSerializer
@@ -66,8 +66,10 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=True, methods=['get'])
     def logs(self, request, pk=None):
+        tocht_centroid = Tocht.centroid()
         tracker = self.get_object()
-        queryset = tracker.tracker_logs.order_by('gps_datetime')
+        queryset = tracker.tracker_logs.filter(point__distance_lt=(tocht_centroid, D(m=GEBIED_MAX_DISTANCE)))
+        queryset = queryset.order_by('gps_datetime')
 
         serializer = TrackerLogSerializer(queryset, many=True)
         return Response(serializer.data)
