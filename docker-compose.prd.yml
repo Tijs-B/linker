@@ -14,8 +14,8 @@ services:
       - upload-media:/media
       - heatmap-data:/heatmap
     environment:
-      - ALLOWED_HOSTS=link.tijsb.be
-      - CSRF_TRUSTED_ORIGINS=https://link.tijsb.be
+      - ALLOWED_HOSTS=link2.tijsb.be
+      - CSRF_TRUSTED_ORIGINS=https://link2.tijsb.be
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
@@ -38,8 +38,8 @@ services:
       - upload-media:/media
       - heatmap-data:/heatmap
     environment:
-      - ALLOWED_HOSTS=link.tijsb.be
-      - CSRF_TRUSTED_ORIGINS=https://link.tijsb.be
+      - ALLOWED_HOSTS=link2.tijsb.be
+      - CSRF_TRUSTED_ORIGINS=https://link2.tijsb.be
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
@@ -62,8 +62,8 @@ services:
       - upload-media:/media
       - heatmap-data:/heatmap
     environment:
-      - ALLOWED_HOSTS=link.tijsb.be
-      - CSRF_TRUSTED_ORIGINS=https://link.tijsb.be
+      - ALLOWED_HOSTS=link2.tijsb.be
+      - CSRF_TRUSTED_ORIGINS=https://link2.tijsb.be
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
@@ -102,7 +102,7 @@ services:
     depends_on:
       - linker
     labels:
-      caddy: link.tijsb.be
+      caddy: link2.tijsb.be
       caddy.reverse_proxy: "{{upstreams 80}}"
 
 volumes:

@@ -22,15 +22,15 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
           runtimeCaching: [
             {
-              urlPattern: /^https:\/\/link.tijsb.be\/api\/user/,
+              urlPattern: /^https:\/\/link2.tijsb.besb.be\/api\/user/,
               handler: 'NetworkOnly',
             },
             {
-              urlPattern: /^https:\/\/link.tijsb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen|forbidden-areas)/,
+              urlPattern: /^https:\/\/link2.tijsb.besb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen|forbidden-areas)/,
               handler: 'StaleWhileRevalidate',
             },
             {
-              urlPattern: /^https:\/\/link.tijsb.be\/api\//,
+              urlPattern: /^https:\/\/link2.tijsb.besb.be\/api\//,
               handler: 'NetworkFirst',
             },
             {
