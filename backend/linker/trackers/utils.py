@@ -9,12 +9,6 @@ from linker.trackers.models import Tracker
 
 
 def generate_heatmap_tiles(result_path: Path):
-    for path in result_path.glob('*'):
-        if path.is_file():
-            path.unlink()
-        elif path.is_dir():
-            rmtree(path)
-
     line_strings = []
     for tracker in Tracker.objects.all():
         if not hasattr(tracker, 'team'):
@@ -110,6 +104,12 @@ def generate_heatmap_tiles(result_path: Path):
             heatmap_color_tif,
         ]
     )
+
+    for path in result_path.glob('*'):
+        if path.is_file():
+            path.unlink()
+        elif path.is_dir():
+            rmtree(path)
 
     subprocess.run(['gdal2tiles.py', '--xyz', '--zoom', '9-16', '-w', 'none', heatmap_color_tif, result_path])
 
