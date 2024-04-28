@@ -1,4 +1,4 @@
-from django.db.models import F, CharField
+from django.db.models import F, CharField, Case, When, Value, Q
 from django.db.models.functions import Concat
 from rest_framework import viewsets
 
@@ -20,7 +20,12 @@ class TochtViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class WeideViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Weide.objects.all().order_by('identifier')
+    queryset = Weide.objects.annotate(
+        sort_order=Case(
+            When(Q(identifier='S'), then=Value(0)),
+            default='tocht__order',
+        )
+    ).order_by('sort_order')
     serializer_class = WeideSerializer
 
 
