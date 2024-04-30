@@ -4,9 +4,12 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import FilterIcon from '@mui/icons-material/FilterAlt';
 import MapIcon from '@mui/icons-material/Map';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import {
   Badge,
+  Box,
+  CircularProgress,
   IconButton,
   InputAdornment,
   ListItemIcon,
@@ -27,6 +30,8 @@ interface MainToolbarProps {
   onSearchEnter: (value: string) => void;
   listOpen: boolean;
   setListOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isUpdating: boolean;
+  onForceUpdate: () => void;
 }
 
 const MainToolbar = memo(function MainToolbar({
@@ -35,6 +40,8 @@ const MainToolbar = memo(function MainToolbar({
   onSearchEnter,
   listOpen,
   setListOpen,
+  isUpdating,
+  onForceUpdate,
 }: MainToolbarProps) {
   const theme = useTheme();
 
@@ -120,6 +127,21 @@ const MainToolbar = memo(function MainToolbar({
         }
         fullWidth
       />
+      <Box sx={{ position: 'relative' }}>
+        <IconButton edge="end" onClick={onForceUpdate}>
+          <RefreshIcon />
+        </IconButton>
+        {isUpdating && (
+          <CircularProgress
+            size={32}
+            sx={{
+              position: 'absolute',
+              top: 4,
+              left: 4,
+            }}
+          />
+        )}
+      </Box>
     </Toolbar>
   );
 });

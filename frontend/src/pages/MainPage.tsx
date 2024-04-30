@@ -44,15 +44,27 @@ export default function MainPage() {
   const showRed = useAppSelector((state) => state.filter.showRed);
   const showBlue = useAppSelector((state) => state.filter.showBlue);
 
-  const { data: teams } = useGetTeamsQuery(undefined, {
+  const {
+    data: teams,
+    isFetching: isFetchingTeams,
+    refetch: refetchTeams,
+  } = useGetTeamsQuery(undefined, {
     pollingInterval: 60_000,
     skipPollingIfUnfocused: true,
   });
-  const { data: organizationMembers } = useGetOrganizationMembersQuery(undefined, {
+  const {
+    data: organizationMembers,
+    isFetching: isFetchingMembers,
+    refetch: refetchMembers,
+  } = useGetOrganizationMembersQuery(undefined, {
     pollingInterval: 60_000,
     skipPollingIfUnfocused: true,
   });
-  const { data: trackers } = useGetTrackersQuery(undefined, {
+  const {
+    data: trackers,
+    isFetching: isFetchingTrackers,
+    refetch: refetchTrackers,
+  } = useGetTrackersQuery(undefined, {
     pollingInterval: 15_000,
     skipPollingIfUnfocused: true,
   });
@@ -185,6 +197,12 @@ export default function MainPage() {
     setKeyword(keyword);
   }, []);
 
+  const onForceUpdate = useCallback(() => {
+    refetchMembers();
+    refetchTeams();
+    refetchTrackers();
+  }, [refetchMembers, refetchTeams, refetchTrackers]);
+
   const sidebar = css`
     display: flex;
     flex-direction: column;
@@ -248,6 +266,8 @@ export default function MainPage() {
             onSearchEnter={onSearchEnter}
             listOpen={listOpen}
             setListOpen={setListOpen}
+            isUpdating={isFetchingTeams || isFetchingMembers || isFetchingTrackers}
+            onForceUpdate={onForceUpdate}
           />
         </Paper>
         <div css={middle}>

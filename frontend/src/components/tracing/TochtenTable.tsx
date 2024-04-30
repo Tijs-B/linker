@@ -49,11 +49,17 @@ const TochtenTable = memo(function TochtenTable({
         <TableCell>
           {tocht.identifier} Rood ({start}&rarr;{end})
         </TableCell>
-        <TableCell>{secondsToHoursMinutes(theStats[tochtId].R.average, false)} ({theStats[tochtId].R.nb_teams} groepen)</TableCell>
+        <TableCell>
+          {secondsToHoursMinutes(theStats[tochtId].R.average, false)} (
+          {theStats[tochtId].R.nb_teams} groepen)
+        </TableCell>
         <TableCell>
           {tocht.identifier} Blauw ({end}&rarr;{start})
         </TableCell>
-        <TableCell>{secondsToHoursMinutes(theStats[tochtId].B.average, false)} ({theStats[tochtId].B.nb_teams} groepen)</TableCell>
+        <TableCell>
+          {secondsToHoursMinutes(theStats[tochtId].B.average, false)} (
+          {theStats[tochtId].B.nb_teams} groepen)
+        </TableCell>
       </TableRow>
     );
   });
