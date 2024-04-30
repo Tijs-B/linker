@@ -27,8 +27,8 @@ dayjs.locale('nl-be');
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider store={store}>
-      <CssBaseline />
       <AppThemeProvider>
+        <CssBaseline enableColorScheme />
         <SnackbarProvider {...notifications}>
           <MapProvider>
             <BrowserRouter>

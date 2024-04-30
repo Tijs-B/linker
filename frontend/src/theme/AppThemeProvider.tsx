@@ -1,4 +1,4 @@
-import { ReactElement, memo } from 'react';
+import { memo, ReactNode } from 'react';
 
 import { ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
@@ -26,7 +26,7 @@ const theme = createTheme({
   },
 });
 
-const AppThemeProvider = memo(function AppThemeProvider({ children }: { children: ReactElement }) {
+const AppThemeProvider = memo(function AppThemeProvider({ children }: { children: ReactNode }) {
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 });
 
