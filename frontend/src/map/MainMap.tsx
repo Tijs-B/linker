@@ -226,6 +226,7 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
         // fog={{range: [2,12], color: 'white', 'horizon-blend': 0.1}}
         onLoad={onMapLoad}
         attributionControl={false}
+        reuseMaps
       >
         <BackgroundLayers showHeatmap={showHeatmap} showZijwegen={showZijwegen} />
 
