@@ -2,16 +2,16 @@ from datetime import timedelta
 
 from django.utils.timezone import now
 from rest_framework import serializers
+from rest_framework_gis.fields import GeometryField
 
 from .constants import TRACKER_OFFLINE_MINUTES
-from .models import Tracker, TrackerLog
+from .models import Tracker
 
 
-class TrackerLogSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TrackerLog
-        fields = ['id', 'gps_datetime', 'point']
-        read_only_fields = fields
+class TrackerLogSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    gps_datetime = serializers.DateTimeField(read_only=True)
+    point = GeometryField(read_only=True, precision=6)
 
 
 class TrackerSerializer(serializers.ModelSerializer):

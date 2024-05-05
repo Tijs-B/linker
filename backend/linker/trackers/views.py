@@ -70,6 +70,7 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
         tracker = self.get_object()
         queryset = tracker.tracker_logs.filter(point__distance_lt=(tocht_centroid, D(m=GEBIED_MAX_DISTANCE)))
         queryset = queryset.order_by('gps_datetime')
+        queryset = queryset.values('id', 'gps_datetime', 'point')
 
         serializer = TrackerLogSerializer(queryset, many=True)
         return Response(serializer.data)
