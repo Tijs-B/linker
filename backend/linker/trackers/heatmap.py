@@ -4,42 +4,61 @@ import tempfile
 from pathlib import Path
 from shutil import rmtree
 
-from linker.trackers.models import Tracker
+from django.db import connection
+
+from linker.map.models import Tocht
+from linker.tracing.constants import GEBIED_MAX_DISTANCE
+
+
+def get_all_tracks() -> str:
+    tocht_centroid = Tocht.centroid()
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+SELECT ST_AsGeoJSON(ST_Collect(f.line))
+FROM (
+    SELECT 
+        ST_MakeLine(trackers_trackerlog.point ORDER BY trackers_trackerlog.gps_datetime) as line
+    FROM trackers_trackerlog
+    INNER JOIN trackers_tracker
+    ON (trackers_trackerlog.tracker_id = trackers_tracker.id)
+    INNER JOIN people_team
+    ON (trackers_tracker.id = people_team.id)
+    WHERE (
+        ST_DistanceSphere(trackers_trackerlog.point, %s::geometry) < %s
+        AND NOT trackers_trackerlog.team_is_safe
+        AND trackers_trackerlog.speed < 15
+    )
+    group by trackers_trackerlog.tracker_id
+) as f;
+            """,
+            [tocht_centroid.hexewkb.decode('utf-8'), GEBIED_MAX_DISTANCE],
+        )
+        row = cursor.fetchone()
+    return row[0]
 
 
 def generate_heatmap_tiles(result_path: Path):
-    tracks = []
-    for tracker in Tracker.objects.all():
-        if not hasattr(tracker, 'team'):
-            continue
-        tracks.append(tracker.get_track_geojson())
-
-    features = [f'{{"type": "Feature", "properties": {{}}, "geometry": {track}}}' for track in tracks]
-
-    if len(tracks) == 0:
-        return
+    # tracks = []
+    # for tracker in Tracker.objects.filter(team__isnull=False):
+    #     tracks.append(tracker.get_track_geojson())
+    #
+    # features = [f'{{"type": "Feature", "properties": {{}}, "geometry": {track}}}' for track in tracks]
+    #
+    # if len(tracks) == 0:
+    #     return
+    #
+    # tmp_dir = Path(tempfile.mkdtemp())
+    #
+    # tracks_geojson = tmp_dir / 'tracks.geojson'
+    # with open(tracks_geojson, 'w') as f:
+    #     f.write('{"type": "FeatureCollection", "features": [')
+    #     f.write(','.join(features))
+    #     f.write(']}')
 
     tmp_dir = Path(tempfile.mkdtemp())
-
     tracks_geojson = tmp_dir / 'tracks.geojson'
-    with open(tracks_geojson, 'w') as f:
-        f.write('{"type": "FeatureCollection", "features": [')
-        f.write(','.join(features))
-        f.write(']}')
-
-    buffer_tracks_shp = tmp_dir / 'buffer_tracks.shp'
-
-    subprocess.run(
-        [
-            'ogr2ogr',
-            '-dialect',
-            'SQLite',
-            '-sql',
-            'SELECT ST_Buffer(geometry, 0.00002) FROM tracks',
-            buffer_tracks_shp,
-            tracks_geojson,
-        ]
-    )
+    tracks_geojson.write_text(get_all_tracks())
 
     heatmap_tif = tmp_dir / 'heatmap.tif'
     subprocess.run(
@@ -52,37 +71,23 @@ def generate_heatmap_tiles(result_path: Path):
             '-burn',
             '1',
             '-l',
-            'buffer_tracks',
-            buffer_tracks_shp,
+            'tracks',
+            tracks_geojson,
             heatmap_tif,
         ]
     )
 
     gdalinfo_stats = subprocess.check_output(['gdalinfo', '-stats', heatmap_tif]).decode('utf-8')
-    max_value = str(float(re.search(r'Maximum=(\d+\.?\d*)', gdalinfo_stats).group(1)))
-
-    heatmap_translate_tif = tmp_dir / 'heatmap_translate.tif'
-    subprocess.run(
-        [
-            'gdal_translate',
-            '-scale',
-            '0',
-            max_value,
-            '0',
-            '1',
-            heatmap_tif,
-            heatmap_translate_tif,
-        ]
-    )
+    max_value = float(re.search(r'Maximum=(\d+\.?\d*)', gdalinfo_stats).group(1))
 
     color_file = tmp_dir / 'color_file'
 
     color_file.write_text(
-        """1.0 255 255 255 255
-    0.746032 255 255 0 255
-    0.365079 255 0 0 255
-    0.05 255 0 0 200
-    0 0 0 0 0"""
+        f'{max_value} 255 255 255 255\n'
+        f'{0.6 * max_value} 255 255 0 255\n'
+        f'{0.2 * max_value} 255 0 0 255\n'
+        f'{0.02 * max_value} 255 0 0 230\n'
+        '0 0 0 0 0'
     )
 
     heatmap_color_tif = tmp_dir / 'heatmap_color.tif'
@@ -91,7 +96,7 @@ def generate_heatmap_tiles(result_path: Path):
             'gdaldem',
             'color-relief',
             '-alpha',
-            heatmap_translate_tif,
+            heatmap_tif,
             color_file,
             heatmap_color_tif,
         ]
