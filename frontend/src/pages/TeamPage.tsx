@@ -334,34 +334,38 @@ const TeamPage = memo(function TeamPage() {
               </Paper>
               <Paper>
                 <Container sx={{ pt: 2, pb: 2 }}>
-                  <Typography variant="h6">Groepsfoto</Typography>
-                  {team.group_picture ? (
-                    <a href={team.group_picture} target="_blank">
-                      <Box
-                        component="img"
-                        src={team.group_picture}
-                        sx={{
-                          maxWidth: '100%',
-                        }}
-                      />
-                    </a>
-                  ) : (
-                    <Typography variant="body2">Nog geen groepsfoto.</Typography>
-                  )}
-                  <Button
-                    component="label"
-                    role={undefined}
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<CloudUploadIcon />}
-                  >
-                    Kies foto
-                    <VisuallyHiddenInput type="file" onChange={onFileInputChange} />
-                  </Button>
-                  {uploadedFile && <Typography variant="body2">{uploadedFile.name}</Typography>}
-                  <Button variant="contained" onClick={onUpload}>
-                    Upload
-                  </Button>
+                  <Stack spacing={1}>
+                    <Typography variant="h6">Groepsfoto</Typography>
+                    {team.group_picture ? (
+                      <a href={team.group_picture} target="_blank">
+                        <Box
+                          component="img"
+                          src={team.group_picture}
+                          sx={{
+                            maxWidth: '100%',
+                          }}
+                        />
+                      </a>
+                    ) : (
+                      <Typography variant="body2">Nog geen groepsfoto.</Typography>
+                    )}
+                    {uploadedFile && <Typography variant="body2">{uploadedFile.name}</Typography>}
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        component="label"
+                        role={undefined}
+                        variant="contained"
+                        color="secondary"
+                        startIcon={<CloudUploadIcon />}
+                      >
+                        Kies foto
+                        <VisuallyHiddenInput type="file" onChange={onFileInputChange} />
+                      </Button>
+                      <Button variant="contained" onClick={onUpload}>
+                        Upload
+                      </Button>
+                    </Stack>
+                  </Stack>
                 </Container>
               </Paper>
             </Stack>
