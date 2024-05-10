@@ -68,18 +68,21 @@ export default function MainPage() {
     pollingInterval: 15_000,
     skipPollingIfUnfocused: true,
   });
-  const { error: queryError } = useGetUserQuery(undefined, {
+  const { currentData: user, error: queryError } = useGetUserQuery(undefined, {
     pollingInterval: 5_000,
     skipPollingIfUnfocused: true,
   });
 
   // Navigate to login page if unauthenticated
+  useEffect(() => {
+    if (user && user.username === null) {
+      navigate('/login/');
+    }
+  }, [navigate, user]);
+
   // Check query error for network errors
   useEffect(() => {
-    if (queryError !== undefined && 'status' in queryError && queryError.status === 404) {
-      navigate('/login/');
-    } else if (queryError !== undefined && networkErrorNotificationId === null) {
-      console.log(queryError);
+    if (queryError !== undefined && networkErrorNotificationId === null) {
       const id = enqueueSnackbar('Geen internetverbinding', {
         variant: 'warning',
         preventDuplicate: true,

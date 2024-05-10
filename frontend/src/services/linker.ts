@@ -51,7 +51,7 @@ export const linkerApi = createApi({
   refetchOnFocus: true,
   refetchOnReconnect: true,
   refetchOnMountOrArgChange: 30,
-  tagTypes: ['Team', 'MapNote', 'User'],
+  tagTypes: ['Team', 'MapNote'],
   endpoints: (build) => ({
     getTrackers: build.query<EntityState<Tracker, number>, void>({
       query: () => '/trackers/',
@@ -137,21 +137,39 @@ export const linkerApi = createApi({
     }),
     getUser: build.query<User, void>({
       query: () => '/user/',
-      providesTags: ['User'],
     }),
-    loginUser: build.mutation<void, LoginUser>({
+    loginUser: build.mutation<User, LoginUser>({
       query: (body) => ({
         url: `/login/`,
         method: 'POST',
-        body,
+        body: { username: body.username.toLowerCase(), password: body.password },
       }),
-      invalidatesTags: ['User'],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data: updatedUser } = await queryFulfilled;
+          dispatch(
+            linkerApi.util.updateQueryData('getUser', undefined, (draft) => {
+              Object.assign(draft, updatedUser);
+            }),
+          );
+        } catch {
+          /* empty */
+        }
+      },
     }),
     logoutUser: build.mutation<void, void>({
       query: () => ({
         url: '/logout/',
         method: 'POST',
       }),
+      onQueryStarted(_, { dispatch }) {
+        dispatch(
+          linkerApi.util.updateQueryData('getUser', undefined, (draft) => {
+            draft.username = null;
+            draft.permissions = [];
+          }),
+        );
+      },
     }),
     createTeamNote: build.mutation<TeamNote, Omit<TeamNote, 'id' | 'created' | 'author'>>({
       query: (note) => ({

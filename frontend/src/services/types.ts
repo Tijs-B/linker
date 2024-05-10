@@ -159,6 +159,6 @@ export interface LoginUser {
 }
 
 export interface User {
-  username: string;
+  username: string | null;
   permissions: string[];
 }

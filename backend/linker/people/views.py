@@ -78,16 +78,32 @@ class ContactPersonViewSet(viewsets.ModelViewSet):
     serializer_class = ContactPersonSerializer
 
 
+def get_user_info(request):
+    if request.user.is_authenticated:
+        if request.user.is_superuser:
+            all_permissions = Permission.objects.all()
+        else:
+            all_permissions = request.user.user_permissions.all() | Permission.objects.filter(group__user=request.user)
+        data = {
+            'username': request.user.username,
+            'permissions': list(all_permissions.values_list('codename', flat=True)),
+        }
+        return data
+    else:
+        return {'username': None, 'permissions': []}
+
+
 class LoginView(View):
     def post(self, request):
         data = loads(request.body)
         username = data.get('username')
         password = data.get('password')
         user = authenticate(request, username=username, password=password)
-        if user is None:
-            return HttpResponse(status=404)
-        login(request, user)
-        return HttpResponse(status=200)
+        if user is not None:
+            login(request, user)
+            return JsonResponse(get_user_info(request))
+        else:
+            return HttpResponse(status=401)
 
 
 class LogoutView(View):
@@ -98,16 +114,4 @@ class LogoutView(View):
 
 class UserView(View):
     def get(self, request):
-        if self.request.user.is_authenticated:
-            if self.request.user.is_superuser:
-                all_permissions = Permission.objects.all()
-            else:
-                all_permissions = self.request.user.user_permissions.all() | Permission.objects.filter(
-                    group__user=request.user
-                )
-            data = {
-                'username': request.user.username,
-                'permissions': list(all_permissions.values_list('codename', flat=True)),
-            }
-            return JsonResponse(data)
-        return HttpResponse(status=404)
+        return JsonResponse(get_user_info(request))

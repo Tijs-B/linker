@@ -1,5 +1,5 @@
 import { memo, useCallback } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -10,7 +10,7 @@ import { useLogoutUserMutation } from '../../services/linker.ts';
 
 const BottomMenu = memo(function BottomMenu() {
   const location = useLocation();
-
+  const navigate = useNavigate();
   const logoutUser = useLogoutUserMutation()[0];
 
   const currentSelection = function (): string | null {
@@ -24,7 +24,8 @@ const BottomMenu = memo(function BottomMenu() {
 
   const onLogout = useCallback(() => {
     logoutUser();
-  }, [logoutUser]);
+    navigate('/login');
+  }, [navigate, logoutUser]);
 
   return (
     <Paper square elevation={3}>

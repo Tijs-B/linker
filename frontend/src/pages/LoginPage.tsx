@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button, Container, Grid, Paper, TextField } from '@mui/material';
 
-import { useGetTeamsQuery, useLoginUserMutation } from '../services/linker.ts';
+import { useSnackbar } from 'notistack';
+
+import { useGetUserQuery, useLoginUserMutation } from '../services/linker.ts';
 
 export default function LoginPage() {
-  const [loginUser, { error, isError, isSuccess }] = useLoginUserMutation();
-  const { data: teams, error: queryError } = useGetTeamsQuery();
-
+  const { currentData: user } = useGetUserQuery();
+  const [loginUser] = useLoginUserMutation();
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   const submitForm = useCallback(
     (event: React.FormEvent) => {
@@ -18,26 +20,26 @@ export default function LoginPage() {
         username: { value: string };
         password: { value: string };
       };
-      const body = {
+      loginUser({
         username: target.username.value,
         password: target.password.value,
-      };
-      loginUser(body);
+      })
+        .unwrap()
+        .then(() => navigate('/'))
+        .catch((rejected) => {
+          if (rejected.status === 401) {
+            enqueueSnackbar('Foute gebruikersnaam of wachtwoord', { variant: 'error' });
+          }
+        });
     },
-    [loginUser],
+    [loginUser, enqueueSnackbar, navigate],
   );
 
   useEffect(() => {
-    if (isSuccess) {
+    if (user?.username) {
       navigate('/');
     }
-  }, [navigate, isSuccess]);
-
-  useEffect(() => {
-    if (teams && !queryError) {
-      navigate('/');
-    }
-  }, [navigate, teams, queryError]);
+  }, [navigate, user]);
 
   return (
     <Container sx={{ pt: 2 }}>
@@ -56,7 +58,6 @@ export default function LoginPage() {
               <TextField required label="Wachtwoord" type="password" name="password" />
               <Button type="submit">Login</Button>
             </form>
-            {isError && 'status' in error && error.status === 404 && <p>Fout wachtwoord</p>}
           </Paper>
         </Grid>
       </Grid>
