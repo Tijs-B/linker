@@ -60,7 +60,7 @@ const TrackerRow = ({ data, index, style }: TrackerRowProps) => {
             secondaryTypographyProps={{ noWrap: true }}
           />
           {'safe_weide' in item && item.safe_weide && (
-            <Chip color="primary" variant="outlined" label={`Safe op ${item.safe_weide}`} />
+            <Chip color="primary" variant="contained" label={`Safe op ${item.safe_weide}`} />
           )}
         </ListItemButton>
       </ListItem>

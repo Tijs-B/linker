@@ -20,6 +20,14 @@ declare module '@mui/material/styles' {
 }
 
 const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#689f38',
+    },
+    secondary: {
+      main: '#ffc400',
+    },
+  },
   dimensions: {
     drawerWidthDesktop: '360px',
     popupMaxWidth: '360px',
