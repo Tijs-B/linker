@@ -24,7 +24,7 @@ const BottomMenu = memo(function BottomMenu() {
 
   const onLogout = useCallback(() => {
     logoutUser();
-    navigate('/login');
+    navigate('/login/');
   }, [navigate, logoutUser]);
 
   return (
