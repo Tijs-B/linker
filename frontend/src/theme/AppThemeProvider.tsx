@@ -1,4 +1,4 @@
-import { memo, ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 
 import { ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
