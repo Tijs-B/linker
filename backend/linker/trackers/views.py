@@ -1,18 +1,17 @@
 from datetime import timedelta
-from json import loads
 
 from django.contrib.gis.measure import D
 from django.db.models import Subquery, OuterRef, Exists
+from django.http import HttpResponse
 from django.utils.timezone import now
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.response import Response
 
 from linker.map.models import Fiche, Tocht, Weide, Basis
 from linker.tracing.constants import FICHE_MAX_DISTANCE, TOCHT_MAX_DISTANCE, WEIDE_MAX_DISTANCE, GEBIED_MAX_DISTANCE
 from linker.trackers.constants import TRACKER_BATTERY_LOW_MINUTES
 from linker.trackers.models import Tracker, TrackerLog
-from linker.trackers.serializers import TrackerSerializer, TrackerLogSerializer
+from linker.trackers.serializers import TrackerSerializer
 
 
 class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
@@ -61,8 +60,8 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['get'])
     def track(self, request, pk=None):
         tracker = self.get_object()
-        track = loads(tracker.get_track().json)
-        return Response(track)
+        track = tracker.get_track_geojson()
+        return HttpResponse(track, content_type='application/geo+json')
 
     @action(detail=True, methods=['get'])
     def logs(self, request, pk=None):
@@ -72,5 +71,12 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = queryset.order_by('gps_datetime')
         queryset = queryset.values('id', 'gps_datetime', 'point')
 
-        serializer = TrackerLogSerializer(queryset, many=True)
-        return Response(serializer.data)
+        response = '['
+        for item in queryset:
+            response += (
+                f'{{"id":{item["id"]},"gps_datetime":"{item["gps_datetime"].isoformat()}",'
+                f'"point":{item["point"].json}}},'
+            )
+        response = response[:-1] + ']'
+
+        return HttpResponse(response, content_type='application/json')

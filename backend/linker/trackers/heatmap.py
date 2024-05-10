@@ -1,4 +1,3 @@
-import json
 import re
 import subprocess
 import tempfile
@@ -9,31 +8,24 @@ from linker.trackers.models import Tracker
 
 
 def generate_heatmap_tiles(result_path: Path):
-    line_strings = []
+    tracks = []
     for tracker in Tracker.objects.all():
         if not hasattr(tracker, 'team'):
             continue
-        line_strings.append(tracker.get_track())
+        tracks.append(tracker.get_track_geojson())
 
-    if len(line_strings) == 0:
+    features = [f'{{"type": "Feature", "properties": {{}}, "geometry": {track}}}' for track in tracks]
+
+    if len(tracks) == 0:
         return
 
     tmp_dir = Path(tempfile.mkdtemp())
 
-    collection = {
-        'type': 'FeatureCollection',
-        'features': [
-            {
-                'type': 'Feature',
-                'properties': {},
-                'geometry': json.loads(line_string.json),
-            }
-            for line_string in line_strings
-        ],
-    }
-
     tracks_geojson = tmp_dir / 'tracks.geojson'
-    tracks_geojson.write_text(json.dumps(collection))
+    with open(tracks_geojson, 'w') as f:
+        f.write('{"type": "FeatureCollection", "features": [')
+        f.write(','.join(features))
+        f.write(']}')
 
     buffer_tracks_shp = tmp_dir / 'buffer_tracks.shp'
 

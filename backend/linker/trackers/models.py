@@ -1,6 +1,7 @@
 from django.contrib.gis.geos import LineString
 from django.contrib.gis.db import models
 from django.contrib.gis.measure import D
+from django.db import connection
 
 from linker.config.models import Switch
 from linker.map.models import Basis, Tocht
@@ -27,12 +28,27 @@ class Tracker(models.Model):
         if hasattr(self, 'team') and Switch.switch_is_active(SWITCH_EXCLUDE_BASIS_FROM_TRACK):
             basis = Basis.objects.first()
             queryset = queryset.filter(point__distance_gt=(basis.point, D(m=SKIP_BASIS_DISTANCE)))
-        queryset = queryset.filter(team_is_safe=False)
         queryset = queryset.order_by('gps_datetime')
         points = list(queryset.values_list('point', flat=True))
         if len(points) == 1:
             points = []
         return LineString(points)
+
+    def get_track_geojson(self) -> str:
+        tocht_centroid = Tocht.centroid()
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT ST_AsGeoJSON(ST_MakeLine(trackers_trackerlog.point ORDER BY trackers_trackerlog.gps_datetime))
+                FROM trackers_trackerlog
+                WHERE (
+                    trackers_trackerlog.tracker_id = %s
+                    AND ST_DistanceSphere(trackers_trackerlog.point, %s::geometry) < %s
+                    AND NOT trackers_trackerlog.team_is_safe
+                )""",
+                [self.id, tocht_centroid.hexewkb.decode('utf-8'), GEBIED_MAX_DISTANCE],
+            )
+            row = cursor.fetchone()
+        return row[0]
 
 
 class TrackerLog(models.Model):
