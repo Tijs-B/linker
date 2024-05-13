@@ -108,6 +108,7 @@ function BackgroundLayers({ showHeatmap, showZijwegen }: BackgroundLayersProps) 
           type="symbol"
           layout={{
             'icon-allow-overlap': true,
+            'text-allow-overlap': true,
             'text-field': ['get', 'name'],
             'text-size': 10,
             'text-font': ['D-DIN DIN-Bold', 'Arial Unicode MS Regular'],
