@@ -161,4 +161,5 @@ export interface LoginUser {
 export interface User {
   username: string | null;
   permissions: string[];
+  is_staff: boolean;
 }

@@ -87,10 +87,11 @@ def get_user_info(request):
         data = {
             'username': request.user.username,
             'permissions': list(all_permissions.values_list('codename', flat=True)),
+            'is_staff': request.user.is_staff,
         }
         return data
     else:
-        return {'username': None, 'permissions': []}
+        return {'username': None, 'permissions': [], 'is_staff': False}
 
 
 class LoginView(View):
