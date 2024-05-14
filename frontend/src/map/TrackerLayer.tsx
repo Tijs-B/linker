@@ -56,33 +56,43 @@ const TrackerLayer = memo(function TrackerLayer({
     };
   }, [mainMap, dispatch]);
 
-  const geoJsonData = useMemo(() => {
+  const [trackerData, offlineData] = useMemo(() => {
     if (!allTrackers) {
-      return featureCollection([]);
+      return [featureCollection([]), featureCollection([])];
     }
     const allItems =
       historyLog && selectedItem?.tracker ? [selectedItem] : [...filteredMembers, ...filteredTeams];
-    const features = allItems
-      .filter((item) => item.tracker !== null)
-      .flatMap((item) => {
-        const tracker = allTrackers!.entities[item.tracker!];
-        const lastLog = tracker?.last_log;
-        const currentLog = historyLog || lastLog;
-        if (!currentLog) {
-          return [];
-        }
-        const props = {
-          image: `tracker-${item.code}-${itemColor(item)}`,
-          sortKey: selectedItem === item ? 100 : 100 - currentLog.point.coordinates[1],
-          action:
-            'member_type' in item
-              ? trackersActions.selectMember(item.id)
-              : trackersActions.selectTeam(item.id),
-        };
-        return [feature(currentLog.point, props)];
-      });
 
-    return featureCollection(features);
+    const features = [];
+    const offlineFeatures = [];
+
+    for (const item of allItems) {
+      if (item.tracker === null) {
+        continue;
+      }
+      const tracker = allTrackers!.entities[item.tracker!];
+      const lastLog = tracker?.last_log;
+      const currentLog = historyLog || lastLog;
+      if (!currentLog) {
+        continue;
+      }
+
+      const props = {
+        image: `tracker-${item.code}-${itemColor(item)}`,
+        sortKey: selectedItem === item ? 100 : 100 - currentLog.point.coordinates[1],
+        action:
+          'member_type' in item
+            ? trackersActions.selectMember(item.id)
+            : trackersActions.selectTeam(item.id),
+      };
+
+      features.push(feature(currentLog.point, props));
+
+      if (!tracker.is_online) {
+        offlineFeatures.push(feature(currentLog.point));
+      }
+    }
+    return [featureCollection(features), featureCollection(offlineFeatures)];
   }, [allTrackers, filteredMembers, filteredTeams, historyLog, selectedItem]);
 
   const selectedData = useMemo(() => {
@@ -99,17 +109,6 @@ const TrackerLayer = memo(function TrackerLayer({
       return featureCollection([]);
     }
   }, [allTrackers, selectedItem, showHistory]);
-
-  const offlineData = useMemo(() => {
-    if (!allTrackers) {
-      return featureCollection([]);
-    }
-    return featureCollection(
-      Object.values(allTrackers.entities)
-        .filter((tracker) => tracker.is_coupled && !tracker.is_online)
-        .map((tracker) => feature(tracker.last_log!.point)),
-    );
-  }, [allTrackers]);
 
   return (
     <>
@@ -128,7 +127,7 @@ const TrackerLayer = memo(function TrackerLayer({
           }}
         />
       </Source>
-      <Source type="geojson" data={geoJsonData}>
+      <Source type="geojson" data={trackerData}>
         <Layer
           type="symbol"
           id="trackers"
