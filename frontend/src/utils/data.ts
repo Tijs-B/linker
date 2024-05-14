@@ -9,10 +9,10 @@ export function getLastCheckpointLog(
   team: number,
   checkpointLogs: EntityState<CheckpointLog, number>,
 ): CheckpointLog | null {
-  const filtered = Object.values(checkpointLogs).filter((l) => l.team === team);
+  const filtered = Object.values(checkpointLogs.entities).filter((l) => l.team === team);
   if (filtered.length > 0) {
     return filtered.reduce((prev, curr) =>
-      new Date(prev.timestamp) > new Date(curr.timestamp) ? prev : curr,
+      new Date(prev.arrived) > new Date(curr.arrived) ? prev : curr,
     );
   } else {
     return null;
