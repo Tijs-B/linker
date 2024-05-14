@@ -19,7 +19,7 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return (
-            Tracker.objects.select_related('last_log')
+            Tracker.objects.select_related('last_log', 'team', 'organizationmember')
             .order_by('tracker_name')
             .annotate(
                 fiche=Subquery(

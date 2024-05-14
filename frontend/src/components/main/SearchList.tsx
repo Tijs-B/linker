@@ -20,6 +20,7 @@ import PersonAvatar from '../PersonAvatar';
 
 type TrackerRowDataItem = (OrganizationMember | Team) & {
   secondary: string;
+  isOnline: boolean;
 };
 
 interface TrackerRowProps {
@@ -50,7 +51,7 @@ const TrackerRow = ({ data, index, style }: TrackerRowProps) => {
         <ListItemButton onClick={onClick}>
           <ListItemAvatar>
             <Badge badgeContent={'team_notes' in item ? item.team_notes.length : 0} color="primary">
-              <PersonAvatar item={item} />
+              <PersonAvatar item={item} isOnline={item.isOnline} />
             </Badge>
           </ListItemAvatar>
           <ListItemText
@@ -84,11 +85,12 @@ export default memo(function SearchList({ members, teams, onClick }: SearchListP
   const items = useMemo(() => {
     const allItems = [...teams, ...members];
     return allItems.map((item: Team | OrganizationMember) => {
-      const result = { secondary: '', safe_weide: '', ...item };
+      const result = { secondary: '', safe_weide: '', isOnline: false, ...item };
       if (!item.tracker) {
         result.secondary = '⚠️ Geen tracker gekoppeld';
       } else if (fiches && tochten && weides && basis && trackers && item.tracker) {
         const tracker = trackers.entities[item.tracker];
+        result.isOnline = tracker.is_online;
         if (tracker.last_log) {
           result.secondary = getPositionDescription(tracker, fiches, tochten, weides);
         }

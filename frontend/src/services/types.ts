@@ -29,6 +29,7 @@ export interface Tracker {
   weide: number | null;
   tocht: number | null;
   basis: number | null;
+  is_coupled: boolean;
   is_online: boolean;
   battery_low: boolean;
   sos_sent: string | null;

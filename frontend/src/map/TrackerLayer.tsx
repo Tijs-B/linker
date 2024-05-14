@@ -65,7 +65,8 @@ const TrackerLayer = memo(function TrackerLayer({
     const features = allItems
       .filter((item) => item.tracker !== null)
       .flatMap((item) => {
-        const lastLog = allTrackers!.entities[item.tracker!]?.last_log;
+        const tracker = allTrackers!.entities[item.tracker!];
+        const lastLog = tracker?.last_log;
         const currentLog = historyLog || lastLog;
         if (!currentLog) {
           return [];
@@ -99,6 +100,17 @@ const TrackerLayer = memo(function TrackerLayer({
     }
   }, [allTrackers, selectedItem, showHistory]);
 
+  const offlineData = useMemo(() => {
+    if (!allTrackers) {
+      return featureCollection([]);
+    }
+    return featureCollection(
+      Object.values(allTrackers.entities)
+        .filter((tracker) => tracker.is_coupled && !tracker.is_online)
+        .map((tracker) => feature(tracker.last_log!.point)),
+    );
+  }, [allTrackers]);
+
   return (
     <>
       <Source type="geojson" data={selectedData}>
@@ -128,6 +140,21 @@ const TrackerLayer = memo(function TrackerLayer({
             'icon-offset': [0, -16.5 * 2],
             'icon-size': 0.5,
             'symbol-sort-key': ['get', 'sortKey'],
+            visibility: visible ? 'visible' : 'none',
+          }}
+        />
+      </Source>
+      <Source type="geojson" data={offlineData}>
+        <Layer
+          type="symbol"
+          id="trackerOffline"
+          beforeId="trackers"
+          layout={{
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true,
+            'icon-image': 'tracker-offline-outline',
+            'icon-offset': [0, -16.5 * 2],
+            'icon-size': 0.5,
             visibility: visible ? 'visible' : 'none',
           }}
         />

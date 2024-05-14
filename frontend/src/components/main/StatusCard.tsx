@@ -202,6 +202,7 @@ const StatusCard = memo(function StatusCard() {
     trackers && selectedItem?.tracker ? trackers.entities[selectedItem.tracker] : null;
   const lastLog = tracker && tracker.last_log;
   const lastUpdate = lastLog ? new Date(lastLog.gps_datetime).toLocaleTimeString() : '-';
+  const trackerIsOnline = tracker ? tracker.is_online : false;
 
   const navigateUrl = useMemo(() => {
     const tracker =
@@ -227,7 +228,7 @@ const StatusCard = memo(function StatusCard() {
     <div css={root}>
       <Card css={card}>
         <CardHeader
-          avatar={<PersonAvatar item={selectedItem} />}
+          avatar={<PersonAvatar item={selectedItem} isOnline={trackerIsOnline} />}
           title={selectedItem?.name}
           titleTypographyProps={{ noWrap: true }}
           subheader={selectedItem && 'chiro' in selectedItem ? selectedItem.chiro : ''}

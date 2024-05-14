@@ -108,6 +108,23 @@ function generateTrackerOutline(): ImageData | null {
   return ctx.getImageData(0, 0, 33 * 2, 48 * 2);
 }
 
+function generateTrackerOfflineOutline(): ImageData | null {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    return null;
+  }
+  ctx.scale(2, 2);
+  ctx.fillStyle = yellow[700];
+  ctx.fill(
+    new Path2D(
+      'M16.5 2.074C7.84 2.074.775 9.138.775 17.8c0 3.735 1.97 7.331 4.43 11.058 2.46 3.726 5.538 7.56 8.248 11.254.662.907 1.767 1.662 3.047 1.662 1.28 0 2.385-.755 3.047-1.662 2.714-3.7 5.792-7.572 8.25-11.314 2.458-3.743 4.428-7.315 4.428-10.998 0-8.661-7.064-15.725-15.725-15.725zm0 2.225c7.46 0 13.5 6.04 13.5 13.5 0 5.57-6.75 13.5-12.25 21-.73 1-1.77 1-2.5 0-5.5-7.5-12.25-15.28-12.25-21 0-7.46 6.04-13.5 13.5-13.5z',
+    ),
+  );
+
+  return ctx.getImageData(0, 0, 33 * 2, 48 * 2);
+}
+
 export function generateAllIcons(
   items: (Team | OrganizationMember)[],
   addToMap: (name: string, data: ImageData) => void,
@@ -136,6 +153,10 @@ export function generateAllIcons(
       const trackerOutlineIcon = generateTrackerOutline();
       if (trackerOutlineIcon) {
         addToMap('tracker-outline', trackerOutlineIcon);
+      }
+      const trackerOfflineOutlineIcon = generateTrackerOfflineOutline();
+      if (trackerOfflineOutlineIcon) {
+        addToMap('tracker-offline-outline', trackerOfflineOutlineIcon);
       }
     });
   });
