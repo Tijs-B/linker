@@ -50,7 +50,7 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
                     )
                 ),
                 sos_sent=Subquery(
-                    TrackerLog.objects.filter(tracker=OuterRef('pk'), tracker_type=17006)
+                    TrackerLog.objects.filter(tracker=OuterRef('pk'), tracker_type__in=(17006, 200))
                     .order_by('-gps_datetime')
                     .values('gps_datetime')[:1]
                 ),

@@ -155,7 +155,7 @@ const TrackerLayer = memo(function TrackerLayer({
             'icon-image': 'tracker-offline-outline',
             'icon-offset': [0, -16.5 * 2],
             'icon-size': 0.5,
-            visibility: visible ? 'visible' : 'none',
+            visibility: visible && !showHistory ? 'visible' : 'none',
           }}
         />
       </Source>
