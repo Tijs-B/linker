@@ -85,6 +85,7 @@ function BackgroundLayers({ showHeatmap, showZijwegen }: BackgroundLayersProps) 
             'hillshade-shadow-color': 'hsl(9, 3%, 41%)',
             'hillshade-highlight-color': 'hsl(20, 13%, 68%)',
           }}
+          layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
         />
       </Source>
       <Source
