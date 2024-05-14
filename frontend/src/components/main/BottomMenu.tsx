@@ -4,14 +4,16 @@ import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MapIcon from '@mui/icons-material/Map';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
 
-import { useLogoutUserMutation } from '../../services/linker.ts';
+import { useGetUserQuery, useLogoutUserMutation } from '../../services/linker.ts';
 
 const BottomMenu = memo(function BottomMenu() {
   const location = useLocation();
   const navigate = useNavigate();
   const logoutUser = useLogoutUserMutation()[0];
+  const { data: user } = useGetUserQuery();
 
   const currentSelection = function (): string | null {
     if (location.pathname === '/') {
@@ -44,6 +46,14 @@ const BottomMenu = memo(function BottomMenu() {
           component={RouterLink}
           to="/tracing/"
         />
+        {user?.is_staff && (
+          <BottomNavigationAction
+            label="Admin"
+            icon={<SettingsIcon />}
+            value="admin"
+            href="/admin/"
+          />
+        )}
         <BottomNavigationAction
           label="Logout"
           icon={<LogoutIcon />}
