@@ -35,16 +35,16 @@ import {
   useGetOrganizationMembersQuery,
   useGetTeamsQuery,
   useGetTochtenQuery,
-} from '../services/linker.ts';
-import { OrganizationMember, Team } from '../services/types.ts';
-import { trackersActions, useAppDispatch } from '../store/index.js';
-import { generateAllIcons } from '../utils/icons.ts';
-import BackgroundLayers from './BackgroundLayers';
-import CustomOverlay from './CustomOverlay.jsx';
-import MapNoteLayer from './MapNoteLayer';
-import MapPadding from './MapPadding.jsx';
-import TrackerHistoryLayer from './TrackerHistoryLayer.jsx';
-import TrackerLayer from './TrackerLayer.jsx';
+} from '../../services/linker.ts';
+import { OrganizationMember, Team } from '../../services/types.ts';
+import { trackersActions, useAppDispatch } from '../../store';
+import { generateAllIcons } from '../../utils/icons.ts';
+import BackgroundLayers from './BackgroundLayers.tsx';
+import CustomOverlay from './CustomOverlay.tsx';
+import MapNoteLayer from './MapNoteLayer.tsx';
+import MapPadding from './MapPadding.tsx';
+import TrackerHistoryLayer from './TrackerHistoryLayer.tsx';
+import TrackerLayer from './TrackerLayer.tsx';
 
 const BOUNDS_OPTIONS = { padding: { top: 30, left: 30, right: 30, bottom: 30 } };
 const DEFAULT_INITIAL_BOUNDS = {

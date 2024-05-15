@@ -23,9 +23,9 @@ import {
   useDeleteMapNoteMutation,
   useGetMapNotesQuery,
   useUpdateMapNoteMutation,
-} from '../services/linker.ts';
-import { MapNote } from '../services/types.ts';
-import { getNavigationUrl } from '../utils/data.ts';
+} from '../../services/linker.ts';
+import { MapNote } from '../../services/types.ts';
+import { getNavigationUrl } from '../../utils/data.ts';
 
 type HoverInfo = {
   x: number;

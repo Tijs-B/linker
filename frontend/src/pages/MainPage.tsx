@@ -13,7 +13,7 @@ import HistoryCard from '../components/main/HistoryCard';
 import MainToolbar from '../components/main/MainToolbar';
 import SearchList from '../components/main/SearchList';
 import StatusCard from '../components/main/StatusCard';
-import MainMap from '../map/MainMap';
+import MainMap from '../components/map/MainMap';
 import {
   useGetOrganizationMembersQuery,
   useGetTeamsQuery,

@@ -12,8 +12,8 @@ import {
   useGetTochtenQuery,
   useGetWeidesQuery,
   useGetZijwegenQuery,
-} from '../services/linker.ts';
-import { contourUrl, demUrl } from '../utils/dem.ts';
+} from '../../services/linker.ts';
+import { contourUrl, demUrl } from '../../utils/dem.ts';
 
 interface BackgroundLayersProps {
   showHeatmap: boolean;

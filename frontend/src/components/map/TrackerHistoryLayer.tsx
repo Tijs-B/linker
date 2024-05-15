@@ -5,8 +5,8 @@ import { red } from '@mui/material/colors';
 
 import { skipToken } from '@reduxjs/toolkit/query';
 
-import { useGetTrackerTrackQuery } from '../services/linker.ts';
-import { selectSelectedItem, useAppSelector } from '../store';
+import { useGetTrackerTrackQuery } from '../../services/linker.ts';
+import { selectSelectedItem, useAppSelector } from '../../store';
 
 const TrackerHistoryLayer = memo(function TrackerHistoryLayer({ visible }: { visible: boolean }) {
   const selectedItem = useAppSelector(selectSelectedItem);

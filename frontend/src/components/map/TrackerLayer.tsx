@@ -3,15 +3,15 @@ import { Layer, MapLayerMouseEvent, Source, useMap } from 'react-map-gl/maplibre
 
 import { feature, featureCollection } from '@turf/helpers';
 
-import { useGetTrackersQuery } from '../services/linker.ts';
-import { OrganizationMember, Team } from '../services/types.ts';
+import { useGetTrackersQuery } from '../../services/linker.ts';
+import { OrganizationMember, Team } from '../../services/types.ts';
 import {
   selectSelectedItem,
   trackersActions,
   useAppDispatch,
   useAppSelector,
-} from '../store/index.js';
-import { itemColor } from '../theme/colors.ts';
+} from '../../store';
+import { itemColor } from '../../theme/colors.ts';
 
 interface TrackerLayerProps {
   visible: boolean;
