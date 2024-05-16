@@ -228,7 +228,11 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
         attributionControl={false}
         reuseMaps
       >
-        <BackgroundLayers showHeatmap={showHeatmap} showZijwegen={showZijwegen} />
+        <BackgroundLayers
+          showHeatmap={showHeatmap}
+          showZijwegen={showZijwegen}
+          showSatellite={showSatellite}
+        />
 
         <MapNoteLayer visible={!showHeatmap} />
         <TrackerLayer

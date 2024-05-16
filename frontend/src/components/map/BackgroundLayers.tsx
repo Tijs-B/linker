@@ -17,10 +17,11 @@ import { contourUrl, demUrl } from '../../utils/dem.ts';
 
 interface BackgroundLayersProps {
   showHeatmap: boolean;
+  showSatellite: boolean;
   showZijwegen: boolean;
 }
 
-function BackgroundLayers({ showHeatmap, showZijwegen }: BackgroundLayersProps) {
+function BackgroundLayers({ showHeatmap, showZijwegen, showSatellite }: BackgroundLayersProps) {
   const { data: tochten } = useGetTochtenQuery();
   const { data: fiches } = useGetFichesQuery();
   const { data: zijwegen } = useGetZijwegenQuery();
@@ -62,6 +63,15 @@ function BackgroundLayers({ showHeatmap, showZijwegen }: BackgroundLayersProps) 
     return [weidesData, labelData];
   }, [weides]);
 
+  const tochtLinePaint = {
+    'line-width': showSatellite ? 2 : 3,
+    'line-color': showSatellite ? 'rgba(255,113,113,0.87)' : '#424242',
+  };
+  const tochtOutlinePaint = {
+    'line-width': showSatellite ? 4 : 5,
+    'line-color': showSatellite ? '#ffffff55' : '#fafafa',
+  };
+
   return (
     <>
       <Source type="raster-dem" tiles={[demUrl]} tileSize={256} encoding="terrarium" maxzoom={14}>
@@ -85,7 +95,7 @@ function BackgroundLayers({ showHeatmap, showZijwegen }: BackgroundLayersProps) 
             'hillshade-shadow-color': 'hsl(9, 3%, 41%)',
             'hillshade-highlight-color': 'hsl(20, 13%, 68%)',
           }}
-          layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
+          layout={{ visibility: showHeatmap || showSatellite ? 'none' : 'visible' }}
         />
       </Source>
       <Source
@@ -141,20 +151,14 @@ function BackgroundLayers({ showHeatmap, showZijwegen }: BackgroundLayersProps) 
           id="tochten"
           beforeId="fiches-circles"
           type="line"
-          paint={{
-            'line-width': 3,
-            'line-color': grey[800],
-          }}
+          paint={tochtLinePaint}
           layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
         />
         <Layer
           id="tochten-outline"
           beforeId="tochten"
           type="line"
-          paint={{
-            'line-width': 5,
-            'line-color': '#fff',
-          }}
+          paint={tochtOutlinePaint}
           layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
         />
       </Source>
@@ -163,20 +167,14 @@ function BackgroundLayers({ showHeatmap, showZijwegen }: BackgroundLayersProps) 
           id="zijwegen"
           beforeId="tochten"
           type="line"
-          paint={{
-            'line-width': 3,
-            'line-color': grey[800],
-          }}
+          paint={tochtLinePaint}
           layout={{ visibility: showHeatmap || !showZijwegen ? 'none' : 'visible' }}
         />
         <Layer
           id="zijwegen-outline"
           beforeId="tochten-outline"
           type="line"
-          paint={{
-            'line-width': 5,
-            'line-color': '#fff',
-          }}
+          paint={tochtOutlinePaint}
           layout={{ visibility: showHeatmap || !showZijwegen ? 'none' : 'visible' }}
         />
       </Source>
@@ -259,7 +257,7 @@ function BackgroundLayers({ showHeatmap, showZijwegen }: BackgroundLayersProps) 
           filter={['>', ['get', 'level'], 0]}
           minzoom={11}
           layout={{
-            visibility: showHeatmap ? 'none' : 'visible',
+            visibility: showHeatmap || showSatellite ? 'none' : 'visible',
           }}
           paint={{
             'line-color': 'hsl(28,8%,50%)',
@@ -274,7 +272,7 @@ function BackgroundLayers({ showHeatmap, showZijwegen }: BackgroundLayersProps) 
           filter={['==', ['get', 'level'], 0]}
           minzoom={11}
           layout={{
-            visibility: showHeatmap ? 'none' : 'visible',
+            visibility: showHeatmap || showSatellite ? 'none' : 'visible',
           }}
           paint={{
             'line-color': 'rgb(136,124,111)',
