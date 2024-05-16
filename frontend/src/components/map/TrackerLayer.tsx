@@ -5,12 +5,7 @@ import { feature, featureCollection } from '@turf/helpers';
 
 import { useGetTrackersQuery } from '../../services/linker.ts';
 import { OrganizationMember, Team } from '../../services/types.ts';
-import {
-  selectSelectedItem,
-  trackersActions,
-  useAppDispatch,
-  useAppSelector,
-} from '../../store';
+import { selectSelectedItem, trackersActions, useAppDispatch, useAppSelector } from '../../store';
 import { itemColor } from '../../theme/colors.ts';
 
 interface TrackerLayerProps {
