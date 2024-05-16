@@ -64,7 +64,7 @@ function BackgroundLayers({ showHeatmap, showZijwegen }: BackgroundLayersProps) 
 
   return (
     <>
-      <Source type="raster-dem" tiles={[demUrl]} tileSize={256} encoding="terrarium">
+      <Source type="raster-dem" tiles={[demUrl]} tileSize={256} encoding="terrarium" maxzoom={14}>
         <Layer
           id="hillshade"
           type="hillshade"
