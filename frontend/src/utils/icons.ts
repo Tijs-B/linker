@@ -1,7 +1,7 @@
 import { yellow } from '@mui/material/colors';
 
-import dDinUrl from '../assets/fonts/D-DIN-Bold.woff2';
-import dDinCondensedUrl from '../assets/fonts/D-DINCondensed-Bold.woff2';
+import dDinUrl from '../assets/fonts/D-DIN-Bold.subset.woff2';
+import dDinCondensedUrl from '../assets/fonts/D-DINCondensed-Bold.subset.woff2';
 import { OrganizationMember, Team } from '../services/types.ts';
 import { itemColor } from '../theme/colors.ts';
 
@@ -25,6 +25,12 @@ const MAP_NOTE_POLE_PATH = new Path2D(
 const MAP_NOTE_BORDER_PATH = new Path2D(
   'M10.4 14.06zm.32.01.09.02-.1-.02zm.28.04zm.22.05zm.19.06.1.05-.1-.05zm.15.08.11.06-.1-.06zm.11.06zm.24.2v1.54a4.26 4.26 0 0 0 .38.53c1.68 1.68 4 2.6 7.09 2.9.4.04 1.28.1 2.04.13 1.85.09 2.66.21 4.04.64 1.08.34 2.32.9 3.43 1.6.31.18.64.43.96.66-3.42 1.48-6.78 3.31-8.8 5.6a7.12 7.12 0 0 1-3.33 2.42c-1.01.37-2.1.29-3.14.21-.46-.09-1.69-.5-1.85-.57-.22-.13-.38-.16-.6-.24a.75.75 0 0 0-.22-.04v.76c.17.04.33.13.48.2.37.18 1.47.52 2.04.63 1.22.2 2.39.09 3.53-.23a7.98 7.98 0 0 0 3.66-2.64c2.68-2.95 6.18-4.5 9.7-5.85.09-.06-1.11-1-2.03-1.56a16.52 16.52 0 0 0-7.83-2.35c-3.1-.11-6.69-.92-8.63-2.8-.46-.57-.56-1.15-.92-1.54zm-2.68 2.28z',
 );
+
+const dDinFontFace = new FontFace('D-DIN Bold', `url(${dDinUrl})`);
+const dDinCondensedFontFace = new FontFace('D-DINCondensed Bold', `url(${dDinCondensedUrl})`);
+document.fonts.add(dDinFontFace);
+document.fonts.add(dDinCondensedFontFace);
+
 
 function generateMapNoteIcon(
   color: string,
@@ -116,11 +122,6 @@ export function generateAllIcons(
   items: (Team | OrganizationMember)[],
   addToMap: (name: string, data: ImageData) => void,
 ) {
-  const dDinFontFace = new FontFace('D-DIN Bold', `url(${dDinUrl})`);
-  const dDinCondensedFontFace = new FontFace('D-DINCondensed Bold', `url(${dDinCondensedUrl})`);
-  document.fonts.add(dDinFontFace);
-  document.fonts.add(dDinCondensedFontFace);
-
   dDinFontFace.load().then(() => {
     dDinCondensedFontFace.load().then(() => {
       const canvas = document.createElement('canvas');
