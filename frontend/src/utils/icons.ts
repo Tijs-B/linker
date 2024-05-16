@@ -31,6 +31,12 @@ const dDinCondensedFontFace = new FontFace('D-DINCondensed Bold', `url(${dDinCon
 document.fonts.add(dDinFontFace);
 document.fonts.add(dDinCondensedFontFace);
 
+dDinFontFace.load();
+dDinCondensedFontFace.load();
+
+const canvas = document.createElement('canvas');
+canvas.width = 33 * 2;
+canvas.height = 48 * 2;
 
 function generateMapNoteIcon(
   color: string,
@@ -124,7 +130,6 @@ export function generateAllIcons(
 ) {
   dDinFontFace.load().then(() => {
     dDinCondensedFontFace.load().then(() => {
-      const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d', { willReadFrequently: true });
       if (!context) {
         return;
