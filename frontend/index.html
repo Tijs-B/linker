@@ -1,15 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="preconnect" href="https://tiles.tijsb.be/" crossorigin />
-  <title>Chirolink tracing</title>
-  <meta name="description" content="Het Chirolink Tracing Systeem">
-  <link rel="stylesheet" type="text/css" href="/src/index.css" />
-</head>
-<body>
-<div id="root"></div>
-<script type="module" src="/src/main.tsx"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://tiles.tijsb.be/" crossorigin />
+    <title>Chirolink tracing</title>
+    <meta name="description" content="Het Chirolink Tracing Systeem" />
+    <link rel="stylesheet" type="text/css" href="/src/index.css" />
+
+    <link
+      rel="preload"
+      href="/node_modules/@fontsource/roboto/files/roboto-latin-400-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/node_modules/@fontsource/roboto/files/roboto-latin-500-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <link rel="dns-prefetch" href="https://tiles.tijsb.be" />
+    <link rel="dns-prefetch" href="https://s3.amazonaws.com" />
+    <link rel="dns-prefetch" href="https://maputnik.github.io" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
