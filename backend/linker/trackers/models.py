@@ -44,7 +44,6 @@ class Tracker(models.Model):
                     trackers_trackerlog.tracker_id = %s
                     AND ST_DistanceSphere(trackers_trackerlog.point, %s::geometry) < %s
                     AND NOT trackers_trackerlog.team_is_safe
-                    AND trackers_trackerlog.speed < 20.0
                 )""",
                 [self.id, tocht_centroid.hexewkb.decode('utf-8'), GEBIED_MAX_DISTANCE],
             )
