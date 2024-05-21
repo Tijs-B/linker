@@ -83,8 +83,8 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
   const mapStyle = showHeatmap
     ? 'https://tiles.tijsb.be/styles/dark-matter/style.json'
     : showSatellite
-    ? 'https://tiles.tijsb.be/styles/satellite/style.json'
-    : 'https://tiles.tijsb.be/styles/outdoor/style.json';
+      ? 'https://tiles.tijsb.be/styles/satellite/style.json'
+      : 'https://tiles.tijsb.be/styles/outdoor/style.json';
 
   useEffect(() => {
     if (tochten && mapRef && mapRef.current && !hasRecentered) {

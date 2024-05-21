@@ -21,7 +21,11 @@ interface BackgroundLayersProps {
   showZijwegen: boolean;
 }
 
-function BackgroundLayers({ showHeatmap, showZijwegen, showSatellite }: BackgroundLayersProps) {
+const BackgroundLayers = memo(function BackgroundLayers({
+  showHeatmap,
+  showZijwegen,
+  showSatellite,
+}: BackgroundLayersProps) {
   const { data: tochten } = useGetTochtenQuery();
   const { data: fiches } = useGetFichesQuery();
   const { data: zijwegen } = useGetZijwegenQuery();
@@ -283,6 +287,6 @@ function BackgroundLayers({ showHeatmap, showZijwegen, showSatellite }: Backgrou
       </Source>
     </>
   );
-}
+});
 
-export default memo(BackgroundLayers);
+export default BackgroundLayers;

@@ -13,5 +13,6 @@
   ],
   "importOrderGroupNamespaceSpecifiers": true,
   "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true
+  "importOrderSortSpecifiers": true,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
 }

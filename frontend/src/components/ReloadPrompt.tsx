@@ -17,10 +17,13 @@ export default function ReloadPrompt() {
       console.log(`Service Worker at ${swUrl}`);
       console.log('Registration:', r);
       if (r) {
-        setInterval(() => {
-          console.log('Checking for sw update');
-          r.update();
-        }, 1000 * 60 * 5 /* 20s for testing purposes */);
+        setInterval(
+          () => {
+            console.log('Checking for sw update');
+            r.update();
+          },
+          1000 * 60 * 5 /* 20s for testing purposes */,
+        );
       }
     },
     onRegisterError(error) {
