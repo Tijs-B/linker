@@ -27,6 +27,7 @@ import { feature, featureCollection } from '@turf/helpers';
 import { useGetTrackerLogsQuery } from '../../services/linker.ts';
 import {
   selectSelectedItem,
+  selectSelectedTeam,
   trackersActions,
   useAppDispatch,
   useAppSelector,
@@ -74,15 +75,16 @@ const HistoryCard = memo(function HistoryCard() {
   const dispatch = useAppDispatch();
   const showHistory = useAppSelector((state) => state.trackers.showHistory);
 
-  const item = useAppSelector(selectSelectedItem);
+  const selectedItem = useAppSelector(selectSelectedItem);
+  const selectedTeam = useAppSelector(selectSelectedTeam);
 
   const [index, setIndex] = useState(0);
   const { mainMap } = useMap();
 
-  const code = item?.code;
+  const code = selectedItem?.code;
 
   const { currentData: logs } = useGetTrackerLogsQuery(
-    item && item.tracker && showHistory ? item.tracker : skipToken,
+    selectedItem?.tracker && showHistory ? selectedItem.tracker : skipToken,
   );
 
   const currentLog = logs?.[index];
@@ -119,16 +121,16 @@ const HistoryCard = memo(function HistoryCard() {
             avatar={
               <Avatar
                 sx={{
-                  bgcolor: item ? itemColor(item) : '#000',
+                  bgcolor: selectedItem ? itemColor(selectedItem) : '#000',
                   fontSize: code && code.length > 2 ? '16px' : '20px',
                 }}
               >
                 {code}
               </Avatar>
             }
-            title={item?.name}
+            title={selectedItem?.name}
             titleTypographyProps={{ noWrap: true }}
-            subheader={item && 'chiro' in item ? item.chiro : ''}
+            subheader={selectedTeam?.chiro || ''}
             action={
               <IconButton
                 size="small"

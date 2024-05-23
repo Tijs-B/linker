@@ -5,7 +5,13 @@ import { feature, featureCollection } from '@turf/helpers';
 
 import { useGetTrackersQuery } from '../../services/linker.ts';
 import { OrganizationMember, Team } from '../../services/types.ts';
-import { selectSelectedItem, trackersActions, useAppDispatch, useAppSelector } from '../../store';
+import {
+  selectSelectedItem,
+  selectSelectedTracker,
+  trackersActions,
+  useAppDispatch,
+  useAppSelector,
+} from '../../store';
 import { itemColor } from '../../theme/colors.ts';
 
 interface TrackerLayerProps {
@@ -21,6 +27,7 @@ const TrackerLayer = memo(function TrackerLayer({
 }: TrackerLayerProps) {
   const dispatch = useAppDispatch();
   const selectedItem = useAppSelector(selectSelectedItem);
+  const selectedTracker = useAppSelector(selectSelectedTracker);
   const showHistory = useAppSelector((state) => state.trackers.showHistory);
 
   const historyLog = useAppSelector((state) => state.trackers.historyLog);
@@ -91,19 +98,12 @@ const TrackerLayer = memo(function TrackerLayer({
   }, [allTrackers, filteredMembers, filteredTeams, historyLog, selectedItem]);
 
   const selectedData = useMemo(() => {
-    if (
-      !showHistory &&
-      selectedItem?.tracker &&
-      allTrackers &&
-      allTrackers.entities[selectedItem.tracker].last_log !== null
-    ) {
-      return featureCollection([
-        feature(allTrackers.entities[selectedItem.tracker].last_log!.point),
-      ]);
+    if (!showHistory && selectedTracker?.last_log) {
+      return featureCollection([feature(selectedTracker.last_log.point)]);
     } else {
       return featureCollection([]);
     }
-  }, [allTrackers, selectedItem, showHistory]);
+  }, [selectedTracker, showHistory]);
 
   return (
     <>

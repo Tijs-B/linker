@@ -27,6 +27,34 @@ export type AppDispatch = typeof store.dispatch;
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
+export const selectSelectedTeam = createSelector(
+  [
+    (state: RootState) => state.trackers.selectedId,
+    (state: RootState) => state.trackers.selectedItemType,
+    linkerApi.endpoints.getTeams.select(undefined),
+  ],
+  (selectedId, selectedItemType, teams) => {
+    if (selectedId === null || selectedItemType !== 'team' || !teams.data) {
+      return null;
+    }
+    return teams.data.entities[selectedId];
+  },
+);
+
+export const selectSelectedMember = createSelector(
+  [
+    (state: RootState) => state.trackers.selectedId,
+    (state: RootState) => state.trackers.selectedItemType,
+    linkerApi.endpoints.getOrganizationMembers.select(undefined),
+  ],
+  (selectedId, selectedItemType, members) => {
+    if (selectedId === null || selectedItemType !== 'member' || !members.data) {
+      return null;
+    }
+    return members.data.entities[selectedId];
+  },
+);
+
 export const selectSelectedItem = createSelector(
   [
     (state: RootState) => state.trackers.selectedId,
@@ -51,6 +79,16 @@ export const selectSelectedItem = createSelector(
       return members.data.entities[selectedId];
     }
     return null;
+  },
+);
+
+export const selectSelectedTracker = createSelector(
+  [selectSelectedItem, linkerApi.endpoints.getTrackers.select(undefined)],
+  (selectedItem, trackers) => {
+    if (selectedItem === null || !trackers.data || selectedItem.tracker === null) {
+      return null;
+    }
+    return trackers.data.entities[selectedItem.tracker];
   },
 );
 

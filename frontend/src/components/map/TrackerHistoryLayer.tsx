@@ -14,37 +14,31 @@ const TrackerHistoryLayer = memo(function TrackerHistoryLayer({ visible }: { vis
     selectedItem?.tracker ? selectedItem.tracker : skipToken,
   );
 
+  const trackData = track || { type: 'LineString', coordinates: [] };
+
   return (
-    <>
-      {track && (
-        <Source data={track} type="geojson">
-          <Layer
-            id="tracker-history"
-            beforeId="trackers"
-            type="line"
-            paint={{
-              'line-color': red[500],
-              'line-width': 4,
-              'line-opacity': selectedItem && track ? 1 : 0,
-              // 'line-opacity-transition': { duration: 200 },
-            }}
-            layout={{ visibility: visible ? 'visible' : 'none' }}
-          />
-          <Layer
-            id="tracker-history-outline"
-            beforeId="tracker-history"
-            type="line"
-            paint={{
-              'line-color': '#fff',
-              'line-width': 6,
-              'line-opacity': selectedItem && track ? 1 : 0,
-              // 'line-opacity-transition': { duration: 200 },
-            }}
-            layout={{ visibility: visible ? 'visible' : 'none' }}
-          />
-        </Source>
-      )}
-    </>
+    <Source data={trackData} type="geojson">
+      <Layer
+        id="tracker-history"
+        beforeId="trackers"
+        type="line"
+        paint={{
+          'line-color': red[500],
+          'line-width': 4,
+        }}
+        layout={{ visibility: visible && track ? 'visible' : 'none' }}
+      />
+      <Layer
+        id="tracker-history-outline"
+        beforeId="tracker-history"
+        type="line"
+        paint={{
+          'line-color': '#fff',
+          'line-width': 6,
+        }}
+        layout={{ visibility: visible && track ? 'visible' : 'none' }}
+      />
+    </Source>
   );
 });
 

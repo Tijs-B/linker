@@ -1,5 +1,4 @@
 import React, { memo, useCallback, useMemo, useState } from 'react';
-import { useMap } from 'react-map-gl/maplibre';
 import { Link as RouterLink } from 'react-router-dom';
 
 import CallIcon from '@mui/icons-material/Call';
@@ -7,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import DirectionsIcon from '@mui/icons-material/Directions';
 import HistoryIcon from '@mui/icons-material/History';
 import InfoIcon from '@mui/icons-material/Info';
-import SearchIcon from '@mui/icons-material/Search';
+import SettingsIcon from '@mui/icons-material/Settings';
 import StarIcon from '@mui/icons-material/Star';
 import {
   Badge,
@@ -34,10 +33,17 @@ import {
   useGetCheckpointLogsQuery,
   useGetFichesQuery,
   useGetStatsQuery,
-  useGetTrackersQuery,
+  useGetUserQuery,
 } from '../../services/linker.ts';
 import { Team } from '../../services/types.ts';
-import { selectSelectedItem, trackersActions, useAppDispatch, useAppSelector } from '../../store';
+import {
+  selectSelectedMember,
+  selectSelectedTeam,
+  selectSelectedTracker,
+  trackersActions,
+  useAppDispatch,
+  useAppSelector,
+} from '../../store';
 import { getLastCheckpointLog, getNavigationUrl } from '../../utils/data';
 import { secondsToHoursMinutes } from '../../utils/time';
 import PersonAvatar from '../PersonAvatar';
@@ -109,9 +115,8 @@ function TeamRows({ team }: { team: Team }) {
   );
 }
 
-const TeamCallButton = memo(function () {
+const TeamCallButton = memo(function ({ team }: { team: Team }) {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const selectedItem = useAppSelector(selectSelectedItem);
 
   const onClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(e.currentTarget),
@@ -119,17 +124,13 @@ const TeamCallButton = memo(function () {
   );
   const onClose = useCallback(() => setAnchorEl(null), []);
 
-  if (!selectedItem || !('contact_persons' in selectedItem)) {
-    return null;
-  }
-
   return (
     <>
       <IconButton onClick={onClick}>
         <CallIcon />
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={onClose}>
-        {selectedItem.contact_persons.map((person) => (
+        {team.contact_persons.map((person) => (
           <MenuItem key={person.id} component="a" href={`tel:${person.phone_number}`}>
             {person.is_favorite && (
               <ListItemIcon>
@@ -146,18 +147,20 @@ const TeamCallButton = memo(function () {
 
 const StatusCard = memo(function StatusCard() {
   const theme = useTheme();
-  const { mainMap } = useMap();
 
   const dispatch = useAppDispatch();
-  const selectedItem = useAppSelector(selectSelectedItem);
+  const selectedTracker = useAppSelector(selectSelectedTracker);
+  const selectedMember = useAppSelector(selectSelectedMember);
+  const selectedTeam = useAppSelector(selectSelectedTeam);
 
-  const { data: trackers } = useGetTrackersQuery();
+  const { data: user } = useGetUserQuery();
 
   const root = css`
     pointer-events: none;
     position: fixed;
     z-index: 5;
     left: 50%;
+    transform: translateX(-50%);
 
     ${theme.breakpoints.up('md')} {
       left: calc(50% + ${theme.dimensions.drawerWidthDesktop} / 2);
@@ -168,8 +171,6 @@ const StatusCard = memo(function StatusCard() {
       left: 50%;
       bottom: calc(${theme.spacing(3)} + 56px);
     }
-
-    transform: translateX(-50%);
   `;
 
   const card = css`
@@ -198,40 +199,22 @@ const StatusCard = memo(function StatusCard() {
     padding-top: ${theme.spacing(0.5)};
   `;
 
-  const tracker =
-    trackers && selectedItem?.tracker ? trackers.entities[selectedItem.tracker] : null;
-  const lastLog = tracker && tracker.last_log;
+  const lastLog = selectedTracker?.last_log;
   const lastUpdate = lastLog ? new Date(lastLog.gps_datetime).toLocaleTimeString() : '-';
-  const trackerIsOnline = tracker ? tracker.is_online : false;
+  const trackerIsOnline = Boolean(selectedTracker) && selectedTracker!.is_online;
 
   const navigateUrl = useMemo(() => {
-    const tracker =
-      trackers && selectedItem?.tracker ? trackers.entities[selectedItem.tracker] : null;
-    const last_log = tracker && tracker.last_log;
-    return getNavigationUrl(last_log?.point);
-  }, [selectedItem, trackers]);
-
-  const focusMap = useCallback(() => {
-    const tracker =
-      trackers && selectedItem?.tracker ? trackers.entities[selectedItem.tracker] : null;
-    const last_log = tracker && tracker.last_log;
-    if (mainMap && last_log) {
-      mainMap.easeTo({
-        // @ts-expect-error the point always has two coordinates
-        center: last_log.point.coordinates,
-        zoom: 14,
-      });
-    }
-  }, [mainMap, selectedItem, trackers]);
+    return getNavigationUrl(selectedTracker?.last_log?.point);
+  }, [selectedTracker]);
 
   return (
     <div css={root}>
       <Card css={card}>
         <CardHeader
-          avatar={<PersonAvatar item={selectedItem} isOnline={trackerIsOnline} />}
-          title={selectedItem?.name}
+          avatar={<PersonAvatar item={selectedTeam || selectedMember} isOnline={trackerIsOnline} />}
+          title={(selectedTeam || selectedMember)?.name}
           titleTypographyProps={{ noWrap: true }}
-          subheader={selectedItem && 'chiro' in selectedItem ? selectedItem.chiro : ''}
+          subheader={selectedTeam?.chiro || ''}
           subheaderTypographyProps={{ noWrap: true }}
           action={
             <IconButton size="small" onClick={() => dispatch(trackersActions.deselect())}>
@@ -254,18 +237,14 @@ const StatusCard = memo(function StatusCard() {
                   </Typography>
                 </TableCell>
               </TableRow>
-              {selectedItem && 'chiro' in selectedItem && <TeamRows team={selectedItem} />}
+              {selectedTeam && <TeamRows team={selectedTeam} />}
             </TableBody>
           </Table>
         </CardContent>
 
         <CardActions css={actions} disableSpacing>
-          <IconButton target="_blank" href={navigateUrl} disabled={!lastLog}>
+          <IconButton target="_blank" href={navigateUrl || ''} disabled={!navigateUrl}>
             <DirectionsIcon />
-          </IconButton>
-
-          <IconButton onClick={focusMap} disabled={!lastLog}>
-            <SearchIcon />
           </IconButton>
 
           <IconButton
@@ -275,24 +254,38 @@ const StatusCard = memo(function StatusCard() {
             <HistoryIcon />
           </IconButton>
 
-          <TeamCallButton />
+          {selectedTeam && <TeamCallButton team={selectedTeam} />}
 
-          {selectedItem && 'phone_number' in selectedItem && (
-            <IconButton
-              component="a"
-              href={`tel:${selectedItem.phone_number}`}
-              disabled={!selectedItem.phone_number}
-            >
-              <CallIcon />
-            </IconButton>
+          {selectedMember && (
+            <>
+              {user && user.is_staff && (
+                <IconButton href={`/admin/people/organizationmember/${selectedMember.id}/change/`}>
+                  <SettingsIcon />
+                </IconButton>
+              )}
+              <IconButton
+                component="a"
+                href={`tel:${selectedMember.phone_number}`}
+                disabled={!selectedMember.phone_number}
+              >
+                <CallIcon />
+              </IconButton>
+            </>
           )}
 
-          {selectedItem && 'team_notes' in selectedItem && (
-            <IconButton component={RouterLink} to={`/team/${selectedItem.id}/`}>
-              <Badge badgeContent={selectedItem.team_notes.length} color="primary">
-                <InfoIcon />
-              </Badge>
-            </IconButton>
+          {selectedTeam && (
+            <>
+              {user && user.is_staff && (
+                <IconButton href={`/admin/people/team/${selectedTeam.id}/change/`}>
+                  <SettingsIcon />
+                </IconButton>
+              )}
+              <IconButton component={RouterLink} to={`/team/${selectedTeam.id}/`}>
+                <Badge badgeContent={selectedTeam.team_notes.length} color="primary">
+                  <InfoIcon />
+                </Badge>
+              </IconButton>
+            </>
           )}
         </CardActions>
       </Card>

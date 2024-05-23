@@ -177,7 +177,7 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <IconButton target="_blank" href={navigateUrl}>
+          <IconButton target="_blank" href={navigateUrl || ''} disabled={!navigateUrl}>
             <DirectionsIcon />
           </IconButton>
           <Button
