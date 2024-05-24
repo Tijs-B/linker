@@ -233,7 +233,10 @@ const StatusCard = memo(function StatusCard() {
                   <Typography variant="body2">Laatste update</Typography>
                 </TableCell>
                 <TableCell css={cell}>
-                  <Tooltip title={lastLog ? new Date(lastLog.gps_datetime).toLocaleString() : '-'}>
+                  <Tooltip
+                    title={lastLog ? new Date(lastLog.gps_datetime).toLocaleString() : '-'}
+                    enterTouchDelay={0}
+                  >
                     <Typography variant="body2" color="textSecondary">
                       {lastLog ? dayjs(lastLog.gps_datetime).fromNow() : '-'}
                     </Typography>
