@@ -16,6 +16,7 @@ import {
 import { EntityState } from '@reduxjs/toolkit';
 
 import { OrganizationMember, Team, Tracker } from '../../services/types.ts';
+import { formatDateTimeLong } from '../../utils/time.ts';
 
 interface TrackersTableProps {
   trackers: EntityState<Tracker, number>;
@@ -76,7 +77,7 @@ const TrackersTable = memo(function TrackersTable({
                 </TableCell>
                 <TableCell>
                   {tracker.sos_sent ? (
-                    <Alert severity="warning">{new Date(tracker.sos_sent).toLocaleString()}</Alert>
+                    <Alert severity="warning">{formatDateTimeLong(tracker.sos_sent)}</Alert>
                   ) : (
                     '-'
                   )}

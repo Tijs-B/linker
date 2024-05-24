@@ -25,11 +25,10 @@ import {
   TableRow,
   TextField,
   Toolbar,
+  Tooltip,
   Typography,
   styled,
 } from '@mui/material';
-
-import dayjs from 'dayjs';
 
 import SafeSelector from '../components/SafeSelector.jsx';
 import ContactPersonsList from '../components/team/ContactPersonsList.jsx';
@@ -48,7 +47,12 @@ import {
 } from '../services/linker.ts';
 import { teamColor } from '../theme/colors.ts';
 import { getPositionDescription } from '../utils/data.ts';
-import { secondsToHoursMinutes } from '../utils/time.ts';
+import {
+  formatDateTimeLong,
+  formatDateTimeShorter,
+  formatFromNow,
+  secondsToHoursMinutes,
+} from '../utils/time.ts';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -184,7 +188,7 @@ const TeamPage = memo(function TeamPage() {
                         <TableCell>{secondsToHoursMinutes(teamStats?.avgFicheDeviation)}</TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell>Locatie</TableCell>
+                        <TableCell>GPS-locatie</TableCell>
                         <TableCell>{positionDescription}</TableCell>
                       </TableRow>
                       <TableRow>
@@ -193,7 +197,7 @@ const TeamPage = memo(function TeamPage() {
                           <SafeSelector team={team} />
                           {team.safe_weide_updated_at && team.safe_weide_updated_by && (
                             <>
-                              {dayjs(team.safe_weide_updated_at).fromNow()} door{' '}
+                              {formatFromNow(team.safe_weide_updated_at)} door{' '}
                               {team.safe_weide_updated_by}
                             </>
                           )}
@@ -211,15 +215,16 @@ const TeamPage = memo(function TeamPage() {
                       <TableRow>
                         <TableCell>Tracker online</TableCell>
                         <TableCell>
-                          {tracker?.is_online ? (
-                            <Alert severity="success">
-                              Laatste update {dayjs(tracker?.last_log?.gps_datetime).fromNow()}
-                            </Alert>
-                          ) : (
-                            <Alert severity="warning">
-                              Laatste update {dayjs(tracker?.last_log?.gps_datetime).fromNow()}
-                            </Alert>
-                          )}
+                          <Alert severity={tracker?.is_online ? 'success' : 'warning'}>
+                            <Tooltip
+                              title={formatDateTimeLong(tracker?.last_log?.gps_datetime)}
+                              enterTouchDelay={0}
+                            >
+                              <Typography variant="body2" color="textSecondary">
+                                Laatste update {formatFromNow(tracker?.last_log?.gps_datetime)}
+                              </Typography>
+                            </Tooltip>
+                          </Alert>
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -231,7 +236,7 @@ const TeamPage = memo(function TeamPage() {
                         <TableCell>
                           {tracker?.sos_sent ? (
                             <Alert severity="error">
-                              Verstuurd op {new Date(tracker.sos_sent).toLocaleString()}
+                              Verstuurd op {formatDateTimeLong(tracker.sos_sent)}
                             </Alert>
                           ) : (
                             '-'
@@ -267,10 +272,8 @@ const TeamPage = memo(function TeamPage() {
                       {teamLogs.map((log) => (
                         <TableRow key={log.id}>
                           <TableCell>{log.ficheName}</TableCell>
-                          <TableCell>{new Date(log.arrived).toLocaleString()}</TableCell>
-                          <TableCell>
-                            {log.left ? new Date(log.left).toLocaleString() : '-'}
-                          </TableCell>
+                          <TableCell>{formatDateTimeShorter(log.arrived)}</TableCell>
+                          <TableCell>{formatDateTimeShorter(log.left)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -299,7 +302,7 @@ const TeamPage = memo(function TeamPage() {
                             <ListItemText
                               primary={note.text}
                               secondary={
-                                new Date(note.created).toLocaleString() +
+                                formatFromNow(note.created) +
                                 (note.author ? ` door ${note.author}` : '')
                               }
                             />

@@ -1,12 +1,10 @@
-export function toHoursMinutes(dateTime: string | undefined): string {
-  if (dateTime) {
-    const parsed = new Date(dateTime);
-    return `${parsed.getHours().toString().padStart(2, '0')}:${parsed
-      .getMinutes()
-      .toString()
-      .padStart(2, '0')}`;
+import dayjs from 'dayjs';
+
+export function toHoursMinutes(timestamp: string | undefined): string {
+  if (!timestamp) {
+    return '-';
   }
-  return '';
+  return dayjs(timestamp).tz('Europe/Brussels').format('HH:MM');
 }
 
 export function secondsToHoursMinutes(
@@ -16,16 +14,42 @@ export function secondsToHoursMinutes(
   if (seconds === null || seconds === undefined) {
     return '-';
   }
-  const totalMinutes = Math.floor(Math.abs(seconds) / 60);
-  const minutes = totalMinutes % 60;
-  const hours = Math.floor(totalMinutes / 60);
+  const duration = dayjs.duration(Math.abs(seconds), 'seconds');
+  let result = '';
 
-  const hoursText = hours > 0 ? `${hours} uur ` : '';
-  const prefix = showPrefix ? (seconds < 0 ? '- ' : '+ ') : '';
-
-  if (hours > 0 || minutes > 0) {
-    return `${prefix}${hoursText}${minutes} minuten`;
-  } else {
-    return `${prefix}${Math.abs(seconds)} seconden`;
+  if (showPrefix) {
+    result += seconds < 0 ? '- ' : '+ ';
   }
+
+  if (duration.asMinutes() >= 1) {
+    if (duration.asHours() >= 1) {
+      result += `${Math.floor(duration.asHours())} uur `;
+    }
+    result += `${duration.minutes()} minuten `;
+  } else {
+    result += `${duration.seconds()} seconden`;
+  }
+
+  return result;
+}
+
+export function formatDateTimeLong(timestamp: string | null | undefined) {
+  if (!timestamp) {
+    return '-';
+  }
+  return dayjs(timestamp).tz('Europe/Brussels').format('ddd D MMM YYYY [om] HH:mm');
+}
+
+export function formatDateTimeShorter(timestamp: string | null | undefined) {
+  if (!timestamp) {
+    return '-';
+  }
+  return dayjs(timestamp).tz('Europe/Brussels').format('ddd [om] HH:mm');
+}
+
+export function formatFromNow(timestamp: string | null | undefined) {
+  if (!timestamp) {
+    return '-';
+  }
+  return dayjs(timestamp).fromNow();
 }
