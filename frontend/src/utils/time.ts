@@ -14,20 +14,25 @@ export function secondsToHoursMinutes(
   if (seconds === null || seconds === undefined) {
     return '-';
   }
-  const duration = dayjs.duration(Math.abs(seconds), 'seconds');
+
   let result = '';
 
   if (showPrefix) {
     result += seconds < 0 ? '- ' : '+ ';
   }
 
-  if (duration.asMinutes() >= 1) {
-    if (duration.asHours() >= 1) {
-      result += `${Math.floor(duration.asHours())} uur `;
+  seconds = Math.abs(seconds);
+  const minutes = seconds / 60;
+  const hours = minutes / 60;
+
+  if (minutes >= 1) {
+    if (hours >= 1) {
+      result += `${Math.floor(hours)} uur `;
     }
-    result += `${duration.minutes()} minuten `;
+    const minutesOfHours = Math.floor(minutes) % 60;
+    result += `${minutesOfHours} minuten `;
   } else {
-    result += `${duration.seconds()} seconden`;
+    result += `${Math.floor(seconds)} seconden`;
   }
 
   return result;
