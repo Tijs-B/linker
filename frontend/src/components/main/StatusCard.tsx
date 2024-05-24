@@ -29,6 +29,7 @@ import {
 } from '@mui/material';
 
 import { css } from '@emotion/react';
+import dayjs from 'dayjs';
 
 import {
   useGetCheckpointLogsQuery,
@@ -46,7 +47,7 @@ import {
   useAppSelector,
 } from '../../store';
 import { getLastCheckpointLog, getNavigationUrl } from '../../utils/data';
-import { formatDateTime, formatFromNow, secondsToHoursMinutes } from '../../utils/time';
+import { secondsToHoursMinutes } from '../../utils/time';
 import PersonAvatar from '../PersonAvatar';
 import SafeSelector from '../SafeSelector';
 
@@ -62,6 +63,9 @@ function TeamRows({ team }: { team: Team }) {
   const { data: stats } = useGetStatsQuery();
 
   const lastCheckpointLog = checkpointLogs && getLastCheckpointLog(team.id, checkpointLogs);
+  const formattedDate = lastCheckpointLog
+    ? new Date(lastCheckpointLog.arrived).toLocaleTimeString()
+    : '-';
   const fiche = lastCheckpointLog && fiches && fiches.entities[lastCheckpointLog.fiche];
   const teamStats = stats && stats.teams[team.id];
 
@@ -73,9 +77,7 @@ function TeamRows({ team }: { team: Team }) {
         </TableCell>
         <TableCell css={cell}>
           <Typography variant="body2" color="textSecondary">
-            {lastCheckpointLog && fiche
-              ? `${fiche.display_name} om ${formatDateTime(lastCheckpointLog.arrived)}`
-              : '-'}
+            {lastCheckpointLog && fiche ? `${fiche.display_name} om ${formattedDate}` : '-'}
           </Typography>
         </TableCell>
       </TableRow>
@@ -231,9 +233,12 @@ const StatusCard = memo(function StatusCard() {
                   <Typography variant="body2">Laatste update</Typography>
                 </TableCell>
                 <TableCell css={cell}>
-                  <Tooltip title={formatDateTime(lastLog?.gps_datetime)} enterTouchDelay={0}>
+                  <Tooltip
+                    title={lastLog ? new Date(lastLog.gps_datetime).toLocaleString() : '-'}
+                    enterTouchDelay={0}
+                  >
                     <Typography variant="body2" color="textSecondary">
-                      {formatFromNow(lastLog?.gps_datetime)}
+                      {lastLog ? dayjs(lastLog.gps_datetime).fromNow() : '-'}
                     </Typography>
                   </Tooltip>
                 </TableCell>

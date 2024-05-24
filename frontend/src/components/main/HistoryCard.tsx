@@ -33,7 +33,6 @@ import {
   useAppSelector,
 } from '../../store/index.ts';
 import { itemColor } from '../../theme/colors.ts';
-import { formatDateTime } from '../../utils/time.ts';
 
 const HistoryCard = memo(function HistoryCard() {
   const theme = useTheme();
@@ -87,6 +86,9 @@ const HistoryCard = memo(function HistoryCard() {
   const { currentData: logs } = useGetTrackerLogsQuery(
     selectedItem?.tracker && showHistory ? selectedItem.tracker : skipToken,
   );
+
+  const currentLog = logs?.[index];
+  const formattedTime = currentLog ? new Date(currentLog.gps_datetime).toLocaleString() : '-';
 
   useEffect(() => {
     if (!logs || !mainMap) {
@@ -167,9 +169,7 @@ const HistoryCard = memo(function HistoryCard() {
                   >
                     <ArrowBackIcon />
                   </IconButton>
-                  <Typography variant="body2">
-                    {formatDateTime(logs?.[index].gps_datetime)}
-                  </Typography>
+                  <Typography variant="body2">{formattedTime}</Typography>
                   <IconButton
                     onClick={() => onSliderChange(Math.min(logs.length - 1, index + 1))}
                     disabled={index === logs.length - 1}
