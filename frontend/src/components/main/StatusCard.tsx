@@ -23,11 +23,13 @@ import {
   TableBody,
   TableCell,
   TableRow,
+  Tooltip,
   Typography,
   useTheme,
 } from '@mui/material';
 
 import { css } from '@emotion/react';
+import dayjs from 'dayjs';
 
 import {
   useGetCheckpointLogsQuery,
@@ -200,7 +202,6 @@ const StatusCard = memo(function StatusCard() {
   `;
 
   const lastLog = selectedTracker?.last_log;
-  const lastUpdate = lastLog ? new Date(lastLog.gps_datetime).toLocaleTimeString() : '-';
   const trackerIsOnline = Boolean(selectedTracker) && selectedTracker!.is_online;
 
   const navigateUrl = useMemo(() => {
@@ -232,9 +233,11 @@ const StatusCard = memo(function StatusCard() {
                   <Typography variant="body2">Laatste update</Typography>
                 </TableCell>
                 <TableCell css={cell}>
-                  <Typography variant="body2" color="textSecondary">
-                    {lastUpdate}
-                  </Typography>
+                  <Tooltip title={lastLog ? new Date(lastLog.gps_datetime).toLocaleString() : '-'}>
+                    <Typography variant="body2" color="textSecondary">
+                      {lastLog ? dayjs(lastLog.gps_datetime).fromNow() : '-'}
+                    </Typography>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
               {selectedTeam && <TeamRows team={selectedTeam} />}
