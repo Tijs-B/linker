@@ -17,7 +17,6 @@ import {
 import { grey } from '@mui/material/colors';
 
 import { feature, featureCollection } from '@turf/helpers';
-import dayjs from 'dayjs';
 
 import {
   useDeleteMapNoteMutation,
@@ -26,6 +25,7 @@ import {
 } from '../../services/linker.ts';
 import { MapNote } from '../../services/types.ts';
 import { getNavigationUrl } from '../../utils/data.ts';
+import { formatFromNow } from '../../utils/time.ts';
 
 type HoverInfo = {
   x: number;
@@ -171,9 +171,9 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
                 <br />
               </>
             )}
-            Toegevoegd: {dayjs(selectedNote?.created).fromNow()}
+            Toegevoegd: {formatFromNow(selectedNote?.created)}
             <br />
-            Aangepast: {dayjs(selectedNote?.created).fromNow()}
+            Aangepast: {formatFromNow(selectedNote?.updated)}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

@@ -1,3 +1,7 @@
+import dayjs from 'dayjs';
+
+const localFormatter = new Intl.DateTimeFormat('nl-BE');
+
 export function toHoursMinutes(dateTime: string | undefined): string {
   if (dateTime) {
     const parsed = new Date(dateTime);
@@ -28,4 +32,18 @@ export function secondsToHoursMinutes(
   } else {
     return `${prefix}${Math.abs(seconds)} seconden`;
   }
+}
+
+export function formatDateTime(timestamp: string | null | undefined) {
+  if (!timestamp) {
+    return '-';
+  }
+  return localFormatter.format(new Date(timestamp));
+}
+
+export function formatFromNow(timestamp: string | null | undefined) {
+  if (!timestamp) {
+    return '-';
+  }
+  return dayjs(timestamp).fromNow();
 }
