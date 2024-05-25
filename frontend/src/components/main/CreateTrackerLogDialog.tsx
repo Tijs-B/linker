@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { LngLat } from 'react-map-gl/maplibre';
 
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -53,6 +54,8 @@ export default function CreateTrackerLogDialog({
     });
   }, [position, selectedTracker, onComplete, dateTime, createTrackerLog]);
 
+  const isInFuture = !!dateTime && dateTime.isAfter(dayjs());
+
   if (selectedTracker === null || selectedItem === null) {
     return null;
   }
@@ -72,12 +75,13 @@ export default function CreateTrackerLogDialog({
           value={dateTime}
           onChange={setDateTime}
         />
+        {isInFuture && <Alert severity="warning">Tijdstip moet in het verleden zijn</Alert>}
       </DialogContent>
       <DialogActions>
         <Button color="error" onClick={onComplete}>
           Annuleren
         </Button>
-        <Button variant="contained" color="success" onClick={onAccept}>
+        <Button variant="contained" color="success" onClick={onAccept} disabled={isInFuture}>
           Verplaatsen
         </Button>
       </DialogActions>
