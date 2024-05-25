@@ -61,7 +61,7 @@ export default function CreateTrackerLogDialog({
   }
 
   return (
-    <Dialog open={position !== null} onClose={onComplete} maxWidth="xs">
+    <Dialog open={position !== null} onClose={onComplete} maxWidth="xs" disableRestoreFocus>
       <DialogTitle>Manuele tracker-update</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -69,6 +69,7 @@ export default function CreateTrackerLogDialog({
           {selectedItem.name}, te verplaatsen.
         </DialogContentText>
         <TimePicker
+          autoFocus
           timezone="Europe/Brussels"
           label="Tijdstip op dit punt"
           sx={{ mt: 2 }}

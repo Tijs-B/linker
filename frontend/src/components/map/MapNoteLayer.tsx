@@ -159,7 +159,6 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
             variant="standard"
             fullWidth
             margin="dense"
-            autoFocus
             multiline
             inputProps={{ spellCheck: 'false' }}
             required

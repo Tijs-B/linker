@@ -45,7 +45,7 @@ export default function CreateMapNoteDialog({ position, onComplete }: CreateMapN
   }, [createMapNote, description, position, onComplete]);
 
   return (
-    <Dialog open={position !== null} onClose={onComplete}>
+    <Dialog open={position !== null} onClose={onComplete} disableRestoreFocus>
       <DialogTitle>Nieuwe kaartnotitie</DialogTitle>
       <DialogContent>
         <DialogContentText>
