@@ -240,7 +240,16 @@ export default function MainPage() {
   );
 
   const onStartTrackerLogCreation = useCallback(() => {
-    setCreatingMarker('tracker');
+    setCreatingMarker((value) => {
+      switch (value) {
+        case 'tracker':
+          return null;
+        case null:
+          return 'tracker';
+        default:
+          return value;
+      }
+    });
   }, []);
 
   const onMarkerComplete = useCallback(() => {
@@ -349,7 +358,10 @@ export default function MainPage() {
         )}
       </div>
       {selectedId !== null && !showHistory && !trackerLogLngLat && (
-        <StatusCard onStartTrackerLogCreation={onStartTrackerLogCreation} />
+        <StatusCard
+          onStartTrackerLogCreation={onStartTrackerLogCreation}
+          isCreatingTrackerLog={creatingMarker === 'tracker'}
+        />
       )}
       {selectedId !== null && showHistory && <HistoryCard />}
 

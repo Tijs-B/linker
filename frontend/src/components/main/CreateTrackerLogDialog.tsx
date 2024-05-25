@@ -55,6 +55,9 @@ export default function CreateTrackerLogDialog({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
+        <Button color="error" onClick={onComplete}>
+          Annuleren
+        </Button>
         <Button variant="contained" color="success" onClick={onAccept}>
           Verplaatsen
         </Button>

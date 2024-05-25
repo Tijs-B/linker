@@ -153,9 +153,13 @@ const TeamCallButton = memo(function ({ team }: { team: Team }) {
 
 interface StatusCardProps {
   onStartTrackerLogCreation: () => void;
+  isCreatingTrackerLog: boolean;
 }
 
-const StatusCard = memo(function StatusCard({ onStartTrackerLogCreation }: StatusCardProps) {
+const StatusCard = memo(function StatusCard({
+  onStartTrackerLogCreation,
+  isCreatingTrackerLog,
+}: StatusCardProps) {
   const dispatch = useAppDispatch();
   const selectedTracker = useAppSelector(selectSelectedTracker);
   const selectedMember = useAppSelector(selectSelectedMember);
@@ -223,7 +227,10 @@ const StatusCard = memo(function StatusCard({ onStartTrackerLogCreation }: Statu
 
         {user && user.permissions.includes('add_trackerlog') && (
           <Tooltip title="Manuele locatie">
-            <IconButton onClick={onStartTrackerLogCreation}>
+            <IconButton
+              onClick={onStartTrackerLogCreation}
+              color={isCreatingTrackerLog ? 'primary' : 'default'}
+            >
               <EditLocationAltIcon />
             </IconButton>
           </Tooltip>
