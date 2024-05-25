@@ -130,9 +130,11 @@ const TeamCallButton = memo(function ({ team }: { team: Team }) {
 
   return (
     <>
-      <IconButton onClick={onClick}>
-        <CallIcon />
-      </IconButton>
+      <Tooltip title="Bellen">
+        <IconButton onClick={onClick}>
+          <CallIcon />
+        </IconButton>
+      </Tooltip>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={onClose}>
         {team.contact_persons.map((person) => (
           <MenuItem key={person.id} component="a" href={`tel:${person.phone_number}`}>
@@ -200,48 +202,59 @@ const StatusCard = memo(function StatusCard() {
       </CardContent>
 
       <CardActions sx={{ justifyContent: 'space-evenly', pt: 0.5 }} disableSpacing>
-        <IconButton target="_blank" href={navigateUrl || ''} disabled={!navigateUrl}>
-          <DirectionsIcon />
-        </IconButton>
+        <Tooltip title="Navigeer">
+          <IconButton target="_blank" href={navigateUrl || ''} disabled={!navigateUrl}>
+            <DirectionsIcon />
+          </IconButton>
+        </Tooltip>
 
-        <IconButton
-          onClick={() => dispatch(trackersActions.setShowHistory(true))}
-          disabled={!lastLog}
-        >
-          <HistoryIcon />
-        </IconButton>
-
-        {selectedTeam && <TeamCallButton team={selectedTeam} />}
+        <Tooltip title="Geschiedenis">
+          <IconButton
+            onClick={() => dispatch(trackersActions.setShowHistory(true))}
+            disabled={!lastLog}
+          >
+            <HistoryIcon />
+          </IconButton>
+        </Tooltip>
 
         {selectedMember && (
           <>
-            {user && user.is_staff && (
-              <IconButton href={`/admin/people/organizationmember/${selectedMember.id}/change/`}>
-                <SettingsIcon />
+            <Tooltip title="Bellen">
+              <IconButton
+                component="a"
+                href={`tel:${selectedMember.phone_number}`}
+                disabled={!selectedMember.phone_number}
+              >
+                <CallIcon />
               </IconButton>
+            </Tooltip>
+            {user && user.is_staff && (
+              <Tooltip title="Admin">
+                <IconButton href={`/admin/people/organizationmember/${selectedMember.id}/change/`}>
+                  <SettingsIcon />
+                </IconButton>
+              </Tooltip>
             )}
-            <IconButton
-              component="a"
-              href={`tel:${selectedMember.phone_number}`}
-              disabled={!selectedMember.phone_number}
-            >
-              <CallIcon />
-            </IconButton>
           </>
         )}
 
         {selectedTeam && (
           <>
+            <TeamCallButton team={selectedTeam}/>
             {user && user.is_staff && (
+              <Tooltip title="Admin">
               <IconButton href={`/admin/people/team/${selectedTeam.id}/change/`}>
                 <SettingsIcon />
               </IconButton>
+              </Tooltip>
             )}
-            <IconButton component={RouterLink} to={`/team/${selectedTeam.id}/`}>
-              <Badge badgeContent={selectedTeam.team_notes.length} color="primary">
-                <InfoIcon />
-              </Badge>
-            </IconButton>
+            <Tooltip title="Meer info">
+              <IconButton component={RouterLink} to={`/team/${selectedTeam.id}/`}>
+                <Badge badgeContent={selectedTeam.team_notes.length} color="primary">
+                  <InfoIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
           </>
         )}
       </CardActions>
