@@ -27,7 +27,6 @@ import {
 import { OrganizationMember, Team } from '../../services/types.ts';
 import { trackersActions, useAppDispatch } from '../../store';
 import { generateAllIcons } from '../../utils/icons.ts';
-import CreateMapNoteDialog from '../main/CreateMapNoteDialog.tsx';
 import BackgroundLayers from './BackgroundLayers.tsx';
 import CustomOverlay from './CustomOverlay.tsx';
 import MapNoteLayer from './MapNoteLayer.tsx';
@@ -44,9 +43,20 @@ const DEFAULT_INITIAL_BOUNDS = {
 interface MainMapProps {
   filteredTeams: Team[];
   filteredMembers: OrganizationMember[];
+  creatingMarker: boolean;
+  creatingMapNote: boolean;
+  onCreateMarker: (position: LngLat) => void;
+  onToggleMapNoteCreation: () => void;
 }
 
-const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMapProps) {
+const MainMap = memo(function MainMap({
+  filteredTeams,
+  filteredMembers,
+  creatingMarker,
+  creatingMapNote,
+  onCreateMarker,
+  onToggleMapNoteCreation,
+}: MainMapProps) {
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const dispatch = useAppDispatch();
@@ -55,8 +65,6 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showSatellite, setShowSatellite] = useState(false);
   const [hasRecentered, setRecentered] = useState(false);
-  const [creatingMarker, setCreatingMarker] = useState(false);
-  const [mapNoteLngLat, setMapNoteLngLat] = useState<LngLat | null>(null);
   const [initialBounds, setInitialBounds] = useState(DEFAULT_INITIAL_BOUNDS);
   const [iconsAdded, setIconsAdded] = useState(true);
   const [showZijwegen, setShowZijwegen] = useState(false);
@@ -131,33 +139,17 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
     }
   }, [mapRef, initialBounds]);
 
-  const onStartMapNoteCreation = useCallback(() => {
-    if (creatingMarker) {
-      setCreatingMarker(false);
-      setCursor('inherit');
-    } else {
-      setCreatingMarker(true);
-      setCursor('crosshair');
-    }
-  }, [creatingMarker]);
-
   const onMapClick = useCallback(
     (event: MapLayerMouseEvent) => {
       if (creatingMarker) {
-        setCreatingMarker(false);
-        setCursor('inherit');
-        setMapNoteLngLat(event.lngLat);
+        onCreateMarker(event.lngLat);
       } else {
         dispatch(trackersActions.setShowHistory(false));
         dispatch(trackersActions.deselect());
       }
     },
-    [creatingMarker, dispatch],
+    [creatingMarker, dispatch, onCreateMarker],
   );
-
-  const onCreateMapNoteCompleted = useCallback(() => {
-    setMapNoteLngLat(null);
-  }, []);
 
   const onMapLoad = useCallback(() => setIconsAdded(false), []);
 
@@ -173,7 +165,7 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
         onClick={onMapClick}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        cursor={cursor}
+        cursor={creatingMarker ? 'crosshair' : cursor}
         ref={mapRef}
         interactiveLayerIds={['trackers', 'map-notes']}
         styleDiffing={false}
@@ -227,10 +219,10 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
         </CustomOverlay>
 
         <CustomOverlay>
-          <IconButton onClick={onStartMapNoteCreation}>
+          <IconButton onClick={onToggleMapNoteCreation}>
             <FlagIcon
               color={'primary'}
-              sx={{ color: creatingMarker ? '' : '#000', marginTop: '2px' }}
+              sx={{ color: creatingMapNote ? '' : '#000', marginTop: '2px' }}
             />
           </IconButton>
         </CustomOverlay>
@@ -245,7 +237,6 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
         </CustomOverlay>
 
         {desktop && <MapPadding left={parseInt(theme.dimensions.drawerWidthDesktop, 10)} />}
-        <CreateMapNoteDialog location={mapNoteLngLat} onComplete={onCreateMapNoteCompleted} />
       </Map>
     </>
   );

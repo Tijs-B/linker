@@ -4,9 +4,9 @@ import { Link as RouterLink } from 'react-router-dom';
 import CallIcon from '@mui/icons-material/Call';
 import CloseIcon from '@mui/icons-material/Close';
 import DirectionsIcon from '@mui/icons-material/Directions';
+import EditLocationAltIcon from '@mui/icons-material/EditLocationAlt';
 import HistoryIcon from '@mui/icons-material/History';
 import InfoIcon from '@mui/icons-material/Info';
-import SettingsIcon from '@mui/icons-material/Settings';
 import StarIcon from '@mui/icons-material/Star';
 import {
   Badge,
@@ -151,7 +151,11 @@ const TeamCallButton = memo(function ({ team }: { team: Team }) {
   );
 });
 
-const StatusCard = memo(function StatusCard() {
+interface StatusCardProps {
+  onStartTrackerLogCreation: () => void;
+}
+
+const StatusCard = memo(function StatusCard({ onStartTrackerLogCreation }: StatusCardProps) {
   const dispatch = useAppDispatch();
   const selectedTracker = useAppSelector(selectSelectedTracker);
   const selectedMember = useAppSelector(selectSelectedMember);
@@ -217,6 +221,14 @@ const StatusCard = memo(function StatusCard() {
           </IconButton>
         </Tooltip>
 
+        {user && user.permissions.includes('add_trackerlog') && (
+          <Tooltip title="Manuele locatie">
+            <IconButton onClick={onStartTrackerLogCreation}>
+              <EditLocationAltIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+
         {selectedMember && (
           <>
             <Tooltip title="Bellen">
@@ -228,26 +240,13 @@ const StatusCard = memo(function StatusCard() {
                 <CallIcon />
               </IconButton>
             </Tooltip>
-            {user && user.is_staff && (
-              <Tooltip title="Admin">
-                <IconButton href={`/admin/people/organizationmember/${selectedMember.id}/change/`}>
-                  <SettingsIcon />
-                </IconButton>
-              </Tooltip>
-            )}
           </>
         )}
 
         {selectedTeam && (
           <>
             <TeamCallButton team={selectedTeam} />
-            {user && user.is_staff && (
-              <Tooltip title="Admin">
-                <IconButton href={`/admin/people/team/${selectedTeam.id}/change/`}>
-                  <SettingsIcon />
-                </IconButton>
-              </Tooltip>
-            )}
+
             <Tooltip title="Meer info">
               <IconButton component={RouterLink} to={`/team/${selectedTeam.id}/`}>
                 <Badge badgeContent={selectedTeam.team_notes.length} color="primary">

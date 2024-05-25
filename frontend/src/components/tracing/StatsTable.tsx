@@ -132,7 +132,7 @@ const StatsTable = memo(function StatsTable({
           {teams.ids.map((id) => (
             <TableRow key={id}>
               <TableCell sx={{ pl: 1, pr: 1 }}>
-                <PersonAvatar item={teams.entities[id]} width={30} isOnline />
+                <PersonAvatar item={teams.entities[id]} sx={{ width: 30, height: 30 }} />
               </TableCell>
               {fiches.ids.map((ficheId) => (
                 <TableCell key={ficheId}>

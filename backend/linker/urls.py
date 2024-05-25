@@ -40,7 +40,7 @@ from linker.people.views import (
     LogoutView,
 )
 from linker.tracing.views import CheckpointLogViewSet, all_stats
-from linker.trackers.views import TrackerViewSet
+from linker.trackers.views import TrackerViewSet, TrackerLogViewSet
 
 router = routers.DefaultRouter()
 router.register('teams', TeamViewSet)
@@ -59,6 +59,7 @@ router.register('forbidden-areas', ForbiddenAreaViewSet)
 router.register('checkpoint-logs', CheckpointLogViewSet)
 
 router.register('trackers', TrackerViewSet, basename='tracker')
+router.register('tracker-logs', TrackerLogViewSet)
 
 
 urlpatterns = [

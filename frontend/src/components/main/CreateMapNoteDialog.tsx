@@ -14,11 +14,11 @@ import {
 import { useCreateMapNoteMutation } from '../../services/linker.ts';
 
 interface CreateMapNoteDialogProps {
-  location: LngLat | null;
+  position: LngLat | null;
   onComplete: () => void;
 }
 
-export default function CreateMapNoteDialog({ location, onComplete }: CreateMapNoteDialogProps) {
+export default function CreateMapNoteDialog({ position, onComplete }: CreateMapNoteDialogProps) {
   const createMapNote = useCreateMapNoteMutation()[0];
 
   const [description, setDescription] = useState('');
@@ -28,10 +28,10 @@ export default function CreateMapNoteDialog({ location, onComplete }: CreateMapN
     [],
   );
   const onCreateMapNote = useCallback(() => {
-    if (!location) {
+    if (!position) {
       return;
     }
-    const { lng, lat } = location;
+    const { lng, lat } = position;
     const data = {
       content: description,
       point: {
@@ -42,10 +42,10 @@ export default function CreateMapNoteDialog({ location, onComplete }: CreateMapN
 
     createMapNote(data);
     onComplete();
-  }, [createMapNote, description, location, onComplete]);
+  }, [createMapNote, description, position, onComplete]);
 
   return (
-    <Dialog open={location !== null} onClose={onComplete}>
+    <Dialog open={position !== null} onClose={onComplete}>
       <DialogTitle>Nieuwe kaartnotitie</DialogTitle>
       <DialogContent>
         <DialogContentText>

@@ -68,7 +68,7 @@ const TeamRow = function ({
     <TableRow>
       <TableCell>
         <Stack direction="row" spacing={1}>
-          <PersonAvatar item={teams.entities[id]} width={30} isOnline />
+          <PersonAvatar item={teams.entities[id]} sx={{ width: 30, height: 30 }} />
           <Link variant="body1" color="inherit" component={RouterLink} to={`/team/${id}/`}>
             {team.name}
           </Link>

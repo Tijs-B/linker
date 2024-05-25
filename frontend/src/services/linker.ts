@@ -51,13 +51,14 @@ export const linkerApi = createApi({
   refetchOnFocus: true,
   refetchOnReconnect: true,
   refetchOnMountOrArgChange: 30,
-  tagTypes: ['Team', 'MapNote'],
+  tagTypes: ['Team', 'MapNote', 'Tracker', 'TrackerLogs'],
   endpoints: (build) => ({
     getTrackers: build.query<EntityState<Tracker, number>, void>({
       query: () => '/trackers/',
       transformResponse(response: Tracker[]) {
         return trackerAdapter.addMany(trackerAdapter.getInitialState(), response);
       },
+      providesTags: ['Tracker'],
     }),
     getTeams: build.query<EntityState<Team, number>, void>({
       query: () => '/teams/',
@@ -116,9 +117,11 @@ export const linkerApi = createApi({
     }),
     getTrackerLogs: build.query<TrackerLog[], number>({
       query: (id) => `/trackers/${id}/logs/`,
+      providesTags: (_result, _error, arg) => [{ type: 'TrackerLogs', id: arg }],
     }),
     getTrackerTrack: build.query<LineString, number>({
       query: (id) => `/trackers/${id}/track/`,
+      providesTags: (_result, _error, arg) => [{ type: 'TrackerLogs', id: arg }],
     }),
     getBasis: build.query<Point, void>({
       query: () => '/basis/',
@@ -186,6 +189,17 @@ export const linkerApi = createApi({
         body: mapNote,
       }),
       invalidatesTags: ['MapNote'],
+    }),
+    createTrackerLog: build.mutation<TrackerLog, Pick<TrackerLog, 'point' | 'tracker'>>({
+      query: (trackerLog) => ({
+        url: '/tracker-logs/',
+        method: 'POST',
+        body: trackerLog,
+      }),
+      invalidatesTags: (_result, _error, arg) => [
+        'Tracker',
+        { type: 'TrackerLogs', id: arg.tracker },
+      ],
     }),
     deleteTeamNote: build.mutation<void, number>({
       query: (noteId) => ({
@@ -259,6 +273,7 @@ export const {
   useLogoutUserMutation,
   useCreateTeamNoteMutation,
   useCreateMapNoteMutation,
+  useCreateTrackerLogMutation,
   useDeleteTeamNoteMutation,
   useDeleteMapNoteMutation,
   useUpdateMapNoteMutation,

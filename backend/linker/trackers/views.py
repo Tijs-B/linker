@@ -6,12 +6,13 @@ from django.http import HttpResponse
 from django.utils.timezone import now
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.mixins import CreateModelMixin
 
 from linker.map.models import Fiche, Tocht, Weide, Basis
 from linker.tracing.constants import FICHE_MAX_DISTANCE, TOCHT_MAX_DISTANCE, WEIDE_MAX_DISTANCE, GEBIED_MAX_DISTANCE
-from linker.trackers.constants import TRACKER_BATTERY_LOW_MINUTES
+from linker.trackers.constants import TRACKER_BATTERY_LOW_MINUTES, TrackerLogSource
 from linker.trackers.models import Tracker, TrackerLog
-from linker.trackers.serializers import TrackerSerializer
+from linker.trackers.serializers import TrackerSerializer, TrackerLogSerializer
 
 
 class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
@@ -69,14 +70,23 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
         tracker = self.get_object()
         queryset = tracker.tracker_logs.filter(point__distance_lt=(tocht_centroid, D(m=GEBIED_MAX_DISTANCE)))
         queryset = queryset.order_by('gps_datetime')
-        queryset = queryset.values('id', 'gps_datetime', 'point')
+        queryset = queryset.values('id', 'gps_datetime', 'point', 'source', 'tracker_id')
 
         response = '['
         for item in queryset:
             response += (
                 f'{{"id":{item["id"]},"gps_datetime":"{item["gps_datetime"].isoformat()}",'
-                f'"point":{item["point"].json}}},'
+                f'"point":{item["point"].json},"source":"{item["source"].value}",'
+                f'"tracker":{item["tracker_id"]}}},'
             )
         response = response[:-1] + ']'
 
         return HttpResponse(response, content_type='application/json')
+
+
+class TrackerLogViewSet(CreateModelMixin, viewsets.GenericViewSet):
+    serializer_class = TrackerLogSerializer
+    queryset = TrackerLog.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(gps_datetime=now(), source=TrackerLogSource.MANUAL)

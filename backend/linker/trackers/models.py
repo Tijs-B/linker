@@ -2,11 +2,12 @@ from django.contrib.gis.geos import LineString
 from django.contrib.gis.db import models
 from django.contrib.gis.measure import D
 from django.db import connection
+from enumfields import EnumField
 
 from linker.config.models import Switch
 from linker.map.models import Basis, Tocht
 from linker.tracing.constants import GEBIED_MAX_DISTANCE, SKIP_BASIS_DISTANCE
-from linker.trackers.constants import SWITCH_EXCLUDE_BASIS_FROM_TRACK
+from linker.trackers.constants import SWITCH_EXCLUDE_BASIS_FROM_TRACK, TrackerLogSource
 
 
 class Tracker(models.Model):
@@ -57,9 +58,10 @@ class TrackerLog(models.Model):
     point = models.PointField()
 
     team_is_safe = models.BooleanField(default=False)
+    source = EnumField(TrackerLogSource, max_length=30)
 
     # The below fields are less important.
-    tracker_type = models.IntegerField(db_index=True)
+    tracker_type = models.IntegerField(db_index=True, blank=True, null=True)
     fetch_datetime = models.DateTimeField(blank=True, null=True)
     local_datetime = models.DateTimeField(blank=True, null=True)
     last_sync_date = models.DateTimeField(blank=True, null=True)

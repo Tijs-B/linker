@@ -13,7 +13,7 @@ from django.utils.timezone import now
 
 from linker.config.models import Setting
 from linker.people.models import Team
-from linker.trackers.constants import SETTING_GEODYNAMICS_API_HISTORY_SECONDS
+from linker.trackers.constants import SETTING_GEODYNAMICS_API_HISTORY_SECONDS, TrackerLogSource
 from linker.trackers.models import Tracker, TrackerLog
 
 
@@ -75,6 +75,7 @@ def import_geodynamics_minisite_data(data: dict, fetch_datetime: Optional[dateti
             TrackerLog(
                 tracker=tracker,
                 gps_datetime=gps_datetime,
+                source=TrackerLogSource.MINISITE_API,
                 fetch_datetime=fetch_datetime,
                 team_is_safe=tracker_id in safe_trackers,
                 local_datetime=try_parse_date(last_location.get('LocalDateTime')),
@@ -132,6 +133,7 @@ def import_geodynamics_api_data(data: list) -> None:
                 TrackerLog(
                     tracker=tracker,
                     tracker_type=position.get('Type'),
+                    source=TrackerLogSource.GEODYNAMICS_API,
                     local_datetime=try_parse_date(position.get('RtcDateTime')),
                     gps_datetime=gps_datetime,
                     speed=position.get('Speed'),

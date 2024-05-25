@@ -25,7 +25,7 @@ def restart_simulation():
     TrackerLog.objects.filter(fetch_datetime__gt=SIMULATION_START).delete()
     CheckpointLog.objects.filter(timestamp__gt=SIMULATION_START).delete()
     for tracker in Tracker.objects.all():
-        tracker.last_log = tracker.tracker_logs.order_by('-gps_datetime').first()
+        tracker.last_log = tracker.tracker_logs.latest('gps_datetime')
         tracker.save()
     Setting.objects.update_or_create(key=SETTING_SIMULATION_START, defaults={'value': timestamp.isoformat()})
 
@@ -63,7 +63,7 @@ def simulate_download_tracker_data(until: Optional[datetime.datetime] = None):
         import_geodynamics_minisite_data(data, _get_timestamp_from_file_name(filename))
 
     for tracker in Tracker.objects.all():
-        tracker.last_log = tracker.tracker_logs.order_by('-gps_datetime').first()
+        tracker.last_log = tracker.tracker_logs.latest('gps_datetime')
         tracker.save()
 
 

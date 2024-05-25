@@ -14,10 +14,18 @@ export enum MemberType {
   BUS = 'Bus',
 }
 
+export enum TrackerLogSource {
+  MINISITE_API = 'minisite_api',
+  GEODYNAMICS_API = 'geodynamics_api',
+  MANUAL = 'manual',
+}
+
 export interface TrackerLog {
   id: number;
   gps_datetime: string;
   point: Point;
+  source: TrackerLogSource;
+  tracker: number;
 }
 
 export interface Tracker {

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useMap } from 'react-map-gl/maplibre';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { LngLat, useMap } from 'react-map-gl/maplibre';
 import { useNavigate } from 'react-router-dom';
 
 import { Paper, useMediaQuery, useTheme } from '@mui/material';
@@ -9,6 +10,8 @@ import Fuse from 'fuse.js';
 import { SnackbarKey, useSnackbar } from 'notistack';
 
 import BottomMenu from '../components/main/BottomMenu';
+import CreateMapNoteDialog from '../components/main/CreateMapNoteDialog.tsx';
+import CreateTrackerLogDialog from '../components/main/CreateTrackerLogDialog.tsx';
 import HistoryCard from '../components/main/HistoryCard';
 import MainToolbar from '../components/main/MainToolbar';
 import SearchList from '../components/main/SearchList';
@@ -32,6 +35,9 @@ export default function MainPage() {
   const [networkErrorNotificationId, setNetworkErrorNotificationId] = useState<SnackbarKey | null>(
     null,
   );
+  const [creatingMarker, setCreatingMarker] = useState<'mapNote' | 'tracker' | null>(null);
+  const [mapNoteLngLat, setMapNoteLngLat] = useState<LngLat | null>(null);
+  const [trackerLogLngLat, setTrackerLogLngLat] = useState<LngLat | null>(null);
   const { mainMap } = useMap();
   const navigate = useNavigate();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -105,6 +111,9 @@ export default function MainPage() {
       setListOpen(false);
     }
   }, [desktop, selectedId]);
+
+  // Stop creating marker when escape is pressed
+  useHotkeys('esc', () => setCreatingMarker(null));
 
   const showTracker = useCallback(
     (tracker: number | null) => {
@@ -206,6 +215,40 @@ export default function MainPage() {
     refetchTrackers();
   }, [refetchMembers, refetchTeams, refetchTrackers]);
 
+  const onToggleMapNoteCreation = useCallback(() => {
+    setCreatingMarker((value) => {
+      switch (value) {
+        case 'mapNote':
+          return null;
+        case null:
+          return 'mapNote';
+        default:
+          return value;
+      }
+    });
+  }, []);
+
+  const onCreateMarker = useCallback(
+    (position: LngLat) => {
+      if (creatingMarker === 'mapNote') {
+        setMapNoteLngLat(position);
+      } else if (creatingMarker === 'tracker') {
+        setTrackerLogLngLat(position);
+      }
+    },
+    [creatingMarker],
+  );
+
+  const onStartTrackerLogCreation = useCallback(() => {
+    setCreatingMarker('tracker');
+  }, []);
+
+  const onMarkerComplete = useCallback(() => {
+    setCreatingMarker(null);
+    setMapNoteLngLat(null);
+    setTrackerLogLngLat(null);
+  }, []);
+
   const sidebar = css`
     display: flex;
     flex-direction: column;
@@ -259,7 +302,16 @@ export default function MainPage() {
         height: 100%;
       `}
     >
-      {desktop && <MainMap filteredTeams={filteredTeams} filteredMembers={filteredMembers} />}
+      {desktop && (
+        <MainMap
+          filteredTeams={filteredTeams}
+          filteredMembers={filteredMembers}
+          creatingMapNote={creatingMarker === 'mapNote'}
+          creatingMarker={creatingMarker !== null}
+          onToggleMapNoteCreation={onToggleMapNoteCreation}
+          onCreateMarker={onCreateMarker}
+        />
+      )}
 
       <div css={sidebar}>
         <Paper elevation={3} square css={header}>
@@ -276,7 +328,14 @@ export default function MainPage() {
         <div css={middle}>
           {!desktop && (
             <div css={contentMap}>
-              <MainMap filteredTeams={filteredTeams} filteredMembers={filteredMembers} />
+              <MainMap
+                filteredTeams={filteredTeams}
+                filteredMembers={filteredMembers}
+                creatingMapNote={creatingMarker === 'mapNote'}
+                creatingMarker={creatingMarker !== null}
+                onToggleMapNoteCreation={onToggleMapNoteCreation}
+                onCreateMarker={onCreateMarker}
+              />
             </div>
           )}
           <Paper css={contentList} sx={{ visibility: listOpen ? 'visible' : 'hidden' }} square>
@@ -289,8 +348,13 @@ export default function MainPage() {
           </div>
         )}
       </div>
-      {selectedId !== null && !showHistory && <StatusCard />}
+      {selectedId !== null && !showHistory && !trackerLogLngLat && (
+        <StatusCard onStartTrackerLogCreation={onStartTrackerLogCreation} />
+      )}
       {selectedId !== null && showHistory && <HistoryCard />}
+
+      <CreateMapNoteDialog position={mapNoteLngLat} onComplete={onMarkerComplete} />
+      <CreateTrackerLogDialog position={trackerLogLngLat} onComplete={onMarkerComplete} />
     </div>
   );
 }
