@@ -240,12 +240,12 @@ const StatusCard = memo(function StatusCard() {
 
         {selectedTeam && (
           <>
-            <TeamCallButton team={selectedTeam}/>
+            <TeamCallButton team={selectedTeam} />
             {user && user.is_staff && (
               <Tooltip title="Admin">
-              <IconButton href={`/admin/people/team/${selectedTeam.id}/change/`}>
-                <SettingsIcon />
-              </IconButton>
+                <IconButton href={`/admin/people/team/${selectedTeam.id}/change/`}>
+                  <SettingsIcon />
+                </IconButton>
               </Tooltip>
             )}
             <Tooltip title="Meer info">

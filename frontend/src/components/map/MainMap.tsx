@@ -1,4 +1,4 @@
-import { ChangeEvent, memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import Map, {
   GeolocateControl,
   LngLat,
@@ -13,25 +13,13 @@ import FlagIcon from '@mui/icons-material/Flag';
 import SatelliteIcon from '@mui/icons-material/Satellite';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  IconButton,
-  TextField,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { IconButton, useMediaQuery, useTheme } from '@mui/material';
 
 import bbox from '@turf/bbox';
 import { feature, featureCollection } from '@turf/helpers';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import {
-  useCreateMapNoteMutation,
   useGetOrganizationMembersQuery,
   useGetTeamsQuery,
   useGetTochtenQuery,
@@ -39,6 +27,7 @@ import {
 import { OrganizationMember, Team } from '../../services/types.ts';
 import { trackersActions, useAppDispatch } from '../../store';
 import { generateAllIcons } from '../../utils/icons.ts';
+import CreateMapNoteDialog from '../main/CreateMapNoteDialog.tsx';
 import BackgroundLayers from './BackgroundLayers.tsx';
 import CustomOverlay from './CustomOverlay.tsx';
 import MapNoteLayer from './MapNoteLayer.tsx';
@@ -68,8 +57,6 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
   const [hasRecentered, setRecentered] = useState(false);
   const [creatingMarker, setCreatingMarker] = useState(false);
   const [mapNoteLngLat, setMapNoteLngLat] = useState<LngLat | null>(null);
-  const [mapNoteDescription, setMapNoteDescription] = useState('');
-  const [createMapNoteDialogOpen, setCreateMapNoteDialogOpen] = useState(false);
   const [initialBounds, setInitialBounds] = useState(DEFAULT_INITIAL_BOUNDS);
   const [iconsAdded, setIconsAdded] = useState(true);
   const [showZijwegen, setShowZijwegen] = useState(false);
@@ -78,7 +65,6 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
   const { data: tochten } = useGetTochtenQuery();
   const { data: teams } = useGetTeamsQuery();
   const { data: members } = useGetOrganizationMembersQuery();
-  const createMapNote = useCreateMapNoteMutation()[0];
 
   const mapStyle = showHeatmap
     ? 'https://tiles.tijsb.be/styles/dark-matter/style.json'
@@ -161,7 +147,6 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
         setCreatingMarker(false);
         setCursor('inherit');
         setMapNoteLngLat(event.lngLat);
-        setCreateMapNoteDialogOpen(true);
       } else {
         dispatch(trackersActions.setShowHistory(false));
         dispatch(trackersActions.deselect());
@@ -170,38 +155,9 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
     [creatingMarker, dispatch],
   );
 
-  const onCreateMapNoteDialogClose = useCallback(() => {
-    setCreatingMarker(false);
-    setCreateMapNoteDialogOpen(false);
+  const onCreateMapNoteCompleted = useCallback(() => {
     setMapNoteLngLat(null);
-    setMapNoteDescription('');
-    setCursor('inherit');
   }, []);
-
-  const onCreateMapNote = useCallback(() => {
-    if (!mapNoteLngLat) {
-      return;
-    }
-    const { lng, lat } = mapNoteLngLat;
-    const data = {
-      content: mapNoteDescription,
-      point: {
-        type: 'Point' as const,
-        coordinates: [lng, lat],
-      },
-    };
-    createMapNote(data);
-    setCreateMapNoteDialogOpen(false);
-    setMapNoteLngLat(null);
-    setMapNoteDescription('');
-    setCreatingMarker(false);
-    setCursor('inherit');
-  }, [createMapNote, mapNoteDescription, mapNoteLngLat]);
-
-  const onMapNoteDescriptionChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => setMapNoteDescription(event.target.value),
-    [],
-  );
 
   const onMapLoad = useCallback(() => setIconsAdded(false), []);
 
@@ -289,30 +245,8 @@ const MainMap = memo(function MainMap({ filteredTeams, filteredMembers }: MainMa
         </CustomOverlay>
 
         {desktop && <MapPadding left={parseInt(theme.dimensions.drawerWidthDesktop, 10)} />}
+        <CreateMapNoteDialog location={mapNoteLngLat} onComplete={onCreateMapNoteCompleted} />
       </Map>
-      <Dialog open={createMapNoteDialogOpen} onClose={onCreateMapNoteDialogClose}>
-        <DialogTitle>Nieuwe kaartnotitie</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Je staat op het punt een nieuwe kaartnotitie te maken. Geef een korte beschrijving.
-          </DialogContentText>
-          <TextField
-            value={mapNoteDescription}
-            onChange={onMapNoteDescriptionChange}
-            label="Beschrijving"
-            variant="standard"
-            fullWidth
-            margin="dense"
-            autoFocus
-            required
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onCreateMapNote} variant="contained">
-            Toevoegen
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 });
