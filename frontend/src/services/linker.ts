@@ -190,7 +190,10 @@ export const linkerApi = createApi({
       }),
       invalidatesTags: ['MapNote'],
     }),
-    createTrackerLog: build.mutation<TrackerLog, Pick<TrackerLog, 'point' | 'tracker'>>({
+    createTrackerLog: build.mutation<
+      TrackerLog,
+      Pick<TrackerLog, 'point' | 'tracker' | 'gps_datetime'>
+    >({
       query: (trackerLog) => ({
         url: '/tracker-logs/',
         method: 'POST',

@@ -5,6 +5,8 @@ import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
 import { CssBaseline } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import '@fontsource/roboto/latin-300.css';
 import '@fontsource/roboto/latin-400.css';
@@ -35,9 +37,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <CssBaseline enableColorScheme />
         <SnackbarProvider {...notifications}>
           <MapProvider>
-            <BrowserRouter>
-              <Navigation />
-            </BrowserRouter>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="nl-be">
+              <BrowserRouter>
+                <Navigation />
+              </BrowserRouter>
+            </LocalizationProvider>
           </MapProvider>
           <ReloadPrompt />
         </SnackbarProvider>

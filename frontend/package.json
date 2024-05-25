@@ -16,6 +16,7 @@
     "@mapbox/mapbox-gl-language": "^1.0.1",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.5",
+    "@mui/x-date-pickers": "^6.20.0",
     "@reduxjs/toolkit": "^2.2.1",
     "@turf/bbox": "^7.0.0-alpha.113",
     "@turf/centroid": "^7.0.0-alpha.113",

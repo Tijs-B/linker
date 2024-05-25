@@ -2,6 +2,7 @@ import { ReactNode, memo } from 'react';
 
 import { ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
+import { nlNL } from '@mui/x-date-pickers';
 
 declare module '@mui/material/styles' {
   interface Theme {
@@ -19,20 +20,23 @@ declare module '@mui/material/styles' {
   }
 }
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#689f38',
+const theme = createTheme(
+  {
+    palette: {
+      primary: {
+        main: '#689f38',
+      },
+      secondary: {
+        main: '#ffc400',
+      },
     },
-    secondary: {
-      main: '#ffc400',
+    dimensions: {
+      drawerWidthDesktop: '360px',
+      popupMaxWidth: '360px',
     },
   },
-  dimensions: {
-    drawerWidthDesktop: '360px',
-    popupMaxWidth: '360px',
-  },
-});
+  nlNL,
+);
 
 const AppThemeProvider = memo(function AppThemeProvider({ children }: { children: ReactNode }) {
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;

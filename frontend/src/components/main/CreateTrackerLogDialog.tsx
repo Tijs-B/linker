@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { LngLat } from 'react-map-gl/maplibre';
 
 import {
@@ -9,6 +9,9 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material';
+import { TimePicker } from '@mui/x-date-pickers';
+
+import dayjs, { Dayjs } from 'dayjs';
 
 import { useCreateTrackerLogMutation } from '../../services/linker.ts';
 import { selectSelectedItem, selectSelectedTracker, useAppSelector } from '../../store';
@@ -25,6 +28,13 @@ export default function CreateTrackerLogDialog({
   const selectedTracker = useAppSelector(selectSelectedTracker);
   const selectedItem = useAppSelector(selectSelectedItem);
   const createTrackerLog = useCreateTrackerLogMutation()[0];
+  const [dateTime, setDateTime] = useState<Dayjs | null>(dayjs().tz('Europe/Brussels'));
+  const [prevPosition, setPrevPosition] = useState(position);
+
+  if (position !== prevPosition) {
+    setPrevPosition(position);
+    setDateTime(dayjs().tz('Europe/Brussels'));
+  }
 
   const onAccept = useCallback(() => {
     if (!position || !selectedTracker) {
@@ -32,14 +42,16 @@ export default function CreateTrackerLogDialog({
     }
     onComplete();
     const { lng, lat } = position;
+    const timestamp = dateTime ? dateTime : dayjs().tz('Europe/Brussels');
     createTrackerLog({
       point: {
         type: 'Point' as const,
         coordinates: [lng, lat],
       },
       tracker: selectedTracker.id,
+      gps_datetime: timestamp.toISOString(),
     });
-  }, [createTrackerLog, position, onComplete, selectedTracker]);
+  }, [position, selectedTracker, onComplete, dateTime, createTrackerLog]);
 
   if (selectedTracker === null || selectedItem === null) {
     return null;
@@ -53,6 +65,13 @@ export default function CreateTrackerLogDialog({
           Je staat op het punt tracker <code>{selectedTracker.tracker_name}</code>, gebruikt door{' '}
           {selectedItem.name}, te verplaatsen.
         </DialogContentText>
+        <TimePicker
+          timezone="Europe/Brussels"
+          label="Tijdstip op dit punt"
+          sx={{ mt: 2 }}
+          value={dateTime}
+          onChange={setDateTime}
+        />
       </DialogContent>
       <DialogActions>
         <Button color="error" onClick={onComplete}>

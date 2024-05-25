@@ -89,4 +89,4 @@ class TrackerLogViewSet(CreateModelMixin, viewsets.GenericViewSet):
     queryset = TrackerLog.objects.all()
 
     def perform_create(self, serializer):
-        serializer.save(gps_datetime=now(), source=TrackerLogSource.MANUAL)
+        serializer.save(source=TrackerLogSource.MANUAL)
