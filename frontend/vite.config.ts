@@ -22,25 +22,30 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
           runtimeCaching: [
             {
-              urlPattern: /^https:\/\/link2.tijsb.besb.be\/api\/user/,
+              urlPattern: /^https:\/\/link2.tijsb.be\/api\/user/,
               handler: 'NetworkOnly',
             },
             {
-              urlPattern: /^https:\/\/link2.tijsb.besb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen|forbidden-areas)/,
+              urlPattern: /^https:\/\/link2.tijsb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen|forbidden-areas)/,
               handler: 'StaleWhileRevalidate',
             },
             {
-              urlPattern: /^https:\/\/link2.tijsb.besb.be\/api\//,
+              urlPattern: /^https:\/\/link2.tijsb.be\/api\//,
               handler: 'NetworkFirst',
             },
             {
-              urlPattern: /^https:\/\/tiles.tijsb.be/,
+              urlPattern: /^https:\/\/link2.tijsb.be\/tiles\/belgium\.pmtiles/,
               handler: 'StaleWhileRevalidate',
               options: {
                 cacheableResponse: {
-                  statuses: [0, 200, 204],
+                  statuses: [0, 200, 204, 206],
                 },
+                rangeRequests: true,
               },
+            },
+            {
+              urlPattern: /^https:\/\/link2.tijsb.be\/tiles\/fonts\//,
+              handler: 'CacheFirst',
             },
             {
               urlPattern: /^https:\/\/maputnik.github.io/,
