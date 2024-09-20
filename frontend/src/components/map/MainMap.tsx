@@ -73,25 +73,17 @@ const MainMap = memo(function MainMap({
   const [initialBounds, setInitialBounds] = useState(DEFAULT_INITIAL_BOUNDS);
   const [iconsAdded, setIconsAdded] = useState(true);
   const [showZijwegen, setShowZijwegen] = useState(false);
-  const [pmTilesReady, setPmTilesReady] = useState(false);
 
   const mapRef = useRef<MapRef>(null);
   const { data: tochten } = useGetTochtenQuery();
   const { data: teams } = useGetTeamsQuery();
   const { data: members } = useGetOrganizationMembersQuery();
 
-  // const mapStyle = showHeatmap
-  //   ? 'https://tiles.tijsb.be/styles/dark-matter/style.json'
-  //   : showSatellite
-  //     ? 'https://tiles.tijsb.be/styles/satellite/style.json'
-  //     : 'https://tiles.tijsb.be/styles/outdoor/style.json';
-
   const mapStyle = showHeatmap ? darkStyle : showSatellite ? satelliteStyle : outdoorStyle;
 
   useEffect(() => {
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol('pmtiles', protocol.tile);
-    setPmTilesReady(true);
   }, []);
 
   useEffect(() => {
