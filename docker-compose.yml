@@ -1,5 +1,3 @@
-version: "3.4"
-
 services:
   linker:
     build:
@@ -64,18 +62,19 @@ services:
     ports:
       - "8063:6379"
 
-#  frontend:
-#    build:
-#      context: .
-#      target: frontend
-#    command: npm run dev -- --port 8061 --host 0.0.0.0
-#    volumes:
-#      - ./frontend:/app
-#      - /app/node_modules/
-#    environment:
-#      - BACKEND_URL=http://linker:8060
-#    ports:
-#      - "8061:8061"
+  frontend:
+    build:
+      context: .
+      target: frontend-dev
+    command: npm run dev -- --port 8061 --host 0.0.0.0
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules/
+      - /app/public/tiles/
+    environment:
+      - VITE_BACKEND_URL=http://linker:8060
+    ports:
+      - "8061:8061"
 
 volumes:
   postgis-data:

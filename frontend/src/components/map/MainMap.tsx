@@ -15,10 +15,15 @@ import WhatshotIcon from '@mui/icons-material/Whatshot';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 import { IconButton, useMediaQuery, useTheme } from '@mui/material';
 
+import * as pmtiles from 'pmtiles';
 import bbox from '@turf/bbox';
 import { feature, featureCollection } from '@turf/helpers';
+import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
+import darkStyle from '../../assets/styles/dark.json';
+import outdoorStyle from '../../assets/styles/outdoor.json';
+import satelliteStyle from '../../assets/styles/satellite.json';
 import {
   useGetOrganizationMembersQuery,
   useGetTeamsQuery,
@@ -68,17 +73,26 @@ const MainMap = memo(function MainMap({
   const [initialBounds, setInitialBounds] = useState(DEFAULT_INITIAL_BOUNDS);
   const [iconsAdded, setIconsAdded] = useState(true);
   const [showZijwegen, setShowZijwegen] = useState(false);
+  const [pmTilesReady, setPmTilesReady] = useState(false);
 
   const mapRef = useRef<MapRef>(null);
   const { data: tochten } = useGetTochtenQuery();
   const { data: teams } = useGetTeamsQuery();
   const { data: members } = useGetOrganizationMembersQuery();
 
-  const mapStyle = showHeatmap
-    ? 'https://tiles.tijsb.be/styles/dark-matter/style.json'
-    : showSatellite
-      ? 'https://tiles.tijsb.be/styles/satellite/style.json'
-      : 'https://tiles.tijsb.be/styles/outdoor/style.json';
+  // const mapStyle = showHeatmap
+  //   ? 'https://tiles.tijsb.be/styles/dark-matter/style.json'
+  //   : showSatellite
+  //     ? 'https://tiles.tijsb.be/styles/satellite/style.json'
+  //     : 'https://tiles.tijsb.be/styles/outdoor/style.json';
+
+  const mapStyle = showHeatmap ? darkStyle : showSatellite ? satelliteStyle : outdoorStyle;
+
+  useEffect(() => {
+    const protocol = new pmtiles.Protocol();
+    maplibregl.addProtocol('pmtiles', protocol.tile);
+    setPmTilesReady(true);
+  }, []);
 
   useEffect(() => {
     if (tochten && mapRef && mapRef.current && !hasRecentered) {

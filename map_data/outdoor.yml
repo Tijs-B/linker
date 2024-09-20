@@ -1,0 +1,56 @@
+schema_name: Custom outdoor
+schema_description: Some custom outdoor features
+attribution:
+  <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy;
+  OpenStreetMap contributors</a>
+sources:
+  osm:
+    type: osm
+    local_path: data/sources/belgium.osm.pbf
+layers:
+  - id: cutline
+    features:
+      - source: osm
+        geometry: line
+        min_zoom: 13
+        include_when:
+          man_made:
+            - cutline
+  - id: poi
+    features:
+      - source: osm
+        geometry: point
+        min_zoom: 15
+        include_when:
+          amenity:
+            - hunting_stand
+        attributes:
+          - key: class
+            value: hunting_stand
+      - source: osm
+        geometry: point
+        min_zoom: 14
+        include_when:
+          amenity:
+            - shelter
+        attributes:
+          - key: class
+            value: shelter
+      - source: osm
+        geometry: polygon_centroid
+        min_zoom: 14
+        include_when:
+          amenity:
+            - shelter
+        attributes:
+          - key: class
+            value: shelter
+      - source: osm
+        geometry: point
+        min_zoom: 14
+        include_when:
+          leisure:
+            - picnic_table
+        attributes:
+          - key: class
+            value: picnic_site
