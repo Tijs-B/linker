@@ -6,7 +6,7 @@ import Map, {
   MapRef,
   NavigationControl,
   ScaleControl,
-} from 'react-map-gl/maplibre';
+} from 'react-map-gl';
 
 import CallSplitIcon from '@mui/icons-material/CallSplit';
 import FlagIcon from '@mui/icons-material/Flag';
@@ -75,10 +75,10 @@ const MainMap = memo(function MainMap({
   const { data: members } = useGetOrganizationMembersQuery();
 
   const mapStyle = showHeatmap
-    ? 'https://tiles.tijsb.be/styles/dark-matter/style.json'
+    ? 'mapbox://styles/mapbox/dark-v11'
     : showSatellite
-      ? 'https://tiles.tijsb.be/styles/satellite/style.json'
-      : 'https://tiles.tijsb.be/styles/outdoor/style.json';
+      ? 'mapbox://styles/mapbox/satellite-v9'
+      : 'mapbox://styles/mapbox/outdoors-v12';
 
   useEffect(() => {
     if (tochten && mapRef && mapRef.current && !hasRecentered) {
@@ -169,12 +169,10 @@ const MainMap = memo(function MainMap({
         ref={mapRef}
         interactiveLayerIds={['trackers', 'map-notes']}
         styleDiffing={false}
-        // maxPitch={85}
-        // terrain={{source: 'relief', exaggeration: 2}}
-        // fog={{range: [2,12], color: 'white', 'horizon-blend': 0.1}}
         onLoad={onMapLoad}
         attributionControl={false}
         reuseMaps
+        mapboxAccessToken={import.meta.env.VITE_MAPBOX_TOKEN}
       >
         <BackgroundLayers
           showHeatmap={showHeatmap}

@@ -13,7 +13,6 @@ import {
   useGetWeidesQuery,
   useGetZijwegenQuery,
 } from '../../services/linker.ts';
-import { contourUrl, demUrl } from '../../utils/dem.ts';
 
 interface BackgroundLayersProps {
   showHeatmap: boolean;
@@ -78,30 +77,6 @@ const BackgroundLayers = memo(function BackgroundLayers({
 
   return (
     <>
-      <Source type="raster-dem" tiles={[demUrl]} tileSize={256} encoding="terrarium" maxzoom={14}>
-        <Layer
-          id="hillshade"
-          type="hillshade"
-          minzoom={3}
-          paint={{
-            'hillshade-accent-color': 'hsl(98, 35%, 86%)',
-            'hillshade-exaggeration': [
-              'interpolate',
-              ['linear'],
-              ['zoom'],
-              6,
-              0.4,
-              14,
-              0.35,
-              18,
-              0.25,
-            ],
-            'hillshade-shadow-color': 'rgba(43, 79, 28, 1)',
-            'hillshade-highlight-color': 'rgba(200, 200, 126, 1)',
-          }}
-          layout={{ visibility: showHeatmap || showSatellite ? 'none' : 'visible' }}
-        />
-      </Source>
       <Source
         type="raster"
         scheme="xyz"
@@ -225,64 +200,6 @@ const BackgroundLayers = memo(function BackgroundLayers({
             'fill-outline-color': red[800],
           }}
           layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
-        />
-      </Source>
-      <Source type="vector" tiles={[contourUrl]}>
-        <Layer
-          id="contour-labels"
-          type="symbol"
-          source-layer="contours"
-          filter={['>', ['get', 'level'], 0]}
-          minzoom={11}
-          layout={{
-            'symbol-avoid-edges': true,
-            'symbol-placement': 'line',
-            'text-allow-overlap': false,
-            'text-field': '{ele} m',
-            'text-font': ['D-DIN Regular'],
-            'text-ignore-placement': false,
-            'text-padding': 10,
-            'text-rotation-alignment': 'map',
-            'text-keep-upright': false,
-            'text-size': ['interpolate', ['linear'], ['zoom'], 15, 10, 20, 12],
-            visibility: showHeatmap ? 'none' : 'visible',
-          }}
-          paint={{
-            'text-color': 'hsl(0, 0%, 37%)',
-            'text-halo-color': 'rgba(255, 255, 255, 0.8)',
-            'text-halo-width': 1.5,
-            'text-opacity': 1,
-          }}
-        />
-        <Layer
-          id="contour-lines-index"
-          type="line"
-          source-layer="contours"
-          filter={['>', ['get', 'level'], 0]}
-          minzoom={11}
-          layout={{
-            visibility: showHeatmap || showSatellite ? 'none' : 'visible',
-          }}
-          paint={{
-            'line-color': 'hsl(28,8%,50%)',
-            'line-opacity': ['interpolate', ['linear'], ['zoom'], 11.1, 0, 11.2, 0.2, 13, 0.4],
-            'line-width': 0.8,
-          }}
-        />
-        <Layer
-          id="contour-lines"
-          type="line"
-          source-layer="contours"
-          filter={['==', ['get', 'level'], 0]}
-          minzoom={11}
-          layout={{
-            visibility: showHeatmap || showSatellite ? 'none' : 'visible',
-          }}
-          paint={{
-            'line-color': 'rgb(136,124,111)',
-            'line-opacity': ['interpolate', ['linear'], ['zoom'], 11.1, 0, 11.2, 0.15, 13, 0.3],
-            'line-width': 0.4,
-          }}
         />
       </Source>
     </>
