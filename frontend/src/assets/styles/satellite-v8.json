@@ -1,0 +1,427 @@
+{
+  "version": 8,
+  "name": "Satellite",
+  "sources": {
+    "esri_satellite": {
+      "type": "raster",
+      "tiles": [
+        "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+      ],
+      "tileSize": 256,
+      "minzoom": 0,
+      "maxzoom": 19
+    },
+    "openmaptiles": {
+      "type": "vector",
+      "url": "pmtiles:///tiles/belgium.pmtiles"
+    }
+  },
+  "glyphs": "/tiles/fonts/{fontstack}/{range}.pbf",
+  "layers": [
+    { "id": "satellite", "type": "raster", "source": "esri_satellite" },
+    {
+      "id": "Tunnel",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": [
+        "all",
+        ["==", ["geometry-type"], "LineString"],
+        ["==", ["get", "brunnel"], "tunnel"],
+        [
+          "match",
+          ["get", "class"],
+          ["motorway", "primary", "secondary", "tertiary", "trunk"],
+          true,
+          false
+        ]
+      ],
+      "layout": {
+        "line-cap": "butt",
+        "line-join": "miter",
+        "visibility": "visible"
+      },
+      "paint": {
+        "line-color": "hsla(0,0%,100%,0.2)",
+        "line-width": ["interpolate", ["exponential", 1.5], ["zoom"], 6, 0.5, 20, 30],
+        "line-dasharray": [0.28, 0.14]
+      }
+    },
+    {
+      "id": "Path",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": [
+        "all",
+        ["==", ["geometry-type"], "LineString"],
+        ["match", ["get", "class"], ["path", "track"], true, false]
+      ],
+      "layout": {
+        "line-cap": "square",
+        "line-join": "bevel",
+        "visibility": "visible"
+      },
+      "paint": {
+        "line-color": "hsla(0,0%,97%,0.33)",
+        "line-width": ["interpolate", ["exponential", 1.5], ["zoom"], 14, 0.5, 20, 4],
+        "line-dasharray": [1, 1]
+      }
+    },
+    {
+      "id": "Road",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "minzoom": 6,
+      "filter": [
+        "all",
+        ["==", ["geometry-type"], "LineString"],
+        ["match", ["get", "class"], ["ferry", "path", "rail", "track"], false, true],
+        ["!=", ["get", "brunnel"], "tunnel"]
+      ],
+      "layout": {
+        "line-cap": "butt",
+        "line-join": "round",
+        "visibility": "visible"
+      },
+      "paint": {
+        "line-color": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          8,
+          "hsla(0,0%,100%,0.2)",
+          14,
+          "hsla(0,0%,100%,0.4)",
+          18,
+          "hsla(0,0%,100%,0.5)"
+        ],
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          5,
+          ["match", ["get", "class"], ["motorway", "motorway_link"], 1, 0],
+          7,
+          ["match", ["get", "class"], ["motorway", "motorway_link"], 1.4, 0],
+          8,
+          ["match", ["get", "class"], ["motorway", "motorway_link", "primary", "trunk"], 0.75, 0],
+          9,
+          ["match", ["get", "class"], ["secondary", "tertiary"], 0.7, 1],
+          10,
+          ["match", ["get", "class"], ["motorway", "motorway_link"], 1.3, 1.3],
+          14,
+          ["match", ["get", "class"], ["minor", "service"], 0.5, 2.4]
+        ]
+      }
+    },
+    {
+      "id": "Railway",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "minzoom": 11,
+      "filter": ["==", ["get", "class"], "rail"],
+      "layout": { "visibility": "visible" },
+      "paint": {
+        "line-color": "hsla(34,12%,66%,0.2)",
+        "line-opacity": ["interpolate", ["linear"], ["zoom"], 11, 0.5, 16, 1.3]
+      }
+    },
+    {
+      "id": "Other border",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "boundary",
+      "minzoom": 3,
+      "filter": ["match", ["get", "admin_level"], [4, 6, 8], true, false],
+      "layout": { "visibility": "visible" },
+      "paint": { "line-color": "hsla(0,0%,76%,0.5)", "line-dasharray": [2, 1] }
+    },
+    {
+      "id": "Country dark border",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "boundary",
+      "filter": [
+        "all",
+        ["<=", ["get", "admin_level"], 2],
+        [
+          "any",
+          ["!", ["has", "maritime"]],
+          [
+            "case",
+            ["==", ["typeof", ["get", "maritime"]], "number"],
+            ["==", ["get", "maritime"], 0],
+            false
+          ]
+        ],
+        ["==", ["geometry-type"], "LineString"]
+      ],
+      "layout": {
+        "line-cap": "butt",
+        "line-join": "round",
+        "visibility": "visible"
+      },
+      "paint": {
+        "line-color": "hsla(0,0%,0%,0.51)",
+        "line-width": ["interpolate", ["exponential", 1.5], ["zoom"], 3, 0.5, 9, 1.5, 22, 32],
+        "line-offset": 1
+      }
+    },
+    {
+      "id": "Disputed border",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "boundary",
+      "filter": [
+        "all",
+        ["==", ["get", "admin_level"], 2],
+        [
+          "any",
+          ["!", ["has", "maritime"]],
+          [
+            "case",
+            ["==", ["typeof", ["get", "maritime"]], "number"],
+            ["==", ["get", "maritime"], 0],
+            false
+          ]
+        ],
+        [
+          "any",
+          ["!", ["has", "disputed"]],
+          [
+            "case",
+            ["==", ["typeof", ["get", "disputed"]], "number"],
+            ["==", ["get", "disputed"], 1],
+            false
+          ]
+        ]
+      ],
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round",
+        "visibility": "visible"
+      },
+      "paint": {
+        "line-color": "hsl(0,0%,94%)",
+        "line-width": ["interpolate", ["exponential", 1.5], ["zoom"], 3, 0.5, 9, 1.5, 22, 32],
+        "line-dasharray": [2, 4]
+      }
+    },
+    {
+      "id": "Country border",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "boundary",
+      "filter": [
+        "all",
+        ["==", ["get", "admin_level"], 2],
+        [
+          "any",
+          ["!", ["has", "maritime"]],
+          [
+            "case",
+            ["==", ["typeof", ["get", "maritime"]], "number"],
+            ["==", ["get", "maritime"], 0],
+            false
+          ]
+        ],
+        [
+          "any",
+          ["!", ["has", "disputed"]],
+          [
+            "case",
+            ["==", ["typeof", ["get", "disputed"]], "number"],
+            ["==", ["get", "disputed"], 0],
+            false
+          ]
+        ]
+      ],
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round",
+        "visibility": "visible"
+      },
+      "paint": {
+        "line-color": "hsl(0,0%,94%)",
+        "line-width": ["interpolate", ["exponential", 1.5], ["zoom"], 3, 0.5, 9, 1.5, 22, 32]
+      }
+    },
+    {
+      "id": "Road labels",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "transportation_name",
+      "filter": [
+        "all",
+        ["==", ["geometry-type"], "LineString"],
+        ["!=", ["get", "subclass"], "ferry"]
+      ],
+      "layout": {
+        "text-font": ["Klokantech Noto Sans Regular"],
+        "text-size": ["interpolate", ["linear", 0.75, 1, 0.75, 1], ["zoom"], 10, 8, 16, 10, 24, 14],
+        "text-field": ["coalesce", ["get", "name:en"], ["get", "name"]],
+        "visibility": "visible",
+        "text-transform": "none",
+        "symbol-placement": "line",
+        "text-letter-spacing": 0.1,
+        "text-rotation-alignment": "map"
+      },
+      "paint": {
+        "text-color": "hsl(0,0%,100%)",
+        "text-halo-color": "hsl(0,0%,17%)",
+        "text-halo-width": 1
+      }
+    },
+    {
+      "id": "Place labels",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "place",
+      "minzoom": 3,
+      "maxzoom": 16,
+      "filter": [
+        "all",
+        ["==", ["geometry-type"], "Point"],
+        ["match", ["get", "class"], ["country", "state"], false, true]
+      ],
+      "layout": {
+        "text-font": ["Klokantech Noto Sans Regular"],
+        "text-size": [
+          "interpolate",
+          ["linear", 0.5, 1, 0.5, 1],
+          ["zoom"],
+          3,
+          ["match", ["get", "class"], "city", 11, 10],
+          6,
+          ["match", ["get", "class"], "city", 14.5, 11],
+          8,
+          ["match", ["get", "class"], "city", 16, 12],
+          10,
+          ["match", ["get", "class"], "city", 20, 13]
+        ],
+        "text-field": ["to-string", ["get", "name"]],
+        "visibility": "visible",
+        "text-max-width": 10
+      },
+      "paint": {
+        "text-color": "hsl(0,0%,100%)",
+        "text-halo-blur": 0.5,
+        "text-halo-color": "hsl(0,0%,0%)",
+        "text-halo-width": 1
+      }
+    },
+    {
+      "id": "State labels",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "place",
+      "minzoom": 3,
+      "maxzoom": 10,
+      "filter": [
+        "all",
+        ["==", ["geometry-type"], "Point"],
+        ["match", ["get", "class"], ["state"], true, false],
+        ["<=", ["get", "rank"], 6]
+      ],
+      "layout": {
+        "text-font": ["Klokantech Noto Sans Italic"],
+        "text-size": [
+          "interpolate",
+          ["linear", 0.75, 1, 0.75, 1],
+          ["zoom"],
+          1,
+          ["step", ["get", "rank"], 10, 1, 9, 2, 9],
+          4,
+          ["step", ["get", "rank"], 12, 1, 10, 2, 10],
+          6,
+          ["step", ["get", "rank"], 15, 1, 14, 2, 14],
+          9,
+          ["step", ["get", "rank"], 24, 1, 16, 2, 16]
+        ],
+        "text-field": ["coalesce", ["get", "name:en"], ["get", "name"]],
+        "visibility": "visible",
+        "text-max-width": 10
+      },
+      "paint": {
+        "text-color": "hsl(0,0%,100%)",
+        "text-opacity": [
+          "step",
+          ["zoom"],
+          0,
+          3,
+          ["case", ["<=", ["get", "rank"], 3], 1, 0],
+          8,
+          ["case", ["==", ["get", "rank"], 0], 0, 1]
+        ],
+        "text-halo-blur": 1,
+        "text-halo-color": "hsl(0,0%,0%)",
+        "text-halo-width": 1
+      }
+    },
+    {
+      "id": "Country labels",
+      "type": "symbol",
+      "source": "openmaptiles",
+      "source-layer": "place",
+      "minzoom": 1,
+      "maxzoom": 12,
+      "filter": [
+        "all",
+        ["==", ["geometry-type"], "Point"],
+        ["match", ["get", "class"], ["country"], true, false]
+      ],
+      "layout": {
+        "text-font": ["Klokantech Noto Sans Bold"],
+        "text-size": [
+          "interpolate",
+          ["linear", 0.75, 1, 0.75, 1],
+          ["zoom"],
+          1,
+          ["step", ["get", "rank"], 13, 1, 12, 2, 12],
+          4,
+          ["step", ["get", "rank"], 15, 1, 14, 2, 14],
+          6,
+          ["step", ["get", "rank"], 23, 1, 18, 2, 18],
+          9,
+          ["step", ["get", "rank"], 27, 1, 22, 2, 22]
+        ],
+        "text-field": ["to-string", ["get", "name:en"]],
+        "visibility": "visible",
+        "text-max-width": 10
+      },
+      "paint": {
+        "text-color": "hsl(0,0%,100%)",
+        "text-halo-blur": 1,
+        "text-halo-color": "hsl(0,0%,0%)",
+        "text-halo-width": 1
+      }
+    },
+    {
+      "id": "Continent labels",
+      "type": "symbol",
+      "metadata": {},
+      "source": "openmaptiles",
+      "source-layer": "place",
+      "maxzoom": 1,
+      "filter": ["==", ["get", "class"], "continent"],
+      "layout": {
+        "text-font": ["Klokantech Noto Sans Bold"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 0, 12, 2, 13],
+        "text-field": ["to-string", ["get", "name"]],
+        "visibility": "visible",
+        "text-justify": "center",
+        "text-transform": "uppercase"
+      },
+      "paint": {
+        "text-color": "hsl(0,0%,100%)",
+        "text-halo-blur": 1,
+        "text-halo-color": "hsl(0,0%,0%)",
+        "text-halo-width": 1
+      }
+    }
+  ],
+  "id": "hybrid"
+}

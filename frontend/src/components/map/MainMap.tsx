@@ -28,8 +28,10 @@ import {
 } from '../../services/linker.ts';
 import { OrganizationMember, Team } from '../../services/types.ts';
 import { trackersActions, useAppDispatch } from '../../store';
+import { darkStyle } from '../../styles/dark.ts';
+import { outdoorStyle } from '../../styles/outdoor.ts';
+import { satelliteStyle } from '../../styles/satellite.ts';
 import { generateAllIcons } from '../../utils/icons.ts';
-import { darkStyle, outdoorStyle, satelliteStyle } from '../../utils/styles.ts';
 import BackgroundLayers from './BackgroundLayers.tsx';
 import CustomOverlay from './CustomOverlay.tsx';
 import MapNoteLayer from './MapNoteLayer.tsx';
@@ -71,25 +73,20 @@ const MainMap = memo(function MainMap({
   const [initialBounds, setInitialBounds] = useState(DEFAULT_INITIAL_BOUNDS);
   const [iconsAdded, setIconsAdded] = useState(true);
   const [showZijwegen, setShowZijwegen] = useState(false);
-  const [pmTilesReady, setPmTilesReady] = useState(false);
 
   const mapRef = useRef<MapRef>(null);
   const { data: tochten } = useGetTochtenQuery();
   const { data: teams } = useGetTeamsQuery();
   const { data: members } = useGetOrganizationMembersQuery();
 
-  const mapStyle = pmTilesReady
-    ? showHeatmap
-      ? darkStyle
-      : showSatellite
-        ? satelliteStyle
-        : outdoorStyle
-    : undefined;
+  const mapStyle = showHeatmap ? darkStyle : showSatellite ? satelliteStyle : outdoorStyle;
 
   useEffect(() => {
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol('pmtiles', protocol.tile);
-    setPmTilesReady(true);
+    return () => {
+      maplibregl.removeProtocol('pmtiles');
+    };
   }, []);
 
   useEffect(() => {
