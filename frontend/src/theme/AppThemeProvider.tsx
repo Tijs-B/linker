@@ -2,7 +2,7 @@ import { ReactNode, memo } from 'react';
 
 import { ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
-import { nlNL } from '@mui/x-date-pickers';
+import { nlNL } from '@mui/x-date-pickers/locales';
 
 declare module '@mui/material/styles' {
   interface Theme {
