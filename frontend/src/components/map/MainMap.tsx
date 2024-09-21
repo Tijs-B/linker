@@ -21,9 +21,6 @@ import { feature, featureCollection } from '@turf/helpers';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-import darkStyle from '../../assets/styles/dark.json';
-import outdoorStyle from '../../assets/styles/outdoor.json';
-import satelliteStyle from '../../assets/styles/satellite.json';
 import {
   useGetOrganizationMembersQuery,
   useGetTeamsQuery,
@@ -32,6 +29,7 @@ import {
 import { OrganizationMember, Team } from '../../services/types.ts';
 import { trackersActions, useAppDispatch } from '../../store';
 import { generateAllIcons } from '../../utils/icons.ts';
+import { darkStyle, outdoorStyle, satelliteStyle } from '../../utils/styles.ts';
 import BackgroundLayers from './BackgroundLayers.tsx';
 import CustomOverlay from './CustomOverlay.tsx';
 import MapNoteLayer from './MapNoteLayer.tsx';
@@ -73,17 +71,25 @@ const MainMap = memo(function MainMap({
   const [initialBounds, setInitialBounds] = useState(DEFAULT_INITIAL_BOUNDS);
   const [iconsAdded, setIconsAdded] = useState(true);
   const [showZijwegen, setShowZijwegen] = useState(false);
+  const [pmTilesReady, setPmTilesReady] = useState(false);
 
   const mapRef = useRef<MapRef>(null);
   const { data: tochten } = useGetTochtenQuery();
   const { data: teams } = useGetTeamsQuery();
   const { data: members } = useGetOrganizationMembersQuery();
 
-  const mapStyle = showHeatmap ? darkStyle : showSatellite ? satelliteStyle : outdoorStyle;
+  const mapStyle = pmTilesReady
+    ? showHeatmap
+      ? darkStyle
+      : showSatellite
+        ? satelliteStyle
+        : outdoorStyle
+    : undefined;
 
   useEffect(() => {
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol('pmtiles', protocol.tile);
+    setPmTilesReady(true);
   }, []);
 
   useEffect(() => {
