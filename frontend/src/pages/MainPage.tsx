@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 import { LngLat, useMap } from 'react-map-gl/maplibre';
 import { useNavigate } from 'react-router-dom';
 
@@ -113,7 +112,17 @@ export default function MainPage() {
   }, [desktop, selectedId]);
 
   // Stop creating marker when escape is pressed
-  useHotkeys('esc', () => setCreatingMarker(null));
+  useEffect(() => {
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setCreatingMarker(null);
+      }
+    }
+    window.addEventListener('keydown', handleEscape);
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+    };
+  });
 
   const showTracker = useCallback(
     (tracker: number | null) => {
