@@ -7,7 +7,7 @@ const demSource = new mlcontour.DemSource({
   encoding: 'terrarium',
   maxzoom: 14,
   worker: true,
-  cacheSize: 100,
+  cacheSize: 200,
   timeoutMs: 10_000,
 });
 demSource.setupMaplibre(maplibregl);
@@ -19,6 +19,7 @@ export const contourUrl = demSource.contourProtocolUrl({
     13: [20, 100],
     14: [10, 100],
   },
+  overzoom: 1,
 });
 
 export const demUrl = demSource.sharedDemProtocolUrl;
