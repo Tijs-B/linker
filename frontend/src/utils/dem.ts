@@ -1,11 +1,10 @@
-// @ts-expect-error No clue
 import mlcontour from 'maplibre-contour';
 import maplibregl from 'maplibre-gl';
 
 const demSource = new mlcontour.DemSource({
   url: 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
   encoding: 'terrarium',
-  maxzoom: 14,
+  maxzoom: 15,
   worker: true,
   cacheSize: 200,
   timeoutMs: 10_000,
