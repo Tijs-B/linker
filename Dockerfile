@@ -24,9 +24,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     libproj-dev \
     gdal-bin
 
-ENV PYTHONBUFFERED 1 \
-    PYTHONDONTWRITEBYTECODE 1 \
-    DJANGO_SETTINGS_MODULE linker.settings
+ENV PYTHONBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    DJANGO_SETTINGS_MODULE=linker.settings
 
 
 COPY backend/requirements.lock .
