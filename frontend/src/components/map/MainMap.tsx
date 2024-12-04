@@ -100,15 +100,21 @@ const MainMap = memo(function MainMap({
     }
   }, [tochten, mapRef, hasRecentered, setRecentered]);
 
-  useEffect(() => {
-    if (teams && members && mapRef && mapRef.current && !iconsAdded) {
+  const addIcons = useCallback(() => {
+    if (teams && members) {
       const allItems = [...Object.values(teams.entities), ...Object.values(members.entities)];
-      setIconsAdded(true);
       generateAllIcons(allItems, (name, image) => {
         mapRef.current!.addImage(name, image);
       });
     }
-  }, [iconsAdded, members, teams, mapRef]);
+  }, [mapRef, teams, members]);
+
+  useEffect(() => {
+    if (teams && members && mapRef && mapRef.current && !iconsAdded) {
+      setIconsAdded(true);
+      addIcons();
+    }
+  }, [iconsAdded, members, teams, mapRef, addIcons]);
 
   const onMouseEnter = useCallback(() => {
     if (!creatingMarker) {
@@ -124,23 +130,23 @@ const MainMap = memo(function MainMap({
   const onToggleHeatmap = useCallback(() => {
     if (showHeatmap) {
       setShowHeatmap(false);
-      setIconsAdded(false);
+      addIcons();
     } else {
       setShowHeatmap(true);
       setShowSatellite(false);
     }
-  }, [showHeatmap]);
+  }, [showHeatmap, addIcons]);
 
   const onToggleSatellite = useCallback(() => {
     if (showSatellite) {
       setShowSatellite(false);
-      setIconsAdded(false);
+      addIcons();
     } else {
       setShowSatellite(true);
       setShowHeatmap(false);
-      setIconsAdded(false);
+      addIcons();
     }
-  }, [showSatellite]);
+  }, [showSatellite, addIcons]);
 
   const onResetBounds = useCallback(() => {
     if (mapRef.current) {
@@ -159,8 +165,6 @@ const MainMap = memo(function MainMap({
     },
     [creatingMarker, dispatch, onCreateMarker],
   );
-
-  const onMapLoad = useCallback(() => setIconsAdded(false), []);
 
   const onToggleZijwegen = useCallback(() => setShowZijwegen((s) => !s), []);
 
@@ -181,7 +185,7 @@ const MainMap = memo(function MainMap({
         // maxPitch={85}
         // terrain={{source: 'relief', exaggeration: 2}}
         // fog={{range: [2,12], color: 'white', 'horizon-blend': 0.1}}
-        onLoad={onMapLoad}
+        onLoad={addIcons}
         attributionControl={false}
         reuseMaps
       >

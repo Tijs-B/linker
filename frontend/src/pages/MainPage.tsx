@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LngLat, useMap } from 'react-map-gl/maplibre';
-import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 import { Paper, useMediaQuery, useTheme } from '@mui/material';
 
@@ -38,7 +38,6 @@ export default function MainPage() {
   const [mapNoteLngLat, setMapNoteLngLat] = useState<LngLat | null>(null);
   const [trackerLogLngLat, setTrackerLogLngLat] = useState<LngLat | null>(null);
   const { mainMap } = useMap();
-  const navigate = useNavigate();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const dispatch = useAppDispatch();
@@ -78,13 +77,6 @@ export default function MainPage() {
     skipPollingIfUnfocused: true,
   });
 
-  // Navigate to login page if unauthenticated
-  useEffect(() => {
-    if (user && user.username === null) {
-      navigate('/login/');
-    }
-  }, [navigate, user]);
-
   // Check query error for network errors
   useEffect(() => {
     if (queryError !== undefined && networkErrorNotificationId === null) {
@@ -102,7 +94,7 @@ export default function MainPage() {
         preventDuplicate: true,
       });
     }
-  }, [dispatch, enqueueSnackbar, navigate, queryError, networkErrorNotificationId, closeSnackbar]);
+  }, [dispatch, enqueueSnackbar, queryError, networkErrorNotificationId, closeSnackbar]);
 
   // Close the list on mobile when team is selected
   useEffect(() => {
@@ -313,6 +305,11 @@ export default function MainPage() {
     grid-area: 1 / 1;
     z-index: 4;
   `;
+
+  // Navigate to login page if unauthenticated
+  if (user && user.username === null) {
+    return <Navigate to={'/login'} />;
+  }
 
   return (
     <div

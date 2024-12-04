@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useCallback } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
 
@@ -36,11 +36,9 @@ export default function LoginPage() {
     [loginUser, enqueueSnackbar, navigate],
   );
 
-  useEffect(() => {
-    if (user?.username) {
-      navigate('/');
-    }
-  }, [navigate, user]);
+  if (user?.username) {
+    return <Navigate to={'/'} />;
+  }
 
   return (
     <Container component="main" maxWidth="xs">
