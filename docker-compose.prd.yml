@@ -74,7 +74,7 @@ services:
       - linker_net
 
   postgis:
-    image: kartoza/postgis:16-3.4
+    image: kartoza/postgis:17-3.5
     environment:
       - POSTGRES_DB=linker
       - POSTGRES_USER=root
