@@ -12,6 +12,7 @@ services:
       - ./backend:/app
       - ./media:/media
       - heatmap-data:/heatmap
+      - /app/.venv
     environment:
       - ALLOWED_HOSTS=*
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker

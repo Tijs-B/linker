@@ -1,32 +1,29 @@
 [project]
 name = "backend"
 version = "0.1.0"
+description = "backend for linker"
+readme = "README.md"
+requires-python = ">=3.13"
 dependencies = [
-    "Django>=5.0.1",
-    "djangorestframework>=3.14.0",
-    "psycopg>=3.1.18",
     "celery>=5.3.6",
-    "redis>=5.0.1",
-    "django-environ>=0.11.2",
-    "django-enumfields>=2.1.1",
-    "openpyxl>=3.1.2",
-    "geopy>=2.4.1",
-    "Pillow>=10.2.0",
-    "djangorestframework-gis>=1.0",
-    "gunicorn>=21.2.0",
-    "django-debug-toolbar>=4.3.0",
-    "watchdog>=3.0.0",
-    "requests>=2.31.0",
-    "django-extensions>=3.2.3",
-    "ipython>=8.23.0",
+    "Django>=5.0.1",
     "django-celery-beat>=2.6.0",
-]
-
-[tool.rye]
-managed = true
-virtual = true
-dev-dependencies = [
-    "ruff>=0.2.0",
+    "django-debug-toolbar>=4.3.0",
+    "django-enumfields>=2.1.1",
+    "django-environ>=0.11.2",
+    "django-extensions>=3.2.3",
+    "djangorestframework-gis>=1.0",
+    "djangorestframework>=3.14.0",
+    "geopy>=2.4.1",
+    "gunicorn>=21.2.0",
+    "ipython>=8.23.0",
+    "openpyxl>=3.1.2",
+    "Pillow>=10.2.0",
+    "psycopg>=3.1.18",
+    "redis>=5.0.1",
+    "ruff>=0.9.6",
+    "requests>=2.31.0",
+    "watchdog>=3.0.0",
 ]
 
 [tool.ruff]
@@ -36,3 +33,5 @@ line-length = 120
 [tool.ruff.format]
 quote-style = "single"
 
+[tool.uv]
+package = false

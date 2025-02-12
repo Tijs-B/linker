@@ -15,7 +15,9 @@ RUN npm run build
 ###############
 ### BACKEND ###
 ###############
-FROM python:3.12-bullseye AS backend
+FROM python:3.13-bullseye AS backend
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -24,14 +26,14 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     libproj-dev \
     gdal-bin
 
-ENV PYTHONBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    DJANGO_SETTINGS_MODULE=linker.settings
+ENV DJANGO_SETTINGS_MODULE=linker.settings
 
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=backend/uv.lock,target=uv.lock \
+    --mount=type=bind,source=backend/pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --compile-bytecode
 
-COPY backend/requirements.lock .
-
-RUN pip install -r requirements.lock
+ENV PATH="/app/.venv/bin:$PATH"
 
 COPY --chmod=0755 backend/docker-entrypoint.sh ./docker-entrypoint.sh
 ENTRYPOINT ["./docker-entrypoint.sh"]
