@@ -62,19 +62,7 @@ def generate_heatmap_tiles(result_path: Path):
 
     heatmap_tif = tmp_dir / 'heatmap.tif'
     subprocess.run(
-        [
-            'gdal_rasterize',
-            '-add',
-            '-ts',
-            '5000',
-            '5000',
-            '-burn',
-            '1',
-            '-l',
-            'tracks',
-            tracks_geojson,
-            heatmap_tif,
-        ]
+        ['gdal_rasterize', '-add', '-ts', '5000', '5000', '-burn', '1', '-l', 'tracks', tracks_geojson, heatmap_tif]
     )
 
     gdalinfo_stats = subprocess.check_output(['gdalinfo', '-stats', heatmap_tif]).decode('utf-8')
@@ -91,16 +79,7 @@ def generate_heatmap_tiles(result_path: Path):
     )
 
     heatmap_color_tif = tmp_dir / 'heatmap_color.tif'
-    subprocess.run(
-        [
-            'gdaldem',
-            'color-relief',
-            '-alpha',
-            heatmap_tif,
-            color_file,
-            heatmap_color_tif,
-        ]
-    )
+    subprocess.run(['gdaldem', 'color-relief', '-alpha', heatmap_tif, color_file, heatmap_color_tif])
 
     for path in result_path.glob('*'):
         if path.is_file():
