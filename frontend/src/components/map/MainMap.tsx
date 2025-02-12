@@ -104,7 +104,9 @@ const MainMap = memo(function MainMap({
     if (teams && members) {
       const allItems = [...Object.values(teams.entities), ...Object.values(members.entities)];
       generateAllIcons(allItems, (name, image) => {
-        mapRef.current!.addImage(name, image);
+        if (mapRef.current) {
+          mapRef.current.addImage(name, image);
+        }
       });
     }
   }, [mapRef, teams, members]);

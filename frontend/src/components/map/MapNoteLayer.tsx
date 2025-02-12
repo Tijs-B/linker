@@ -160,7 +160,7 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
             fullWidth
             margin="dense"
             multiline
-            inputProps={{ spellCheck: 'false' }}
+            slotProps={{ input: { spellCheck: false } }}
             required
           />
           <DialogContentText>

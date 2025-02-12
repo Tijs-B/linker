@@ -320,7 +320,7 @@ const TeamPage = memo(function TeamPage() {
                         value={newNoteText}
                         onChange={(e) => setNewNoteText(e.target.value)}
                         multiline
-                        inputProps={{ spellCheck: 'false' }}
+                        slotProps={{ input: { spellCheck: false } }}
                       />
                       <Button variant="contained" onClick={createNote}>
                         Post
