@@ -7,3 +7,4 @@ frontend/dev-dist/
 backend/.env
 celerybeat-schedule
 .DS_Store
+db_dump
