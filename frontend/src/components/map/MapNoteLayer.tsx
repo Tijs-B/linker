@@ -1,4 +1,4 @@
-import { ChangeEvent, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { Layer, MapLayerMouseEvent, Source, useMap } from 'react-map-gl/maplibre';
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -33,7 +33,7 @@ type HoverInfo = {
   content: string;
 };
 
-const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean }) {
+export default function MapNoteLayer({ visible }: { visible: boolean }) {
   const { mainMap } = useMap();
   const [selectedNote, setSelectedNote] = useState<MapNote | null>(null);
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
@@ -199,6 +199,4 @@ const MapNoteLayer = memo(function MapNoteLayer({ visible }: { visible: boolean 
       )}
     </>
   );
-});
-
-export default MapNoteLayer;
+}

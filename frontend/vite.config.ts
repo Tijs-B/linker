@@ -1,8 +1,10 @@
-import react from '@vitejs/plugin-react-swc';
+import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 import manifest from './manifest.json';
+
+const ReactCompilerConfig = { /* ... */ };
 
 export default defineConfig(({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
@@ -10,6 +12,11 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react({
         jsxImportSource: '@emotion/react',
+        babel: {
+          plugins: [
+            ["babel-plugin-react-compiler", ReactCompilerConfig]
+          ]
+        }
       }),
       VitePWA({
         manifest,

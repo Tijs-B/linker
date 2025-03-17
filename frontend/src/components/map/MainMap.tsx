@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Map, {
   GeolocateControl,
   LngLat,
@@ -54,7 +54,7 @@ interface MainMapProps {
   onToggleMapNoteCreation: () => void;
 }
 
-const MainMap = memo(function MainMap({
+export default function MainMap({
   filteredTeams,
   filteredMembers,
   creatingMarker,
@@ -255,6 +255,4 @@ const MainMap = memo(function MainMap({
       </Map>
     </>
   );
-});
-
-export default MainMap;
+}

@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
 import { red } from '@mui/material/colors';
@@ -8,7 +7,7 @@ import { skipToken } from '@reduxjs/toolkit/query';
 import { useGetTrackerTrackQuery } from '../../services/linker.ts';
 import { selectSelectedItem, useAppSelector } from '../../store';
 
-const TrackerHistoryLayer = memo(function TrackerHistoryLayer({ visible }: { visible: boolean }) {
+export default function TrackerHistoryLayer({ visible }: { visible: boolean }) {
   const selectedItem = useAppSelector(selectSelectedItem);
   const { currentData: track } = useGetTrackerTrackQuery(
     selectedItem?.tracker ? selectedItem.tracker : skipToken,
@@ -40,6 +39,4 @@ const TrackerHistoryLayer = memo(function TrackerHistoryLayer({ visible }: { vis
       />
     </Source>
   );
-});
-
-export default TrackerHistoryLayer;
+}

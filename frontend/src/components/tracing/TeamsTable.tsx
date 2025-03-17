@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 import {
@@ -92,7 +91,7 @@ interface TeamsTableProps {
   showFull: boolean;
 }
 
-const TeamsTable = memo(function TeamTable({
+export default function TeamTable({
   teams,
   fiches,
   tochten,
@@ -131,6 +130,4 @@ const TeamsTable = memo(function TeamTable({
       </Table>
     </TableContainer>
   );
-});
-
-export default TeamsTable;
+}

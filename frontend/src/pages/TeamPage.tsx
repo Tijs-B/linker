@@ -1,4 +1,4 @@
-import { ChangeEvent, memo, useCallback, useMemo, useState } from 'react';
+import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -66,7 +66,7 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-const TeamPage = memo(function TeamPage() {
+export default function TeamPage() {
   const { teamId } = useParams();
 
   const { data: teams } = useGetTeamsQuery();
@@ -377,6 +377,4 @@ const TeamPage = memo(function TeamPage() {
       </Container>
     </>
   );
-});
-
-export default TeamPage;
+}

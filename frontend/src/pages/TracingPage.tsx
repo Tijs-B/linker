@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -32,7 +32,7 @@ import {
   useGetWeidesQuery,
 } from '../services/linker.ts';
 
-const TracingPage = memo(function TracingPage() {
+export default function TracingPage() {
   const { data: fiches } = useGetFichesQuery();
   const { data: tochten } = useGetTochtenQuery();
   const { data: weides } = useGetWeidesQuery();
@@ -125,6 +125,4 @@ const TracingPage = memo(function TracingPage() {
       </Container>
     </>
   );
-});
-
-export default TracingPage;
+}

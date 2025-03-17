@@ -14,9 +14,13 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   settings: { react: { version: '18.2' } },
-  plugins: ['react-refresh'],
+  plugins: [
+    'react-refresh',
+    'eslint-plugin-react-compiler',
+  ],
   rules: {
     'react-refresh/only-export-components': 'warn',
     'react/prop-types': 'off',
+    'react-compiler/react-compiler': 'error',
   },
 };

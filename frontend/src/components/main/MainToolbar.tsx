@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -34,7 +34,7 @@ interface MainToolbarProps {
   onForceUpdate: () => void;
 }
 
-const MainToolbar = memo(function MainToolbar({
+export default function MainToolbar({
   keyword,
   onChangeKeyword,
   onSearchEnter,
@@ -144,6 +144,4 @@ const MainToolbar = memo(function MainToolbar({
       </Box>
     </Toolbar>
   );
-});
-
-export default MainToolbar;
+}

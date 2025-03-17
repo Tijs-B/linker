@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import {
   Paper,
@@ -41,17 +41,19 @@ interface StatsTableProps {
   teams: EntityState<Team, number>;
 }
 
-const StatsTable = memo(function StatsTable({
+export default function StatsTable({
   fiches,
   tochten,
   stats,
   checkpointLogs,
   teams,
 }: StatsTableProps) {
-  const nbFichesPerTocht = tochten.ids.map((id) => ({
-    id,
-    nbFiches: Object.values(fiches.entities).filter((fiche) => fiche.tocht === id).length,
-  }));
+  const nbFichesPerTocht = useMemo(() => {
+    return tochten.ids.map((id) => ({
+      id,
+      nbFiches: Object.values(fiches.entities).filter((fiche) => fiche.tocht === id).length,
+    }));
+  }, [fiches, tochten]);
 
   const [minFicheTime, maxFicheTime] = useMemo(() => {
     const ficheTimes = fiches.ids.flatMap((id) => [
@@ -145,6 +147,4 @@ const StatsTable = memo(function StatsTable({
       </Table>
     </TableContainer>
   );
-});
-
-export default StatsTable;
+}

@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -33,7 +33,7 @@ import { itemColor } from '../../theme/colors.ts';
 import { formatDateTimeLong } from '../../utils/time.ts';
 import MainCard from './MainCard.tsx';
 
-const HistoryCard = memo(function HistoryCard() {
+export default function HistoryCard() {
   const dispatch = useAppDispatch();
   const showHistory = useAppSelector((state) => state.trackers.showHistory);
 
@@ -148,6 +148,4 @@ const HistoryCard = memo(function HistoryCard() {
       </CardContent>
     </MainCard>
   );
-});
-
-export default HistoryCard;
+}

@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
@@ -9,7 +9,7 @@ import { BottomNavigation, BottomNavigationAction, Paper } from '@mui/material';
 
 import { useGetUserQuery, useLogoutUserMutation } from '../../services/linker.ts';
 
-const BottomMenu = memo(function BottomMenu() {
+export default function BottomMenu() {
   const location = useLocation();
   const navigate = useNavigate();
   const logoutUser = useLogoutUserMutation()[0];
@@ -63,6 +63,4 @@ const BottomMenu = memo(function BottomMenu() {
       </BottomNavigation>
     </Paper>
   );
-});
-
-export default BottomMenu;
+}

@@ -1,4 +1,4 @@
-import { memo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
 interface MapPaddingProps {
@@ -8,12 +8,7 @@ interface MapPaddingProps {
   left?: number;
 }
 
-const MapPadding = memo(function MapPadding({
-  top = 0,
-  right = 0,
-  bottom = 0,
-  left = 0,
-}: MapPaddingProps) {
+export default function MapPadding({ top = 0, right = 0, bottom = 0, left = 0 }: MapPaddingProps) {
   const { mainMap } = useMap();
 
   useEffect(() => {
@@ -28,6 +23,4 @@ const MapPadding = memo(function MapPadding({
   }, [top, right, bottom, left, mainMap]);
 
   return null;
-});
-
-export default MapPadding;
+}

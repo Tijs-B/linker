@@ -1,4 +1,4 @@
-import { CSSProperties, memo, useCallback, useMemo } from 'react';
+import { CSSProperties, useCallback, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
 
@@ -75,7 +75,7 @@ interface SearchListProps {
   teams: Team[];
 }
 
-export default memo(function SearchList({ members, teams, onClick }: SearchListProps) {
+export default function SearchList({ members, teams, onClick }: SearchListProps) {
   const { data: fiches } = useGetFichesQuery();
   const { data: tochten } = useGetTochtenQuery();
   const { data: weides } = useGetWeidesQuery();
@@ -121,4 +121,4 @@ export default memo(function SearchList({ members, teams, onClick }: SearchListP
       )}
     </AutoSizer>
   );
-});
+}

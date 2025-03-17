@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 
 import { FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 
@@ -9,7 +9,7 @@ interface SafeSelectorProps {
   team: Team;
 }
 
-const SafeSelector = memo(function SafeSelector({ team }: SafeSelectorProps) {
+export default function SafeSelector({ team }: SafeSelectorProps) {
   const { data: weides } = useGetWeidesQuery();
   const { data: user } = useGetUserQuery();
   const updateTeam = useUpdateTeamMutation()[0];
@@ -47,6 +47,4 @@ const SafeSelector = memo(function SafeSelector({ team }: SafeSelectorProps) {
       </Select>
     </FormControl>
   );
-});
-
-export default SafeSelector;
+}

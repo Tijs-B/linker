@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
 import { green, grey, red } from '@mui/material/colors';
@@ -21,7 +21,7 @@ interface BackgroundLayersProps {
   showZijwegen: boolean;
 }
 
-const BackgroundLayers = memo(function BackgroundLayers({
+export default function BackgroundLayers({
   showHeatmap,
   showZijwegen,
   showSatellite,
@@ -287,6 +287,4 @@ const BackgroundLayers = memo(function BackgroundLayers({
       </Source>
     </>
   );
-});
-
-export default BackgroundLayers;
+}

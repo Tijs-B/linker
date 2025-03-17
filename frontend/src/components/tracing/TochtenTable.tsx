@@ -1,5 +1,3 @@
-import { memo } from 'react';
-
 import {
   Paper,
   Table,
@@ -22,12 +20,7 @@ interface TochtenTableProps {
   showFull: boolean;
 }
 
-const TochtenTable = memo(function TochtenTable({
-  tochten,
-  fiches,
-  stats,
-  showFull,
-}: TochtenTableProps) {
+export default function TochtenTable({ tochten, fiches, stats, showFull }: TochtenTableProps) {
   const theStats = showFull ? stats.fullTochten : stats.partialTochten;
   const rows = tochten.ids.map((tochtId) => {
     const tocht = tochten.entities[tochtId];
@@ -79,6 +72,4 @@ const TochtenTable = memo(function TochtenTable({
       </Table>
     </TableContainer>
   );
-});
-
-export default TochtenTable;
+}

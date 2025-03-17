@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 
 import CallIcon from '@mui/icons-material/Call';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -20,7 +20,7 @@ interface ContactPersonItemProps {
   person: ContactPerson;
 }
 
-const ContactPersonItem = memo(function ContactPersonItem({ person }: ContactPersonItemProps) {
+function ContactPersonItem({ person }: ContactPersonItemProps) {
   const updateContactPerson = useUpdateContactPersonMutation()[0];
 
   const copyPhoneNumber = useCallback(() => {
@@ -64,13 +64,13 @@ const ContactPersonItem = memo(function ContactPersonItem({ person }: ContactPer
       </ListItemButton>
     </ListItem>
   );
-});
+}
 
 interface ContactPersonsListProps {
   team: Team;
 }
 
-const ContactPersonsList = memo(function ContactPersonsList({ team }: ContactPersonsListProps) {
+export default function ContactPersonsList({ team }: ContactPersonsListProps) {
   return (
     <>
       <List dense>
@@ -80,6 +80,4 @@ const ContactPersonsList = memo(function ContactPersonsList({ team }: ContactPer
       </List>
     </>
   );
-});
-
-export default ContactPersonsList;
+}

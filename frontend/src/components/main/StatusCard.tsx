@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 import CallIcon from '@mui/icons-material/Call';
@@ -119,7 +119,7 @@ function TeamRows({ team }: { team: Team }) {
   );
 }
 
-const TeamCallButton = memo(function ({ team }: { team: Team }) {
+function TeamCallButton({ team }: { team: Team }) {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const onClick = useCallback(
@@ -149,14 +149,14 @@ const TeamCallButton = memo(function ({ team }: { team: Team }) {
       </Menu>
     </>
   );
-});
+}
 
 interface StatusCardProps {
   onStartTrackerLogCreation: () => void;
   isCreatingTrackerLog: boolean;
 }
 
-const StatusCard = memo(function StatusCard({
+export default function StatusCard({
   onStartTrackerLogCreation,
   isCreatingTrackerLog,
 }: StatusCardProps) {
@@ -266,6 +266,4 @@ const StatusCard = memo(function StatusCard({
       </CardActions>
     </MainCard>
   );
-});
-
-export default StatusCard;
+}

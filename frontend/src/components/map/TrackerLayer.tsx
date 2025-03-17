@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Layer, MapLayerMouseEvent, Source, useMap } from 'react-map-gl/maplibre';
 
 import { feature, featureCollection } from '@turf/helpers';
@@ -20,7 +20,7 @@ interface TrackerLayerProps {
   filteredMembers: OrganizationMember[];
 }
 
-const TrackerLayer = memo(function TrackerLayer({
+export default function TrackerLayer({
   visible,
   filteredTeams,
   filteredMembers,
@@ -155,6 +155,4 @@ const TrackerLayer = memo(function TrackerLayer({
       </Source>
     </>
   );
-});
-
-export default TrackerLayer;
+}

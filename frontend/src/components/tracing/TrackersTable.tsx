@@ -1,5 +1,3 @@
-import { memo } from 'react';
-
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckIcon from '@mui/icons-material/Check';
 import {
@@ -24,11 +22,7 @@ interface TrackersTableProps {
   members: EntityState<OrganizationMember, number>;
 }
 
-const TrackersTable = memo(function TrackersTable({
-  trackers,
-  teams,
-  members,
-}: TrackersTableProps) {
+export default function TrackersTable({ trackers, teams, members }: TrackersTableProps) {
   const coupledMapping: { [key: number]: string } = {};
 
   Object.values(teams.entities).forEach((team) => {
@@ -92,6 +86,4 @@ const TrackersTable = memo(function TrackersTable({
       </Table>
     </TableContainer>
   );
-});
-
-export default TrackersTable;
+}
