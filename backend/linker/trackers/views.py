@@ -1,4 +1,3 @@
-
 from django.contrib.gis.measure import D
 from django.db.models import Subquery, OuterRef
 from django.http import HttpResponse

@@ -2,6 +2,7 @@ import csv
 import json
 import re
 from pathlib import Path
+from typing import Any
 
 from django.contrib.gis.gdal import DataSource, GDALException
 from django.contrib.gis.geos import GEOSGeometry
@@ -57,19 +58,8 @@ def import_gpkg(filename: Path):
             pass
 
 
-def import_geoserver(base_url: str | None = None):
-    params = {
-        'service': 'WFS',
-        'version': '1.0.0',
-        'request': 'GetFeature',
-        'typeName': 'Chirolink:tochten_2024',
-        'maxFeatures': 1000,
-        'outputFormat': 'application/json',
-    }
-    tochten = get(base_url + '/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:tochten_2024'})
-    tochten = tochten.json()
-
-    for feature in tochten['features']:
+def _import_geojson_tochten(geojson: dict[str, Any]) -> None:
+    for feature in geojson['features']:
         if feature.get('geometry') is not None:
             route = GEOSGeometry(json.dumps(feature['geometry']))
             letter = feature['properties']['letter']
@@ -79,10 +69,9 @@ def import_geoserver(base_url: str | None = None):
                 defaults=dict(route=route),
             )
 
-    weides = get(base_url + '/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:weides_2024'})
-    weides = weides.json()
 
-    for feature in weides['features']:
+def _import_geojson_weides(geojson: dict[str, Any]) -> None:
+    for feature in geojson['features']:
         if feature.get('geometry') is not None:
             polygon = GEOSGeometry(json.dumps(feature['geometry']))
             letter = feature['properties']['letter'][0].upper()
@@ -99,10 +88,9 @@ def import_geoserver(base_url: str | None = None):
             tocht = Tocht.objects.get(identifier=letter)
             Weide.objects.update_or_create(tocht=tocht, defaults=dict(polygon=polygon, identifier=letter, name=name))
 
-    fiches = get(base_url + '/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:fiches_2024'})
-    fiches = fiches.json()
 
-    for feature in fiches['features']:
+def _import_geojson_fiches(geojson: dict[str, Any]) -> None:
+    for feature in geojson['features']:
         if feature.get('geometry') is not None:
             point = GEOSGeometry(json.dumps(feature['geometry']))
             name = feature['properties']['name']
@@ -114,14 +102,52 @@ def import_geoserver(base_url: str | None = None):
                 defaults=dict(point=point),
             )
 
-    zijwegen = get(base_url + '/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:zijwegen_2024'})
-    zijwegen = zijwegen.json()
 
+def _import_geojson_zijwegen(geojson: dict[str, Any]) -> None:
     Zijweg.objects.all().delete()
-    for feature in zijwegen['features']:
+    for feature in geojson['features']:
         if feature.get('geometry') is not None:
             line = GEOSGeometry(json.dumps(feature['geometry']))
             Zijweg.objects.create(geom=line)
+
+
+def import_geoserver(base_url: str):
+    params = {
+        'service': 'WFS',
+        'version': '1.0.0',
+        'request': 'GetFeature',
+        'typeName': 'Chirolink:tochten_2024',
+        'maxFeatures': 1000,
+        'outputFormat': 'application/json',
+    }
+    tochten = get(base_url + '/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:tochten_2024'})
+    _import_geojson_tochten(tochten.json())
+
+    weides = get(base_url + '/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:weides_2024'})
+    _import_geojson_weides(weides.json())
+
+    fiches = get(base_url + '/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:fiches_2024'})
+    _import_geojson_fiches(fiches.json())
+
+    zijwegen = get(base_url + '/geoserver/Chirolink/ows', params={**params, 'typeName': 'Chirolink:zijwegen_2024'})
+    _import_geojson_zijwegen(zijwegen.json())
+
+
+def import_featureserv(base_url: str):
+    params = {'limit': 10_000}
+    stripped = base_url.rstrip('/')
+
+    tochten = get(stripped + '/collections/public.tochten_2025/items.json', params=params)
+    _import_geojson_tochten(tochten.json())
+
+    weides = get(stripped + '/collections/public.weides_2025/items.json', params=params)
+    _import_geojson_weides(weides.json())
+
+    fiches = get(stripped + '/collections/public.fiches_2025/items.json', params=params)
+    _import_geojson_fiches(fiches.json())
+
+    zijwegen = get(stripped + '/collections/public.zijwegen_2025/items.json', params=params)
+    _import_geojson_zijwegen(zijwegen.json())
 
 
 def import_groepen_en_deelnemers(filename: Path):
