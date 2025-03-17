@@ -1,7 +1,6 @@
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckIcon from '@mui/icons-material/Check';
 import {
-  Alert,
   Paper,
   Table,
   TableBody,
@@ -14,7 +13,6 @@ import {
 import { EntityState } from '@reduxjs/toolkit';
 
 import { OrganizationMember, Team, Tracker } from '../../services/types.ts';
-import { formatDateTimeLong } from '../../utils/time.ts';
 
 interface TrackersTableProps {
   trackers: EntityState<Tracker, number>;
@@ -44,8 +42,6 @@ export default function TrackersTable({ trackers, teams, members }: TrackersTabl
           <TableRow>
             <TableCell>Code</TableCell>
             <TableCell>Online</TableCell>
-            <TableCell>Batterijniveau OK</TableCell>
-            <TableCell>SOS</TableCell>
             <TableCell>Gekoppeld aan</TableCell>
           </TableRow>
         </TableHead>
@@ -60,20 +56,6 @@ export default function TrackersTable({ trackers, teams, members }: TrackersTabl
                     <CheckIcon color="success" fontSize="small" />
                   ) : (
                     <CancelIcon color="warning" fontSize="small" />
-                  )}
-                </TableCell>
-                <TableCell>
-                  {tracker.battery_low ? (
-                    <CancelIcon color="warning" fontSize="small" />
-                  ) : (
-                    <CheckIcon color="success" fontSize="small" />
-                  )}
-                </TableCell>
-                <TableCell>
-                  {tracker.sos_sent ? (
-                    <Alert severity="warning">{formatDateTimeLong(tracker.sos_sent)}</Alert>
-                  ) : (
-                    '-'
                   )}
                 </TableCell>
                 <TableCell>

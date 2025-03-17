@@ -31,13 +31,7 @@ class TrackerSerializer(serializers.ModelSerializer):
     tocht = serializers.IntegerField(read_only=True)
     basis = serializers.IntegerField(read_only=True)
 
-    is_coupled = serializers.SerializerMethodField()
     is_online = serializers.SerializerMethodField()
-    battery_low = serializers.BooleanField()
-    sos_sent = serializers.DateTimeField()
-
-    def get_is_coupled(self, obj):
-        return hasattr(obj, 'team') or hasattr(obj, 'organizationmember')
 
     def get_is_online(self, obj):
         if obj.last_log is None:
@@ -55,9 +49,6 @@ class TrackerSerializer(serializers.ModelSerializer):
             'weide',
             'tocht',
             'basis',
-            'is_coupled',
             'is_online',
-            'battery_low',
-            'sos_sent',
         ]
         read_only_fields = fields

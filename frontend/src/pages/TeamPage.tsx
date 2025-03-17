@@ -231,28 +231,6 @@ export default function TeamPage() {
                         <TableCell>Trackercode</TableCell>
                         <TableCell>{tracker?.tracker_name}</TableCell>
                       </TableRow>
-                      <TableRow>
-                        <TableCell>Tracker SOS</TableCell>
-                        <TableCell>
-                          {tracker?.sos_sent ? (
-                            <Alert severity="error">
-                              Verstuurd op {formatDateTimeLong(tracker.sos_sent)}
-                            </Alert>
-                          ) : (
-                            '-'
-                          )}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Batterijniveau</TableCell>
-                        <TableCell>
-                          {tracker?.battery_low ? (
-                            <Alert>Laag batterijniveau</Alert>
-                          ) : (
-                            <Alert>OK</Alert>
-                          )}
-                        </TableCell>
-                      </TableRow>
                     </TableBody>
                   </Table>
                 </Container>

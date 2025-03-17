@@ -85,24 +85,12 @@ function TeamRows({ team }: { team: Team }) {
       </TableRow>
       <TableRow>
         <TableCell css={cell}>
-          <Typography variant="body2">Gem. afwijking voor tochten</Typography>
+          <Typography variant="body2">Snelheid</Typography>
         </TableCell>
         <TableCell css={cell}>
           <Typography variant="body2" color="textSecondary">
             {teamStats && teamStats.avgPartialTochtDeviation
               ? secondsToHoursMinutes(teamStats.avgPartialTochtDeviation)
-              : '-'}
-          </Typography>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell css={cell}>
-          <Typography variant="body2">Gem. afwijking voor fiches</Typography>
-        </TableCell>
-        <TableCell css={cell}>
-          <Typography variant="body2" color="textSecondary">
-            {teamStats && teamStats.avgFicheDeviation
-              ? secondsToHoursMinutes(teamStats.avgFicheDeviation)
               : '-'}
           </Typography>
         </TableCell>

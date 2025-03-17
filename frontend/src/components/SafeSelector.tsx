@@ -24,7 +24,9 @@ export default function SafeSelector({ team }: SafeSelectorProps) {
   );
 
   if (user === undefined || !user.permissions.includes('change_team')) {
-    if (team.safe_weide === null || weides === undefined) {
+    if (!weides) {
+      return '-';
+    } else if (team.safe_weide === null) {
       return 'Unsafe';
     } else {
       return weides.entities[team.safe_weide].name;

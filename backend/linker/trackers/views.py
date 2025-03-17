@@ -1,16 +1,14 @@
-from datetime import timedelta
 
 from django.contrib.gis.measure import D
-from django.db.models import Subquery, OuterRef, Exists
+from django.db.models import Subquery, OuterRef
 from django.http import HttpResponse
-from django.utils.timezone import now
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.mixins import CreateModelMixin
 
 from linker.map.models import Fiche, Tocht, Weide, Basis
 from linker.tracing.constants import FICHE_MAX_DISTANCE, TOCHT_MAX_DISTANCE, WEIDE_MAX_DISTANCE, GEBIED_MAX_DISTANCE
-from linker.trackers.constants import TRACKER_BATTERY_LOW_MINUTES, TrackerLogSource
+from linker.trackers.constants import TrackerLogSource
 from linker.trackers.models import Tracker, TrackerLog
 from linker.trackers.serializers import TrackerSerializer, TrackerLogSerializer
 
@@ -42,18 +40,6 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
                     Basis.objects.filter(
                         point__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))
                     ).values('pk')[:1]
-                ),
-                battery_low=Exists(
-                    TrackerLog.objects.filter(
-                        tracker=OuterRef('pk'),
-                        gps_datetime__gte=now() - timedelta(minutes=TRACKER_BATTERY_LOW_MINUTES),
-                        tracker_type__in=(1000, 1001, 1002),
-                    )
-                ),
-                sos_sent=Subquery(
-                    TrackerLog.objects.filter(tracker=OuterRef('pk'), tracker_type__in=(17006, 200))
-                    .order_by('-gps_datetime')
-                    .values('gps_datetime')[:1]
                 ),
             )
         )
