@@ -41,6 +41,9 @@ interface CustomOverlayProps {
 }
 
 export default function CustomOverlay({ children, position = 'top-right' }: CustomOverlayProps) {
+  // eslint-disable-next-line
+  'use no memo';
+
   const [, setVersion] = useState(0);
   const ctrl = useControl(
     () => {
