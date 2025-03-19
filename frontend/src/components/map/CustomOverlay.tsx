@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ControlPosition, IControl, MapInstance, useControl } from 'react-map-gl/maplibre';
 
@@ -40,10 +40,7 @@ interface CustomOverlayProps {
   position?: ControlPosition;
 }
 
-const CustomOverlay = memo(function CustomOverlay({
-  children,
-  position = 'top-right',
-}: CustomOverlayProps) {
+export default function CustomOverlay({ children, position = 'top-right' }: CustomOverlayProps) {
   const [, setVersion] = useState(0);
   const ctrl = useControl(
     () => {
@@ -61,6 +58,4 @@ const CustomOverlay = memo(function CustomOverlay({
       ctrl.getElement(),
     )
   );
-});
-
-export default CustomOverlay;
+}
