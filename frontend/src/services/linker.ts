@@ -13,6 +13,7 @@ import {
   ForbiddenArea,
   LoginUser,
   MapNote,
+  Notification,
   OrganizationMember,
   Stats,
   Team,
@@ -51,7 +52,7 @@ export const linkerApi = createApi({
   refetchOnFocus: true,
   refetchOnReconnect: true,
   refetchOnMountOrArgChange: 30,
-  tagTypes: ['Team', 'MapNote', 'Tracker', 'TrackerLogs'],
+  tagTypes: ['Team', 'MapNote', 'Tracker', 'TrackerLogs', 'Notifications'],
   endpoints: (build) => ({
     getTrackers: build.query<EntityState<Tracker, number>, void>({
       query: () => '/trackers/',
@@ -140,6 +141,10 @@ export const linkerApi = createApi({
     }),
     getUser: build.query<User, void>({
       query: () => '/user/',
+    }),
+    getNotifications: build.query<Notification[], void>({
+      query: () => '/notifications/',
+      providesTags: ['Notifications'],
     }),
     loginUser: build.mutation<User, LoginUser>({
       query: (body) => ({
@@ -253,6 +258,20 @@ export const linkerApi = createApi({
       }),
       invalidatesTags: ['Team'],
     }),
+    markNotificationAsRead: build.mutation<void, number>({
+      query: (id) => ({
+        url: `/notifications/${id}/mark-as-read/`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Notifications'],
+    }),
+    markAllNotificationsAsRead: build.mutation<void, void>({
+      query: () => ({
+        url: `/notifications/mark-all-as-read/`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Notifications'],
+    }),
   }),
 });
 
@@ -272,6 +291,7 @@ export const {
   useGetStatsQuery,
   useGetForbiddenAreasQuery,
   useGetUserQuery,
+  useGetNotificationsQuery,
   useLoginUserMutation,
   useLogoutUserMutation,
   useCreateTeamNoteMutation,
@@ -283,4 +303,6 @@ export const {
   useUpdateTeamMutation,
   useUpdateContactPersonMutation,
   useUploadGroupPictureMutation,
+  useMarkNotificationAsReadMutation,
+  useMarkAllNotificationsAsReadMutation,
 } = linkerApi;

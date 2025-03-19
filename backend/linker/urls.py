@@ -23,7 +23,7 @@ from linker.people.views import (
     UserView,
     LogoutView,
 )
-from linker.tracing.views import CheckpointLogViewSet, StatsView
+from linker.tracing.views import CheckpointLogViewSet, StatsView, NotificationViewSet
 from linker.trackers.views import TrackerViewSet, TrackerLogViewSet
 
 router = routers.DefaultRouter()
@@ -41,6 +41,7 @@ router.register('basis', BasisViewSet)
 router.register('forbidden-areas', ForbiddenAreaViewSet)
 
 router.register('checkpoint-logs', CheckpointLogViewSet)
+router.register('notifications', NotificationViewSet, basename='notification')
 
 router.register('trackers', TrackerViewSet, basename='tracker')
 router.register('tracker-logs', TrackerLogViewSet)

@@ -57,8 +57,10 @@ const TrackerRow = ({ data, index, style }: TrackerRowProps) => {
           <ListItemText
             primary={item.name}
             secondary={item.secondary}
-            primaryTypographyProps={{ noWrap: true }}
-            secondaryTypographyProps={{ noWrap: true }}
+            slotProps={{
+              primary: { noWrap: true },
+              secondary: { noWrap: true },
+            }}
           />
           {'safe_weide' in item && item.safe_weide && (
             <Chip color="primary" variant="filled" label={`Safe op ${item.safe_weide}`} />
@@ -69,13 +71,13 @@ const TrackerRow = ({ data, index, style }: TrackerRowProps) => {
   );
 };
 
-interface SearchListProps {
+interface TrackerListProps {
   onClick: (tracker: number) => void;
   members: OrganizationMember[];
   teams: Team[];
 }
 
-export default function SearchList({ members, teams, onClick }: SearchListProps) {
+export default function TrackerList({ members, teams, onClick }: TrackerListProps) {
   const { data: fiches } = useGetFichesQuery();
   const { data: tochten } = useGetTochtenQuery();
   const { data: weides } = useGetWeidesQuery();

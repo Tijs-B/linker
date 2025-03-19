@@ -20,6 +20,14 @@ export enum TrackerLogSource {
   MANUAL = 'manual',
 }
 
+export enum NotificationType {
+  TRACKER_OFFLINE = 'tracker_offline',
+  TRACKER_FAR_AWAY = 'tracker_far_away',
+  TRACKER_SOS = 'tracker_sos',
+  TRACKER_LOW_BATTERY = 'tracker_low_battery',
+  TRACKER_NOT_MOVING = 'tracker_not_moving',
+}
+
 export interface TrackerLog {
   id: number;
   gps_datetime: string;
@@ -168,4 +176,13 @@ export interface User {
   username: string | null;
   permissions: string[];
   is_staff: boolean;
+}
+
+export interface Notification {
+  id: number;
+  notification_type: NotificationType;
+  sent: string;
+  tracker: number;
+  read: boolean;
+  severity: number;
 }

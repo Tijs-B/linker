@@ -13,10 +13,12 @@ import CreateMapNoteDialog from '../components/main/CreateMapNoteDialog.tsx';
 import CreateTrackerLogDialog from '../components/main/CreateTrackerLogDialog.tsx';
 import HistoryCard from '../components/main/HistoryCard';
 import MainToolbar from '../components/main/MainToolbar';
-import SearchList from '../components/main/SearchList';
+import NotificationList from '../components/main/NotificationList.tsx';
 import StatusCard from '../components/main/StatusCard';
+import TrackerList from '../components/main/TrackerList.tsx';
 import MainMap from '../components/map/MainMap';
 import {
+  useGetNotificationsQuery,
   useGetOrganizationMembersQuery,
   useGetTeamsQuery,
   useGetTrackersQuery,
@@ -31,6 +33,7 @@ export default function MainPage() {
 
   const [keyword, setKeyword] = useState('');
   const [listOpen, setListOpen] = useState(desktop);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [networkErrorNotificationId, setNetworkErrorNotificationId] = useState<SnackbarKey | null>(
     null,
   );
@@ -69,9 +72,11 @@ export default function MainPage() {
     isFetching: isFetchingTrackers,
     refetch: refetchTrackers,
   } = useGetTrackersQuery(undefined, {
-    pollingInterval: 15_000,
+    pollingInterval: 10_000,
     skipPollingIfUnfocused: true,
   });
+  const { isFetching: isFetchingNotifications, refetch: refetchNotifications } =
+    useGetNotificationsQuery(undefined, { pollingInterval: 30_000, skipPollingIfUnfocused: true });
   const { currentData: user, error: queryError } = useGetUserQuery(undefined, {
     pollingInterval: 5_000,
     skipPollingIfUnfocused: true,
@@ -206,6 +211,7 @@ export default function MainPage() {
   const onChangeKeyword = useCallback((keyword: string) => {
     if (keyword) {
       setListOpen(true);
+      setShowNotifications(false);
     }
     setKeyword(keyword);
   }, []);
@@ -214,7 +220,8 @@ export default function MainPage() {
     refetchMembers();
     refetchTeams();
     refetchTrackers();
-  }, [refetchMembers, refetchTeams, refetchTrackers]);
+    refetchNotifications();
+  }, [refetchMembers, refetchTeams, refetchTrackers, refetchNotifications]);
 
   const onToggleMapNoteCreation = useCallback(() => {
     setCreatingMarker((value) => {
@@ -336,8 +343,11 @@ export default function MainPage() {
             onSearchEnter={onSearchEnter}
             listOpen={listOpen}
             setListOpen={setListOpen}
-            isUpdating={isFetchingTeams || isFetchingMembers || isFetchingTrackers}
+            isUpdating={
+              isFetchingTeams || isFetchingMembers || isFetchingTrackers || isFetchingNotifications
+            }
             onForceUpdate={onForceUpdate}
+            onOpenNotifications={() => setShowNotifications((value) => !value)}
           />
         </Paper>
         <div css={middle}>
@@ -354,7 +364,11 @@ export default function MainPage() {
             </div>
           )}
           <Paper css={contentList} sx={{ visibility: listOpen ? 'visible' : 'hidden' }} square>
-            <SearchList members={filteredMembers} teams={filteredTeams} onClick={showTracker} />
+            {showNotifications ? (
+              <NotificationList onTrackerClick={showTracker} />
+            ) : (
+              <TrackerList members={filteredMembers} teams={filteredTeams} onClick={showTracker} />
+            )}
           </Paper>
         </div>
         {desktop && (

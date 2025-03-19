@@ -4,6 +4,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import FilterIcon from '@mui/icons-material/FilterAlt';
 import MapIcon from '@mui/icons-material/Map';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import {
@@ -22,6 +23,7 @@ import {
 
 import { css } from '@emotion/react';
 
+import { useGetNotificationsQuery, useGetUserQuery } from '../../services/linker.ts';
 import { filterActions, selectFilterActive, useAppDispatch, useAppSelector } from '../../store';
 
 interface MainToolbarProps {
@@ -32,6 +34,7 @@ interface MainToolbarProps {
   setListOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isUpdating: boolean;
   onForceUpdate: () => void;
+  onOpenNotifications: () => void;
 }
 
 export default function MainToolbar({
@@ -42,6 +45,7 @@ export default function MainToolbar({
   setListOpen,
   isUpdating,
   onForceUpdate,
+  onOpenNotifications,
 }: MainToolbarProps) {
   const theme = useTheme();
 
@@ -51,6 +55,12 @@ export default function MainToolbar({
   const showBlue = useAppSelector((state) => state.filter.showBlue);
   const filterActive = useAppSelector(selectFilterActive);
   const dispatch = useAppDispatch();
+
+  const { data: user } = useGetUserQuery();
+  const canViewNotifications = Boolean(user?.permissions.includes('view_notification'));
+  const { data: notifications } = useGetNotificationsQuery(undefined, {
+    skip: !canViewNotifications,
+  });
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<Element | null>(null);
 
@@ -73,6 +83,8 @@ export default function MainToolbar({
   const onClearKeyword = useCallback(() => {
     onChangeKeyword('');
   }, [onChangeKeyword]);
+
+  const nbUnreadNotifications = notifications ? notifications.filter((n) => !n.read).length : 0;
 
   return (
     <Toolbar
@@ -127,6 +139,13 @@ export default function MainToolbar({
         }
         fullWidth
       />
+      {canViewNotifications && (
+        <IconButton edge="end" onClick={onOpenNotifications}>
+          <Badge badgeContent={nbUnreadNotifications} color="primary">
+            <NotificationsIcon />
+          </Badge>
+        </IconButton>
+      )}
       <Box sx={{ position: 'relative' }}>
         <IconButton edge="end" onClick={onForceUpdate}>
           <RefreshIcon />

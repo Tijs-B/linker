@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import StrEnum, auto
 
 FICHE_MAX_DISTANCE = 100
 TOCHT_MAX_DISTANCE = 60
@@ -6,8 +6,22 @@ WEIDE_MAX_DISTANCE = 100
 GEBIED_MAX_DISTANCE = 50_000
 SKIP_BASIS_DISTANCE = 50
 
+TRACKER_LOG_BATTERY_LOW_TYPES = [1000, 1001, 1002]
+TRACKER_LOG_SOS_TYPES = [17006, 200]
+TRACKER_FAR_AWAY_METERS = 1000
+TRACKER_NOT_MOVING_MINUTES = 3 * 60
+TRACKER_NOT_MOVING_METERS = 300
+
 SWITCH_TRACE_TEAMS = 'trace_teams'
 
 
-class CheckpointLogType(Enum):
-    AUTOMATED = 'automated'
+class CheckpointLogType(StrEnum):
+    AUTOMATED = auto()
+
+
+class NotificationType(StrEnum):
+    TRACKER_OFFLINE = auto()
+    TRACKER_FAR_AWAY = auto()
+    TRACKER_SOS = auto()
+    TRACKER_LOW_BATTERY = auto()
+    TRACKER_NOT_MOVING = auto()
