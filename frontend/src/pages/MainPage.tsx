@@ -266,6 +266,15 @@ export default function MainPage() {
     setTrackerLogLngLat(null);
   }, []);
 
+  const onOpenNotifications = useCallback(() => {
+    if (!listOpen) {
+      setListOpen(true);
+      setShowNotifications(true);
+    } else {
+      setShowNotifications((value) => !value);
+    }
+  }, [listOpen]);
+
   const sidebar = css`
     display: flex;
     flex-direction: column;
@@ -347,7 +356,7 @@ export default function MainPage() {
               isFetchingTeams || isFetchingMembers || isFetchingTrackers || isFetchingNotifications
             }
             onForceUpdate={onForceUpdate}
-            onOpenNotifications={() => setShowNotifications((value) => !value)}
+            onOpenNotifications={onOpenNotifications}
           />
         </Paper>
         <div css={middle}>
