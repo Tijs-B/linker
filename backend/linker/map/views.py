@@ -44,7 +44,7 @@ class FicheViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class MapNoteViewSet(viewsets.ModelViewSet):
-    queryset = MapNote.objects.all()
+    queryset = MapNote.objects.all().select_related('author')
     serializer_class = MapNoteSerializer
 
     def perform_create(self, serializer):

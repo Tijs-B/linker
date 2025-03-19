@@ -21,24 +21,23 @@ from .serializers import (
 
 
 class TeamViewSet(viewsets.ModelViewSet):
-    queryset = Team.objects.prefetch_related(
-        Prefetch('contact_persons', queryset=ContactPerson.objects.order_by('name')),
-        Prefetch('team_notes', queryset=TeamNote.objects.order_by('created')),
-    ).order_by('number')
     serializer_class = TeamSerializer
 
     def get_queryset(self):
-        queryset = Team.objects.prefetch_related(
-            Prefetch('team_notes', queryset=TeamNote.objects.order_by('created')),
-        ).order_by('number')
         if self.request.user.has_perm('people.view_contactperson'):
-            queryset = queryset.prefetch_related(
-                Prefetch('contact_persons', queryset=ContactPerson.objects.order_by('name')),
-            )
+            contact_person_inner_queryset = ContactPerson.objects.order_by('name')
         else:
-            queryset = queryset.prefetch_related(
-                Prefetch('contact_persons', queryset=ContactPerson.objects.none()),
+            contact_person_inner_queryset = ContactPerson.objects.order_by('name')
+
+        queryset = (
+            Team.objects.prefetch_related(
+                Prefetch('team_notes', queryset=TeamNote.objects.order_by('created').select_related('author')),
+                Prefetch('contact_persons', queryset=contact_person_inner_queryset),
             )
+            .select_related('safe_weide_updated_by')
+            .order_by('number')
+        )
+
         return queryset
 
     def get_permissions(self):
@@ -66,7 +65,7 @@ class OrganizationMemberViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class TeamNoteViewSet(viewsets.ModelViewSet):
-    queryset = TeamNote.objects.all()
+    queryset = TeamNote.objects.all().select_related('author')
     serializer_class = TeamNoteSerializer
 
     def perform_create(self, serializer):

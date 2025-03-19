@@ -27,7 +27,7 @@ from linker.tracing.views import CheckpointLogViewSet, StatsView
 from linker.trackers.views import TrackerViewSet, TrackerLogViewSet
 
 router = routers.DefaultRouter()
-router.register('teams', TeamViewSet)
+router.register('teams', TeamViewSet, basename='team')
 router.register('organization-members', OrganizationMemberViewSet)
 router.register('team-notes', TeamNoteViewSet)
 router.register('contact-persons', ContactPersonViewSet)
