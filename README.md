@@ -72,8 +72,8 @@ De frontend draait nu op [localhost:8061](http://localhost:8060) en de backend o
   - [x] Melding bij offline
   - [x] Lokale cache van data (telefoonnummers bijvoorbeeld!) bij offline
 - [ ] Flag aandacht vragende teams?
-- [ ] Meldingen?
-  - [ ] Tracker health: wanneer een tracker uit staat of al even geen updates meer heeft gekregen
-  - [ ] Wanneer een groep echt heel ver van de route zit
-  - [ ] Wanneer een groep al een hele tijd stil staat
+- [x] Meldingen?
+  - [x] Tracker health: wanneer een tracker uit staat of al even geen updates meer heeft gekregen
+  - [x] Wanneer een groep echt heel ver van de route zit
+  - [x] Wanneer een groep al een hele tijd stil staat
 - [x] Heatmap
