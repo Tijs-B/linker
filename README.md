@@ -50,9 +50,9 @@ De frontend draait nu op [localhost:8061](http://localhost:8060) en de backend o
   - [ ] Voor een bepaald stuk, mbv markers/sections
   - [x] Per groep
     - [x] Op team pagina per tocht zetten
-- [ ] Verboden zones
+- [x] Verboden zones
   - [x] Basis implementatie
-  - [ ] Melding wanneer groep in verboden zone loopt
+  - [x] Melding wanneer groep in verboden zone loopt
 - [x] Leesbare locatie per team
 - [x] Safe status per team (veilig op een weide)
   - [x] Filter lijst van teams op teams die nog niet safe zijn

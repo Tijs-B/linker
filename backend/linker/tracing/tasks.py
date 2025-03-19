@@ -9,7 +9,7 @@ from django.db.models import Q, Exists, OuterRef
 from django.utils.timezone import now
 
 from linker.config.models import Switch
-from linker.map.models import Tocht
+from linker.map.models import Tocht, ForbiddenArea
 from linker.people.models import Team
 from linker.tracing.constants import (
     SWITCH_TRACE_TEAMS,
@@ -70,14 +70,19 @@ def tracker_sos_notifications() -> None:
 @shared_task
 def tracker_battery_notifications() -> None:
     cutoff = now() - timedelta(hours=3)
-    battery_log = TrackerLog.objects.filter(tracker_type__in=TRACKER_LOG_BATTERY_LOW_TYPES, gps_datetime__gte=cutoff)
-    for sos_log in battery_log:
-        if Notification.objects.filter(
-            notification_type=NotificationType.TRACKER_LOW_BATTERY, tracker_id=sos_log.tracker_id, sent__gte=cutoff
-        ):
-            continue
+    tracker_ids = list(
+        Tracker.objects.filter(
+            Exists(
+                TrackerLog.objects.filter(
+                    tracker=OuterRef('pk'), tracker_type__in=TRACKER_LOG_BATTERY_LOW_TYPES, gps_datetime__gte=cutoff
+                )
+            )
+        ).values_list('pk', flat=True)
+    )
+
+    for tracker_id in tracker_ids:
         Notification.objects.get_or_create(
-            notification_type=NotificationType.TRACKER_SOS, tracker_id=sos_log.tracker_id
+            notification_type=NotificationType.TRACKER_LOW_BATTERY, tracker_id=tracker_id
         )
 
 
@@ -126,3 +131,22 @@ def tracker_not_moving_notifications() -> None:
             Notification.objects.get_or_create(notification_type=NotificationType.TRACKER_NOT_MOVING, tracker=tracker)
         else:
             Notification.objects.filter(notification_type=NotificationType.TRACKER_NOT_MOVING, tracker=tracker).delete()
+
+
+@shared_task
+def tracker_forbidden_area_notifications() -> None:
+    tracker_ids = list(
+        Tracker.objects.filter(last_log__isnull=False)
+        .filter(Exists(ForbiddenArea.objects.filter(area__contains=OuterRef('last_log__point'))))
+        .values_list('pk', flat=True)
+    )
+
+    for tracker in tracker_ids:
+        Notification.objects.get_or_create(
+            notification_type=NotificationType.TRACKER_IN_FORBIDDEN_AREA, tracker_id=tracker
+        )
+
+    # Delete notifications not in this list
+    Notification.objects.filter(notification_type=NotificationType.TRACKER_IN_FORBIDDEN_AREA).exclude(
+        tracker_id__in=tracker_ids
+    ).delete()

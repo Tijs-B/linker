@@ -25,3 +25,4 @@ class NotificationType(StrEnum):
     TRACKER_SOS = auto()
     TRACKER_LOW_BATTERY = auto()
     TRACKER_NOT_MOVING = auto()
+    TRACKER_IN_FORBIDDEN_AREA = auto()

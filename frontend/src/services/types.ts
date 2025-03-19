@@ -26,6 +26,7 @@ export enum NotificationType {
   TRACKER_SOS = 'tracker_sos',
   TRACKER_LOW_BATTERY = 'tracker_low_battery',
   TRACKER_NOT_MOVING = 'tracker_not_moving',
+  TRACKER_IN_FORBIDDEN_AREA = 'tracker_in_forbidden_area',
 }
 
 export interface TrackerLog {

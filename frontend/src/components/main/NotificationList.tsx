@@ -6,6 +6,7 @@ import Battery1BarIcon from '@mui/icons-material/Battery1Bar';
 import CheckIcon from '@mui/icons-material/Check';
 import CloudOffIcon from '@mui/icons-material/CloudOff';
 import CoffeeIcon from '@mui/icons-material/Coffee';
+import LockIcon from '@mui/icons-material/Lock';
 import SosIcon from '@mui/icons-material/Sos';
 import SportsBarIcon from '@mui/icons-material/SportsBar';
 import {
@@ -80,6 +81,10 @@ const NotificationRow = ({ data, index, style }: NotificationRowProps) => {
     case NotificationType.TRACKER_NOT_MOVING:
       icon = <CoffeeIcon />;
       title = `Tracker staat stil`;
+      break;
+    case NotificationType.TRACKER_IN_FORBIDDEN_AREA:
+      icon = <LockIcon />;
+      title = `Tracker in verboden gebied`;
       break;
   }
 
