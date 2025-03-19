@@ -30,6 +30,7 @@ class TrackerSerializer(serializers.ModelSerializer):
     weide = serializers.IntegerField(read_only=True)
     tocht = serializers.IntegerField(read_only=True)
     basis = serializers.IntegerField(read_only=True)
+    forbidden_area = serializers.IntegerField(read_only=True)
 
     is_online = serializers.SerializerMethodField()
 
@@ -49,6 +50,7 @@ class TrackerSerializer(serializers.ModelSerializer):
             'weide',
             'tocht',
             'basis',
+            'forbidden_area',
             'is_online',
         ]
         read_only_fields = fields

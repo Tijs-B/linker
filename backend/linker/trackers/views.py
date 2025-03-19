@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.mixins import CreateModelMixin
 
-from linker.map.models import Fiche, Tocht, Weide, Basis
+from linker.map.models import Fiche, Tocht, Weide, Basis, ForbiddenArea
 from linker.tracing.constants import FICHE_MAX_DISTANCE, TOCHT_MAX_DISTANCE, WEIDE_MAX_DISTANCE, GEBIED_MAX_DISTANCE
 from linker.trackers.constants import TrackerLogSource
 from linker.trackers.models import Tracker, TrackerLog
@@ -39,6 +39,9 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
                     Basis.objects.filter(
                         point__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))
                     ).values('pk')[:1]
+                ),
+                forbidden_area=Subquery(
+                    ForbiddenArea.objects.filter(area__contains=OuterRef('last_log__point')).values('pk')[:1]
                 ),
             )
         )

@@ -37,6 +37,7 @@ import {
   useDeleteTeamNoteMutation,
   useGetCheckpointLogsQuery,
   useGetFichesQuery,
+  useGetForbiddenAreasQuery,
   useGetStatsQuery,
   useGetTeamsQuery,
   useGetTochtenQuery,
@@ -74,6 +75,7 @@ export default function TeamPage() {
   const { data: fiches } = useGetFichesQuery();
   const { data: tochten } = useGetTochtenQuery();
   const { data: weides } = useGetWeidesQuery();
+  const { data: forbiddenAreas } = useGetForbiddenAreasQuery();
   const { data: stats } = useGetStatsQuery();
   const { data: trackers } = useGetTrackersQuery();
   const { data: user } = useGetUserQuery();
@@ -104,15 +106,21 @@ export default function TeamPage() {
   }, [teamId, checkpointLogs, fiches]);
 
   const positionDescription = useMemo(() => {
-    if (!(teams && trackers && fiches && tochten && weides && teamId)) {
+    if (!(teams && trackers && fiches && tochten && weides && forbiddenAreas && teamId)) {
       return '-';
     }
     const trackerId = teams.entities[+teamId].tracker;
     if (!trackerId) {
       return '-';
     }
-    return getPositionDescription(trackers.entities[trackerId], fiches, tochten, weides);
-  }, [teamId, teams, trackers, fiches, tochten, weides]);
+    return getPositionDescription(
+      trackers.entities[trackerId],
+      fiches,
+      tochten,
+      weides,
+      forbiddenAreas,
+    );
+  }, [teamId, teams, trackers, fiches, tochten, weides, forbiddenAreas]);
 
   const createNote = useCallback(() => {
     if (newNoteText && teamId) {

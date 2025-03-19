@@ -14,7 +14,7 @@ import { green, red } from '@mui/material/colors';
 
 import { EntityState } from '@reduxjs/toolkit';
 
-import { Fiche, Stats, Team, Tocht, Tracker, Weide } from '../../services/types.ts';
+import { Fiche, ForbiddenArea, Stats, Team, Tocht, Tracker, Weide } from '../../services/types.ts';
 import { getPositionDescription } from '../../utils/data.ts';
 import { secondsToHoursMinutes } from '../../utils/time.ts';
 import PersonAvatar from '../PersonAvatar.jsx';
@@ -40,6 +40,7 @@ interface TeamRowProps {
   fiches: EntityState<Fiche, number>;
   tochten: EntityState<Tocht, number>;
   weides: EntityState<Weide, number>;
+  forbiddenAreas: EntityState<ForbiddenArea, number>;
   stats: Stats;
   trackers: EntityState<Tracker, number>;
   showFull: boolean;
@@ -51,13 +52,15 @@ const TeamRow = function ({
   fiches,
   tochten,
   weides,
+  forbiddenAreas,
   stats,
   trackers,
   showFull,
 }: TeamRowProps) {
   const team = teams.entities[id];
   const tracker = team.tracker === null ? null : trackers.entities[team.tracker];
-  const description = tracker && getPositionDescription(tracker, fiches, tochten, weides);
+  const description =
+    tracker && getPositionDescription(tracker, fiches, tochten, weides, forbiddenAreas);
   const teamStats = stats.teams[id];
   const tochtDev = showFull ? teamStats.avgFullTochtDeviation : teamStats.avgPartialTochtDeviation;
   const ficheDev = teamStats.avgFicheDeviation;
@@ -86,6 +89,7 @@ interface TeamsTableProps {
   fiches: EntityState<Fiche, number>;
   tochten: EntityState<Tocht, number>;
   weides: EntityState<Weide, number>;
+  forbiddenAreas: EntityState<ForbiddenArea, number>;
   stats: Stats;
   trackers: EntityState<Tracker, number>;
   showFull: boolean;
@@ -96,6 +100,7 @@ export default function TeamTable({
   fiches,
   tochten,
   weides,
+  forbiddenAreas,
   stats,
   trackers,
   showFull,
@@ -123,6 +128,7 @@ export default function TeamTable({
               fiches={fiches}
               trackers={trackers}
               weides={weides}
+              forbiddenAreas={forbiddenAreas}
               showFull={showFull}
             />
           ))}

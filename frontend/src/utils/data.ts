@@ -3,7 +3,7 @@ import distance from '@turf/distance';
 import { Point } from 'geojson';
 import isMobile from 'is-mobile';
 
-import { CheckpointLog, Fiche, Tocht, Tracker, Weide } from '../services/types.ts';
+import { CheckpointLog, Fiche, ForbiddenArea, Tocht, Tracker, Weide } from '../services/types.ts';
 
 export function getLastCheckpointLog(
   team: number,
@@ -24,6 +24,7 @@ export function getPositionDescription(
   fiches: EntityState<Fiche, number>,
   tochten: EntityState<Tocht, number>,
   weides: EntityState<Weide, number>,
+  forbiddenAreas: EntityState<ForbiddenArea, number>,
 ): string {
   if (tracker.last_log === null) {
     return '-';
@@ -36,6 +37,10 @@ export function getPositionDescription(
   }
   if (tracker.fiche !== null) {
     return `Fiche ${fiches.entities[tracker.fiche].display_name}`;
+  }
+  if (tracker.forbidden_area !== null) {
+    const forbiddenArea = forbiddenAreas.entities[tracker.forbidden_area];
+    return `🚨 In verboden gebied ${forbiddenArea.description}`;
   }
   if (tracker.tocht !== null) {
     const tocht = tochten.entities[tracker.tocht];

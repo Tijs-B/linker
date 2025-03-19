@@ -46,6 +46,7 @@ export interface Tracker {
   weide: number | null;
   tocht: number | null;
   basis: number | null;
+  forbidden_area: number | null;
   is_online: boolean;
 }
 

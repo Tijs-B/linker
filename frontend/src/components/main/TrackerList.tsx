@@ -9,6 +9,7 @@ import { css } from '@emotion/react';
 import {
   useGetBasisQuery,
   useGetFichesQuery,
+  useGetForbiddenAreasQuery,
   useGetTochtenQuery,
   useGetTrackersQuery,
   useGetWeidesQuery,
@@ -82,6 +83,7 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
   const { data: tochten } = useGetTochtenQuery();
   const { data: weides } = useGetWeidesQuery();
   const { data: basis } = useGetBasisQuery();
+  const { data: forbiddenAreas } = useGetForbiddenAreasQuery();
   const { data: trackers } = useGetTrackersQuery();
 
   const items = useMemo(() => {
@@ -90,11 +92,25 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
       const result = { secondary: '', safe_weide: '', isOnline: false, ...item };
       if (!item.tracker) {
         result.secondary = '⚠️ Geen tracker gekoppeld';
-      } else if (fiches && tochten && weides && basis && trackers && item.tracker) {
+      } else if (
+        fiches &&
+        tochten &&
+        weides &&
+        basis &&
+        forbiddenAreas &&
+        trackers &&
+        item.tracker
+      ) {
         const tracker = trackers.entities[item.tracker];
         result.isOnline = tracker.is_online;
         if (tracker.last_log) {
-          result.secondary = getPositionDescription(tracker, fiches, tochten, weides);
+          result.secondary = getPositionDescription(
+            tracker,
+            fiches,
+            tochten,
+            weides,
+            forbiddenAreas,
+          );
         }
       }
       if (weides && tochten && 'safe_weide' in item && item.safe_weide) {
@@ -102,7 +118,7 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
       }
       return result;
     });
-  }, [teams, members, fiches, tochten, weides, basis, trackers]);
+  }, [teams, members, fiches, tochten, weides, basis, forbiddenAreas, trackers]);
 
   return (
     <AutoSizer

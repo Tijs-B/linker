@@ -67,6 +67,17 @@ export default function BackgroundLayers({
     return [weidesData, labelData];
   }, [weides]);
 
+  const forbiddenAreasData = useMemo(() => {
+    if (!forbiddenAreas) {
+      return featureCollection([]);
+    }
+    return featureCollection(
+      Object.values(forbiddenAreas.entities).map((forbiddenArea) =>
+        feature(forbiddenArea.area, {}, { id: forbiddenArea.id }),
+      ),
+    );
+  }, [forbiddenAreas]);
+
   const tochtLinePaint = {
     'line-width': showSatellite ? 2 : 3,
     'line-color': showSatellite ? 'rgba(255,113,113,0.87)' : '#424242',
@@ -214,7 +225,7 @@ export default function BackgroundLayers({
           layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
         />
       </Source>
-      <Source type="geojson" data={forbiddenAreas || featureCollection([])}>
+      <Source type="geojson" data={forbiddenAreasData}>
         <Layer
           id="forbidden-areas"
           type="fill"

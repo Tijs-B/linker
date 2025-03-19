@@ -23,6 +23,7 @@ import TrackersTable from '../components/tracing/TrackersTable.tsx';
 import {
   useGetCheckpointLogsQuery,
   useGetFichesQuery,
+  useGetForbiddenAreasQuery,
   useGetOrganizationMembersQuery,
   useGetStatsQuery,
   useGetTeamsQuery,
@@ -36,6 +37,7 @@ export default function TracingPage() {
   const { data: fiches } = useGetFichesQuery();
   const { data: tochten } = useGetTochtenQuery();
   const { data: weides } = useGetWeidesQuery();
+  const { data: forbiddenAreas } = useGetForbiddenAreasQuery();
   const { data: stats } = useGetStatsQuery(undefined, {
     pollingInterval: 60000,
     skipPollingIfUnfocused: true,
@@ -90,20 +92,28 @@ export default function TracingPage() {
             <TochtenTable stats={stats} tochten={tochten} fiches={fiches} showFull={showFull} />
           </Box>
         )}
-        {currentTab === 'teams' && tochten && fiches && weides && teams && stats && trackers && (
-          <Box>
-            <h2>Teams</h2>
-            <TeamsTable
-              teams={teams}
-              tochten={tochten}
-              fiches={fiches}
-              weides={weides}
-              stats={stats}
-              trackers={trackers}
-              showFull={showFull}
-            />
-          </Box>
-        )}
+        {currentTab === 'teams' &&
+          tochten &&
+          fiches &&
+          weides &&
+          forbiddenAreas &&
+          teams &&
+          stats &&
+          trackers && (
+            <Box>
+              <h2>Teams</h2>
+              <TeamsTable
+                teams={teams}
+                tochten={tochten}
+                fiches={fiches}
+                weides={weides}
+                forbiddenAreas={forbiddenAreas}
+                stats={stats}
+                trackers={trackers}
+                showFull={showFull}
+              />
+            </Box>
+          )}
         {currentTab === 'trackers' && trackers && teams && members && (
           <Box>
             <h2>Trackers</h2>

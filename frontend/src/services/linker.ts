@@ -2,7 +2,7 @@ import { createEntityAdapter } from '@reduxjs/toolkit';
 import type { EntityState } from '@reduxjs/toolkit';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { feature, featureCollection } from '@turf/helpers';
-import { FeatureCollection, LineString, MultiPolygon, Point } from 'geojson';
+import { FeatureCollection, LineString, Point } from 'geojson';
 
 import { getCookie } from '../utils/cookie';
 import {
@@ -34,6 +34,7 @@ const ficheAdapter = createEntityAdapter<Fiche>();
 const checkpointLogAdapter = createEntityAdapter<CheckpointLog>();
 const mapNoteAdapter = createEntityAdapter<MapNote>();
 const weidesAdapter = createEntityAdapter<Weide>();
+const forbiddenAreasAdapter = createEntityAdapter<ForbiddenArea>();
 
 export const linkerApi = createApi({
   reducerPath: 'linkerApi',
@@ -133,10 +134,10 @@ export const linkerApi = createApi({
     getStats: build.query<Stats, void>({
       query: () => '/stats/',
     }),
-    getForbiddenAreas: build.query<FeatureCollection<MultiPolygon>, void>({
+    getForbiddenAreas: build.query<EntityState<ForbiddenArea, number>, void>({
       query: () => '/forbidden-areas/',
       transformResponse(response: ForbiddenArea[]) {
-        return featureCollection(response.map((area) => feature(area.area, {}, { id: area.id })));
+        return forbiddenAreasAdapter.addMany(forbiddenAreasAdapter.getInitialState(), response);
       },
     }),
     getUser: build.query<User, void>({
