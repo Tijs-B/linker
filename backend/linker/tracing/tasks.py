@@ -143,7 +143,7 @@ def tracker_forbidden_area_notifications() -> None:
 
     for tracker in tracker_ids:
         Notification.objects.get_or_create(
-            notification_type=NotificationType.TRACKER_IN_FORBIDDEN_AREA, tracker_id=tracker
+            notification_type=NotificationType.TRACKER_IN_FORBIDDEN_AREA, tracker_id=tracker, severity=1
         )
 
     # Delete notifications not in this list
