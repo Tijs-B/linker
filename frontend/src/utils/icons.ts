@@ -124,38 +124,35 @@ function generateTrackerOfflineOutline(
   addToMap('tracker-offline-outline', context.getImageData(0, 0, 33 * 2, 48 * 2));
 }
 
-export function generateAllIcons(
+export async function generateAllIcons(
   items: (Team | OrganizationMember)[],
   addToMap: (name: string, data: ImageData) => void,
 ) {
-  dDinFontFace.load().then(() => {
-    dDinCondensedFontFace.load().then(() => {
-      const context = canvas.getContext('2d', { willReadFrequently: true });
-      if (!context) {
-        return;
-      }
-      context.scale(2, 2);
+  await Promise.all([dDinFontFace.load(), dDinCondensedFontFace.load()]);
+  const context = canvas.getContext('2d', { willReadFrequently: true });
+  if (!context) {
+    return;
+  }
+  context.scale(2, 2);
 
-      const codesPerColor: Record<string, string[]> = {};
+  const codesPerColor: Record<string, string[]> = {};
 
-      for (const item of items) {
-        const color = itemColor(item);
-        if (!color) {
-          continue;
-        }
-        if (!codesPerColor[color]) {
-          codesPerColor[color] = [];
-        }
-        codesPerColor[color].push(item.code);
-      }
+  for (const item of items) {
+    const color = itemColor(item);
+    if (!color) {
+      continue;
+    }
+    if (!codesPerColor[color]) {
+      codesPerColor[color] = [];
+    }
+    codesPerColor[color].push(item.code);
+  }
 
-      Object.entries(codesPerColor).forEach(([color, codes]) =>
-        generateTrackers(color, codes, context, addToMap),
-      );
+  Object.entries(codesPerColor).forEach(([color, codes]) =>
+    generateTrackers(color, codes, context, addToMap),
+  );
 
-      generateMapNoteIcon(yellow[400], context, addToMap);
-      generateTrackerOutline(context, addToMap);
-      generateTrackerOfflineOutline(context, addToMap);
-    });
-  });
+  generateMapNoteIcon(yellow[400], context, addToMap);
+  generateTrackerOutline(context, addToMap);
+  generateTrackerOfflineOutline(context, addToMap);
 }
