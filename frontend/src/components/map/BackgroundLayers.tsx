@@ -119,7 +119,7 @@ export default function BackgroundLayers({
         minzoom={9}
         maxzoom={16}
         tileSize={256}
-        tiles={['/api/heatmap/{z}/{x}/{y}.png']}
+        tiles={['/heatmap/{z}/{x}/{y}.png']}
       >
         <Layer
           id="heatmap"

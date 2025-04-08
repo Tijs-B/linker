@@ -72,6 +72,7 @@ services:
       - ./frontend:/app
       - /app/node_modules/
       - /app/public/tiles/
+      - heatmap-data:/app/public/heatmap/
     environment:
       - VITE_BACKEND_URL=http://linker:8060
     ports:

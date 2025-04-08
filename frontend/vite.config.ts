@@ -32,19 +32,19 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
           runtimeCaching: [
             {
-              urlPattern: /^https:\/\/link2.tijsb.be\/api\/user/,
+              urlPattern: /^https:\/\/link\d?.tijsb.be\/api\/user/,
               handler: 'NetworkOnly',
             },
             {
-              urlPattern: /^https:\/\/link2.tijsb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen|forbidden-areas)/,
+              urlPattern: /^https:\/\/link\d?.tijsb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen|forbidden-areas)/,
               handler: 'StaleWhileRevalidate',
             },
             {
-              urlPattern: /^https:\/\/link2.tijsb.be\/api\//,
+              urlPattern: /^https:\/\/link\d?.tijsb.be\/api\//,
               handler: 'NetworkFirst',
             },
             {
-              urlPattern: /^https:\/\/link2.tijsb.be\/tiles\/belgium\.pmtiles/,
+              urlPattern: /^https:\/\/link\d?.tijsb.be\/tiles\/belgium\.pmtiles/,
               handler: 'StaleWhileRevalidate',
               options: {
                 cacheableResponse: {
@@ -54,7 +54,7 @@ export default defineConfig(({ mode }) => {
               },
             },
             {
-              urlPattern: /^https:\/\/link2.tijsb.be\/tiles\/fonts\//,
+              urlPattern: /^https:\/\/link\d?.tijsb.be\/tiles\/fonts\//,
               handler: 'CacheFirst',
             },
             {

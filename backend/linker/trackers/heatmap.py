@@ -6,7 +6,7 @@ from shutil import rmtree
 
 from django.db import connection
 
-from linker.map.models import Tocht
+from linker.map.models import Tocht, Basis
 from linker.tracing.constants import GEBIED_MAX_DISTANCE
 
 
@@ -26,13 +26,19 @@ FROM (
     ON (trackers_tracker.id = people_team.id)
     WHERE (
         ST_DistanceSphere(trackers_trackerlog.point, %s::geometry) < %s
+        AND ST_DistanceSphere(trackers_trackerlog.point, %s::geometry) > %s
         AND NOT trackers_trackerlog.team_is_safe
         AND trackers_trackerlog.speed < 15
     )
     group by trackers_trackerlog.tracker_id
 ) as f;
             """,
-            [tocht_centroid.hexewkb.decode('utf-8'), GEBIED_MAX_DISTANCE],
+            [
+                tocht_centroid.hexewkb.decode('utf-8'),
+                GEBIED_MAX_DISTANCE,
+                Basis.objects.get().point.hexewkb.decode('utf-8'),
+                300,
+            ],
         )
         row = cursor.fetchone()
     return row[0]
