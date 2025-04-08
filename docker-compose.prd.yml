@@ -5,14 +5,13 @@ services:
     build:
       context: .
       target: backend
-    command: gunicorn linker.wsgi --bind 0.0.0.0:8000 --chdir=/app
+    command: gunicorn linker.wsgi -w 4 --bind 0.0.0.0:8000 --chdir=/app
     depends_on:
       - postgis
       - redis
     volumes:
       - ./simulation-data:/simulation-data:ro
       - upload-media:/media
-      - heatmap-data:/heatmap
     environment:
       - ALLOWED_HOSTS=link2.tijsb.be
       - CSRF_TRUSTED_ORIGINS=https://link2.tijsb.be
@@ -21,7 +20,6 @@ services:
       - SIMULATION_PATH=/simulation-data
       - DEBUG=False
       - MEDIA_ROOT=/media
-      - HEATMAP_PATH=/heatmap
     networks:
       - linker_net
 
@@ -36,7 +34,6 @@ services:
     volumes:
       - ./simulation-data:/simulation-data:ro
       - upload-media:/media
-      - heatmap-data:/heatmap
     environment:
       - ALLOWED_HOSTS=link2.tijsb.be
       - CSRF_TRUSTED_ORIGINS=https://link2.tijsb.be
@@ -45,7 +42,6 @@ services:
       - SIMULATION_PATH=/simulation-data
       - DEBUG=False
       - MEDIA_ROOT=/media
-      - HEATMAP_PATH=/heatmap
     networks:
       - linker_net
 
@@ -60,7 +56,6 @@ services:
     volumes:
       - ./simulation-data:/simulation-data:ro
       - upload-media:/media
-      - heatmap-data:/heatmap
     environment:
       - ALLOWED_HOSTS=link2.tijsb.be
       - CSRF_TRUSTED_ORIGINS=https://link2.tijsb.be
@@ -69,7 +64,6 @@ services:
       - SIMULATION_PATH=/simulation-data
       - DEBUG=False
       - MEDIA_ROOT=/media
-      - HEATMAP_PATH=/heatmap
     networks:
       - linker_net
 
@@ -98,7 +92,6 @@ services:
       - caddy
     volumes:
       - upload-media:/media
-      - heatmap-data:/heatmap
     depends_on:
       - linker
     labels:
@@ -108,7 +101,6 @@ services:
 volumes:
   postgis-data:
   upload-media:
-  heatmap-data:
 
 networks:
   caddy:

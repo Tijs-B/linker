@@ -113,18 +113,15 @@ export default function BackgroundLayers({
           layout={{ visibility: showHeatmap || showSatellite ? 'none' : 'visible' }}
         />
       </Source>
-      <Source
-        type="raster"
-        scheme="xyz"
-        minzoom={9}
-        maxzoom={16}
-        tileSize={256}
-        tiles={['/heatmap/{z}/{x}/{y}.png']}
-      >
+      <Source type="geojson" data="/api/heatmap/">
         <Layer
           id="heatmap"
-          type="raster"
+          type="line"
           layout={{ visibility: showHeatmap ? 'visible' : 'none' }}
+          paint={{
+            'line-color': '#e8380c',
+            'line-opacity': 0.2,
+          }}
         />
       </Source>
 

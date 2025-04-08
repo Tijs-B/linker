@@ -152,7 +152,6 @@ GDAL_LIBRARY_PATH = env('GDAL_LIBRARY_PATH', default=None)
 GEOS_LIBRARY_PATH = env('GEOS_LIBRARY_PATH', default=None)
 
 SIMULATION_PATH = env('SIMULATION_PATH', default=None)
-HEATMAP_PATH = env('HEATMAP_PATH', default=None)
 
 CELERY_BROKER_URL = env('CACHE_URL', default='redis://localhost:6379')
 CELERY_TIMEZONE = 'Europe/Brussels'
@@ -169,10 +168,6 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 #     'trace-teams': {
 #         'task': 'linker.tracing.tasks.trace_teams',
 #         'schedule': datetime.timedelta(minutes=1),
-#     },
-#     'update-heatmap': {
-#         'task': 'linker.trackers.tasks.update_heatmap',
-#         'schedule': datetime.timedelta(minutes=10),
 #     },
 # }
 

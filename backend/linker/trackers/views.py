@@ -1,13 +1,18 @@
 from django.contrib.gis.measure import D
+from django.core.cache import cache
 from django.db.models import Subquery, OuterRef
 from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.mixins import CreateModelMixin
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.views import APIView
 
 from linker.map.models import Fiche, Tocht, Weide, Basis, ForbiddenArea
 from linker.tracing.constants import FICHE_MAX_DISTANCE, TOCHT_MAX_DISTANCE, WEIDE_MAX_DISTANCE, GEBIED_MAX_DISTANCE
 from linker.trackers.constants import TrackerLogSource
+from linker.trackers.heatmap import get_all_tracks
 from linker.trackers.models import Tracker, TrackerLog
 from linker.trackers.serializers import TrackerSerializer, TrackerLogSerializer
 
@@ -78,3 +83,13 @@ class TrackerLogViewSet(CreateModelMixin, viewsets.GenericViewSet):
 
     def perform_create(self, serializer):
         serializer.save(source=TrackerLogSource.MANUAL)
+
+
+class HeatmapView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request: Request) -> HttpResponse:
+        if not (result := cache.get('heatmap-cache')):
+            result = get_all_tracks()
+            cache.set('heatmap-cache', result, timeout=60)
+        return HttpResponse(result, content_type='application/geo+json')

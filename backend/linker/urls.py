@@ -24,7 +24,7 @@ from linker.people.views import (
     LogoutView,
 )
 from linker.tracing.views import CheckpointLogViewSet, StatsView, NotificationViewSet
-from linker.trackers.views import TrackerViewSet, TrackerLogViewSet
+from linker.trackers.views import TrackerViewSet, TrackerLogViewSet, HeatmapView
 
 router = routers.DefaultRouter()
 router.register('teams', TeamViewSet, basename='team')
@@ -50,6 +50,7 @@ router.register('tracker-logs', TrackerLogViewSet)
 urlpatterns = [
     path('api/', include(router.urls)),
     path('api/stats/', StatsView.as_view()),
+    path('api/heatmap/', HeatmapView.as_view()),
     path('api/login/', csrf_exempt(LoginView.as_view())),
     path('api/logout/', LogoutView.as_view()),
     path('api/user/', UserView.as_view()),
