@@ -9,6 +9,9 @@ const ReactCompilerConfig = { /* ... */ };
 export default defineConfig(({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
   return {
+    resolve: {
+      conditions: ['mui-modern', 'module', 'browser', 'development|production'],
+    },
     plugins: [
       react({
         jsxImportSource: '@emotion/react',

@@ -110,7 +110,6 @@ export default function HistoryCard() {
                 <Slider
                   value={index}
                   max={logs.length - 1}
-                  // @ts-expect-error v will always be a single item because there's only one marker
                   onChange={(_, v) => onSliderChange(v)}
                 />
               </Box>

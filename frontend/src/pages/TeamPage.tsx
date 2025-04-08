@@ -173,7 +173,7 @@ export default function TeamPage() {
       </AppBar>
       <Container sx={{ pt: 2 }}>
         <Grid container spacing={2}>
-          <Grid container item xs={12} md={8}>
+          <Grid container size={{ xs: 12, md: 8 }}>
             <Stack flex="1 1 0" spacing={2}>
               <Paper>
                 <Container sx={{ pt: 2, pb: 2 }}>
@@ -268,7 +268,7 @@ export default function TeamPage() {
               </Paper>
             </Stack>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Stack flex="1 1 0" spacing={2}>
               <Paper>
                 <Container sx={{ pt: 2, pb: 2 }}>
