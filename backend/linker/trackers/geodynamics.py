@@ -43,7 +43,7 @@ def import_geodynamics_minisite_data(data: dict, fetch_datetime: Optional[dateti
 
     new_tracker_logs = []
     trackers = {tracker.tracker_id: tracker for tracker in Tracker.objects.all()}
-    safe_trackers = set(Team.objects.exclude(safe_weide__isnull=True).values_list('tracker__tracker_id', flat=True))
+    safe_trackers = set(Team.objects.exclude(safe_weide='').values_list('tracker__tracker_id', flat=True))
 
     for tracker_data in data['Data']:
         tracker_id = tracker_data['Id']

@@ -6,6 +6,7 @@ from linker.tracing.constants import GEBIED_MAX_DISTANCE
 
 def get_all_tracks() -> str:
     tocht_centroid = Tocht.centroid()
+    basis = Basis.objects.get().point
     with connection.cursor() as cursor:
         cursor.execute(
             """
@@ -30,7 +31,7 @@ FROM (
             [
                 tocht_centroid.hexewkb.decode('utf-8'),
                 GEBIED_MAX_DISTANCE,
-                Basis.objects.get().point.hexewkb.decode('utf-8'),
+                basis.hexewkb.decode('utf-8'),
                 300,
             ],
         )

@@ -46,7 +46,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def perform_update(self, serializer: TeamSerializer):
-        if serializer.validated_data.get('safe_weide') is not None:
+        if serializer.validated_data.get('safe_weide'):
             serializer.save(safe_weide_updated_at=now(), safe_weide_updated_by=self.request.user)
         else:
             serializer.save()

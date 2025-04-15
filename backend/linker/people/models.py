@@ -50,9 +50,7 @@ class Team(models.Model):
     tracker = models.OneToOneField(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
     group_picture = models.ImageField(upload_to=group_picture_path, blank=True, null=True)
 
-    safe_weide = models.ForeignKey(
-        'map.Weide', on_delete=models.SET_NULL, blank=True, null=True, related_name='safe_teams'
-    )
+    safe_weide = models.CharField(max_length=64, blank=True)
     safe_weide_updated_at = models.DateTimeField(blank=True, null=True)
     safe_weide_updated_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 

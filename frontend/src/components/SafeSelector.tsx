@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+import { SyntheticEvent, useCallback, useMemo } from 'react';
 
-import { FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { Autocomplete, FormControl, TextField } from '@mui/material';
 
 import { useGetUserQuery, useGetWeidesQuery, useUpdateTeamMutation } from '../services/linker.ts';
 import { Team } from '../services/types.ts';
@@ -14,39 +14,35 @@ export default function SafeSelector({ team }: SafeSelectorProps) {
   const { data: user } = useGetUserQuery();
   const updateTeam = useUpdateTeamMutation()[0];
 
-  const handleSafeChange = useCallback(
-    (e: SelectChangeEvent<number | 'Unsafe'>) => {
-      const safeWeide = e.target.value === 'Unsafe' ? null : e.target.value;
-      // @ts-expect-error safeWeide is never a string here
+  const onChange = useCallback(
+    (_e: SyntheticEvent, value: string | null) => {
+      const safeWeide = !value || value === 'Unsafe' ? '' : value;
       updateTeam({ id: team.id, safe_weide: safeWeide });
     },
     [team, updateTeam],
   );
 
-  if (user === undefined || !user.permissions.includes('change_team')) {
-    if (!weides) {
-      return '-';
-    } else if (team.safe_weide === null) {
-      return 'Unsafe';
-    } else {
-      return weides.entities[team.safe_weide].name;
-    }
+  const options = useMemo(() => {
+    if (!weides) return [];
+    const result = weides.ids.map((id) => weides.entities[id].name);
+    result.unshift('Unsafe');
+    return result;
+  }, [weides]);
+
+  if (!weides || !user || !user.permissions.includes('change_team')) {
+    return team.safe_weide || 'Unsafe';
   }
 
   return (
     <FormControl fullWidth size="small">
-      <Select
-        value={team.safe_weide === null ? 'Unsafe' : team.safe_weide}
-        onChange={handleSafeChange}
-      >
-        <MenuItem value="Unsafe">Unsafe</MenuItem>
-        {weides &&
-          weides.ids.map((id) => (
-            <MenuItem key={id} value={id}>
-              {weides.entities[id].name}
-            </MenuItem>
-          ))}
-      </Select>
+      <Autocomplete
+        freeSolo
+        options={options}
+        value={team.safe_weide || 'Unsafe'}
+        onChange={onChange}
+        renderInput={(params) => <TextField {...params} hiddenLabel size="small" />}
+        selectOnFocus
+      />
     </FormControl>
   );
 }

@@ -89,7 +89,7 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
   const items = useMemo(() => {
     const allItems = [...teams, ...members];
     return allItems.map((item: Team | OrganizationMember) => {
-      const result = { secondary: '', safe_weide: '', isOnline: false, ...item };
+      const result = { secondary: '', isOnline: false, ...item };
       if (!item.tracker) {
         result.secondary = '⚠️ Geen tracker gekoppeld';
       } else if (
@@ -112,9 +112,6 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
             forbiddenAreas,
           );
         }
-      }
-      if (weides && tochten && 'safe_weide' in item && item.safe_weide) {
-        result.safe_weide = weides.entities[item.safe_weide].identifier;
       }
       return result;
     });

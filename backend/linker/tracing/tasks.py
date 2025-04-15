@@ -40,7 +40,7 @@ def trace_teams() -> None:
 def tracker_offline_notifications() -> None:
     # Find offline trackers
     cutoff = now() - timedelta(minutes=TRACKER_OFFLINE_MINUTES)
-    offline_trackers = Tracker.objects.filter(team__isnull=False).filter(
+    offline_trackers = Tracker.objects.filter(team__isnull=False, team__safe_weide='').filter(
         Q(last_log__isnull=True) | Q(last_log__gps_datetime__lte=cutoff)
     )
 
@@ -94,7 +94,7 @@ def tracker_far_away_notifications() -> None:
                 Tocht.objects.filter(route__distance_lte=(OuterRef('last_log__point'), D(m=TRACKER_FAR_AWAY_METERS)))
             )
         )
-        .filter(far_away=True, team__isnull=False)
+        .filter(far_away=True, team__isnull=False, team__safe_weide='')
         .values_list('pk', flat=True)
     )
     for tracker in trackers_far_away:
@@ -112,7 +112,7 @@ def tracker_not_moving_notifications() -> None:
     minimum_log_count = TRACKER_NOT_MOVING_MINUTES // 5
 
     # iterate these trackers
-    for tracker in Tracker.objects.filter(team__isnull=False):
+    for tracker in Tracker.objects.filter(team__isnull=False, team__safe_weide=''):
         # Get the tracker logs in the time window
         tracker_logs = tracker.tracker_logs.filter(gps_datetime__gte=cutoff)
 
@@ -136,7 +136,7 @@ def tracker_not_moving_notifications() -> None:
 @shared_task
 def tracker_forbidden_area_notifications() -> None:
     tracker_ids = list(
-        Tracker.objects.filter(last_log__isnull=False)
+        Tracker.objects.filter(team__isnull=False, team__safe_weide='', last_log__isnull=False)
         .filter(Exists(ForbiddenArea.objects.filter(area__contains=OuterRef('last_log__point'))))
         .values_list('pk', flat=True)
     )
