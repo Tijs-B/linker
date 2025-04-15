@@ -12,6 +12,7 @@ import SportsBarIcon from '@mui/icons-material/SportsBar';
 import {
   Avatar,
   IconButton,
+  List,
   ListItem,
   ListItemAvatar,
   ListItemButton,
@@ -179,6 +180,18 @@ export default function NotificationList({ onTrackerClick }: NotificationListPro
     },
     [markAsRead],
   );
+
+  if (items.length === 0) {
+    return (
+      <List>
+        <ListItem>
+          <ListItemButton>
+            <ListItemText primary="Geen meldingen"></ListItemText>
+          </ListItemButton>
+        </ListItem>
+      </List>
+    );
+  }
 
   return (
     <AutoSizer

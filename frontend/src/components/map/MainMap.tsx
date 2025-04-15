@@ -104,7 +104,7 @@ export default function MainMap({
     if (teams && members) {
       const allItems = [...Object.values(teams.entities), ...Object.values(members.entities)];
       generateAllIcons(allItems, (name, image) => {
-        if (mapRef.current) {
+        if (mapRef.current && !mapRef.current.hasImage(name)) {
           mapRef.current.addImage(name, image);
         }
       });
