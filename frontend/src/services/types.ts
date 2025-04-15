@@ -95,7 +95,8 @@ export interface OrganizationMember {
 export interface Tocht {
   id: number;
   identifier: string;
-  order: number;
+  order: number | null;
+  is_alternative: boolean;
   route: LineString;
 }
 

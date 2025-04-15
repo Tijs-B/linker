@@ -44,6 +44,9 @@ export function getPositionDescription(
   }
   if (tracker.tocht !== null) {
     const tocht = tochten.entities[tracker.tocht];
+    if (tocht.is_alternative) {
+      return `Tocht ${tocht.identifier}`;
+    }
     const closest_fiches = Object.values(fiches.entities).map((fiche) => ({
       // @ts-expect-error I have no idea
       distance: distance(tracker.last_log.point, fiche.point),

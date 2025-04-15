@@ -71,7 +71,7 @@ export default function MainMap({
   const [showSatellite, setShowSatellite] = useState(false);
   const [hasRecentered, setRecentered] = useState(false);
   const [initialBounds, setInitialBounds] = useState(DEFAULT_INITIAL_BOUNDS);
-  const [iconsAdded, setIconsAdded] = useState(true);
+  const [iconsAdded, setIconsAdded] = useState(false);
   const [showZijwegen, setShowZijwegen] = useState(false);
 
   const mapRef = useRef<MapRef>(null);

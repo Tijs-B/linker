@@ -7,21 +7,19 @@ from django.core.validators import MinValueValidator
 
 
 class Tocht(models.Model):
-    identifier = models.CharField(max_length=1, unique=True)
-    order = models.IntegerField(validators=[MinValueValidator(1)])
-    leads = models.ManyToManyField('people.OrganizationMember')
+    identifier = models.CharField(max_length=2, unique=True)
+    order = models.IntegerField(validators=[MinValueValidator(1)], null=True, blank=True)
+    is_alternative = models.BooleanField(default=False)
+    leads = models.ManyToManyField('people.OrganizationMember', blank=True)
 
     route = models.LineStringField()
 
     def __str__(self):
         return self.identifier
 
-    def natural_key(self):
-        return self.identifier
-
     @classmethod
     def centroid(cls) -> Point:
-        return cls.objects.aggregate(centroid=Centroid(Collect('route')))['centroid']
+        return cls.objects.filter(is_alternative=False).aggregate(centroid=Centroid(Collect('route')))['centroid']
 
 
 class Weide(models.Model):

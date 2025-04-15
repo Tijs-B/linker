@@ -6,7 +6,7 @@ from .models import Tocht, Fiche, Weide, Zijweg, MapNote, Basis, ForbiddenArea
 class TochtSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tocht
-        fields = ['id', 'identifier', 'order', 'route']
+        fields = ['id', 'identifier', 'is_alternative', 'order', 'route']
         read_only_fields = fields
 
 

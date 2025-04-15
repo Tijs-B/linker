@@ -49,10 +49,12 @@ export default function StatsTable({
   teams,
 }: StatsTableProps) {
   const nbFichesPerTocht = useMemo(() => {
-    return tochten.ids.map((id) => ({
-      id,
-      nbFiches: Object.values(fiches.entities).filter((fiche) => fiche.tocht === id).length,
-    }));
+    return tochten.ids
+      .filter((id) => !tochten.entities[id].is_alternative)
+      .map((id) => ({
+        id,
+        nbFiches: Object.values(fiches.entities).filter((fiche) => fiche.tocht === id).length,
+      }));
   }, [fiches, tochten]);
 
   const [minFicheTime, maxFicheTime] = useMemo(() => {
