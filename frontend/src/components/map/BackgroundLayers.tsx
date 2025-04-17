@@ -133,9 +133,10 @@ export default function BackgroundLayers({
             'icon-allow-overlap': true,
             'text-allow-overlap': true,
             'text-field': ['get', 'name'],
-            'text-size': 10,
-            'text-font': ['D-DIN DIN-Bold', 'Arial Unicode MS Regular'],
+            'text-size': 14,
+            'text-font': ['D-DINCondensed-Bold'],
             'text-max-width': 5,
+            'text-offset': [0, 0.2],
             visibility: showHeatmap ? 'none' : 'visible',
           }}
           paint={{
@@ -198,13 +199,16 @@ export default function BackgroundLayers({
           layout={{
             'icon-allow-overlap': true,
             'text-field': ['get', 'name'],
-            'text-size': 12,
-            'text-font': ['D-DIN DIN-Bold', 'Arial Unicode MS Regular'],
+            'text-size': 14,
+            'text-font': ['D-DIN-Bold'],
+            'text-offset': [0, 0.2],
             visibility: showHeatmap ? 'none' : 'visible',
           }}
           paint={{
             'text-opacity': showHeatmap ? 0 : 1,
             'text-color': grey[800],
+            'text-halo-color': 'rgba(255, 255, 255, 0.8)',
+            'text-halo-width': 2,
           }}
           minzoom={13}
         />
@@ -247,7 +251,7 @@ export default function BackgroundLayers({
             'symbol-placement': 'line',
             'text-allow-overlap': false,
             'text-field': '{ele} m',
-            'text-font': ['D-DIN Regular'],
+            'text-font': ['D-DIN'],
             'text-ignore-placement': false,
             'text-padding': 10,
             'text-rotation-alignment': 'map',
@@ -257,7 +261,7 @@ export default function BackgroundLayers({
           }}
           paint={{
             'text-color': 'hsl(0, 0%, 37%)',
-            'text-halo-color': 'rgba(255, 255, 255, 0.8)',
+            'text-halo-color': 'rgba(255, 255, 255, 0.6)',
             'text-halo-width': 1.5,
             'text-opacity': 1,
           }}

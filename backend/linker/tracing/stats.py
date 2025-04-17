@@ -39,7 +39,9 @@ def get_next_tocht_fiche_full_map(all_fiches: list[Fiche]) -> dict[Direction, di
 
 def calculate_stats() -> dict:
     # Good luck :)
-    all_fiches: list[Fiche] = list(Fiche.objects.order_by('tocht__order', 'order').all())
+    all_fiches: list[Fiche] = list(
+        Fiche.objects.filter(tocht__is_alternative=False).order_by('tocht__order', 'order').all()
+    )
     all_tochten: list[Tocht] = list(Tocht.objects.filter(is_alternative=False).order_by('order').all())
 
     next_fiche_map = get_next_fiche_map(all_fiches)

@@ -63,10 +63,18 @@ def _import_geojson_tochten(geojson: dict[str, Any]) -> None:
         if feature.get('geometry') is not None:
             route = GEOSGeometry(json.dumps(feature['geometry']))
             letter = feature['properties']['letter']
+
+            if letter in ['A', 'B', 'C', 'D', 'E', 'F', 'G']:
+                order = ord(letter) - ord('A') + 1
+                is_alternative = False
+            else:
+                order = None
+                is_alternative = True
+
             Tocht.objects.update_or_create(
                 identifier=letter,
-                order=ord(letter) - ord('A') + 1,
-                defaults=dict(route=route),
+                order=order,
+                defaults=dict(route=route, is_alternative=is_alternative),
             )
 
 
@@ -76,14 +84,6 @@ def _import_geojson_weides(geojson: dict[str, Any]) -> None:
             polygon = GEOSGeometry(json.dumps(feature['geometry']))
             letter = feature['properties']['letter'][0].upper()
             name = feature['properties']['name']
-            if letter == 'X':
-                basis = Basis.objects.first()
-                if basis is None:
-                    Basis.objects.create(point=polygon.centroid)
-                else:
-                    basis.point = polygon.centroid
-                    basis.save()
-                continue
 
             tocht = Tocht.objects.get(identifier=letter)
             Weide.objects.update_or_create(tocht=tocht, defaults=dict(polygon=polygon, identifier=letter, name=name))
@@ -109,6 +109,18 @@ def _import_geojson_zijwegen(geojson: dict[str, Any]) -> None:
         if feature.get('geometry') is not None:
             line = GEOSGeometry(json.dumps(feature['geometry']))
             Zijweg.objects.create(geom=line)
+
+
+def _import_geojson_basis(geojson: dict[str, Any]) -> None:
+    if len(geojson['features']) == 0:
+        return
+    point = GEOSGeometry(json.dumps(geojson['features'][0]['geometry'])).centroid
+    basis = Basis.objects.first()
+    if basis is None:
+        Basis.objects.create(point=point)
+    else:
+        basis.point = point
+        basis.save()
 
 
 def import_geoserver(base_url: str):
@@ -148,6 +160,9 @@ def import_featureserv(base_url: str):
 
     zijwegen = get(stripped + '/collections/public.zijwegen_2025/items.json', params=params)
     _import_geojson_zijwegen(zijwegen.json())
+
+    basis = get(stripped + '/collections/public.basis_2025/items.json', params=params)
+    _import_geojson_basis(basis.json())
 
 
 def import_groepen_en_deelnemers(filename: Path):

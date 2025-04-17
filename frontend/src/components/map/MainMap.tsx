@@ -41,7 +41,7 @@ import TrackerLayer from './TrackerLayer.tsx';
 
 const BOUNDS_OPTIONS = { padding: { top: 30, left: 30, right: 30, bottom: 30 } };
 const DEFAULT_INITIAL_BOUNDS = {
-  bounds: [5.552625, 50.217043, 5.68067, 50.295693] as [number, number, number, number],
+  bounds: [5.709597, 50.298247, 5.832838, 50.358745] as [number, number, number, number],
   fitBoundsOptions: BOUNDS_OPTIONS,
 };
 
@@ -69,8 +69,6 @@ export default function MainMap({
   const [cursor, setCursor] = useState('inherit');
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showSatellite, setShowSatellite] = useState(false);
-  const [hasRecentered, setRecentered] = useState(false);
-  const [initialBounds, setInitialBounds] = useState(DEFAULT_INITIAL_BOUNDS);
   const [iconsAdded, setIconsAdded] = useState(false);
   const [showZijwegen, setShowZijwegen] = useState(false);
 
@@ -88,17 +86,6 @@ export default function MainMap({
       maplibregl.removeProtocol('pmtiles');
     };
   }, []);
-
-  useEffect(() => {
-    if (tochten && mapRef && mapRef.current && !hasRecentered) {
-      const features = Object.values(tochten.entities).map((tocht) => feature(tocht.route));
-      const bounds = bbox(featureCollection(features)) as [number, number, number, number];
-
-      mapRef.current.fitBounds(bounds, BOUNDS_OPTIONS);
-      setRecentered(true);
-      setInitialBounds({ bounds, fitBoundsOptions: BOUNDS_OPTIONS });
-    }
-  }, [tochten, mapRef, hasRecentered, setRecentered]);
 
   const addIcons = useCallback(() => {
     if (teams && members) {
@@ -151,10 +138,15 @@ export default function MainMap({
   }, [showSatellite, addIcons]);
 
   const onResetBounds = useCallback(() => {
-    if (mapRef.current) {
-      mapRef.current.fitBounds(initialBounds.bounds, initialBounds.fitBoundsOptions);
+    if (mapRef.current && tochten) {
+      const features = Object.values(tochten.entities).map((tocht) => feature(tocht.route));
+      if (features.length === 0) {
+        return;
+      }
+      const bounds = bbox(featureCollection(features)) as [number, number, number, number];
+      mapRef.current.fitBounds(bounds, BOUNDS_OPTIONS);
     }
-  }, [mapRef, initialBounds]);
+  }, [mapRef, tochten]);
 
   const onMapClick = useCallback(
     (event: MapLayerMouseEvent) => {

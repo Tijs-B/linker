@@ -72,7 +72,9 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
                 f'"point":{item["point"].json},"source":"{item["source"].value}",'
                 f'"tracker":{item["tracker_id"]}}},'
             )
-        response = response[:-1] + ']'
+        if response[-1] == ',':
+            response = response[:-1]
+        response = response + ']'
 
         return HttpResponse(response, content_type='application/json')
 

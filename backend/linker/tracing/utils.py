@@ -17,7 +17,9 @@ logger = getLogger(__name__)
 def trace_team(team: Team):
     logger.info(f'Tracing team {team}')
     closest_fiche = Subquery(
-        Fiche.objects.filter(point__distance_lte=(OuterRef('point'), D(m=FICHE_MAX_DISTANCE))).values('pk')[:1]
+        Fiche.objects.filter(
+            tocht__is_alternative=False, point__distance_lte=(OuterRef('point'), D(m=FICHE_MAX_DISTANCE))
+        ).values('pk')[:1]
     )
 
     logs = TrackerLog.objects.filter(tracker__team=team, team_is_safe=False)

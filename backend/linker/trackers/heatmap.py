@@ -36,4 +36,7 @@ FROM (
             ],
         )
         row = cursor.fetchone()
+    result = row[0]
+    if result is None:
+        return '{"type":"MultiLineString","coordinates":[]}'
     return row[0]

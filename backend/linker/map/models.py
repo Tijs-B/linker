@@ -18,7 +18,7 @@ class Tocht(models.Model):
         return self.identifier
 
     @classmethod
-    def centroid(cls) -> Point:
+    def centroid(cls) -> Point | None:
         return cls.objects.filter(is_alternative=False).aggregate(centroid=Centroid(Collect('route')))['centroid']
 
 

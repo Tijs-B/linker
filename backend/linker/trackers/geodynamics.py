@@ -159,8 +159,8 @@ def fetch_geodynamics_api_data():
     url = base_url.rstrip('/') + '/api/v1/location/position'
 
     history_seconds = float(Setting.get_value_for_key(SETTING_GEODYNAMICS_API_HISTORY_SECONDS, default='300'))
-    from_ts = (now() - timedelta(seconds=history_seconds + 5)).astimezone(ZoneInfo('UTC')).isoformat()
-    to_ts = (now() - timedelta(seconds=5)).astimezone(ZoneInfo('UTC')).isoformat()
+    from_ts = (now() - timedelta(seconds=history_seconds)).astimezone(ZoneInfo('UTC')).isoformat()
+    to_ts = (now() + timedelta(seconds=5)).astimezone(ZoneInfo('UTC')).isoformat()
     params = {'from': from_ts, 'to': to_ts}
 
     tracker_ids = list(Tracker.objects.values_list('tracker_id', flat=True))

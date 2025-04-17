@@ -7,7 +7,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import {
   Avatar,
   Box,
-  CardActionArea,
   CardContent,
   CardHeader,
   CircularProgress,
@@ -50,7 +49,7 @@ export default function HistoryCard() {
   );
 
   useEffect(() => {
-    if (!logs || !mainMap) {
+    if (!logs || logs.length === 0 || !mainMap) {
       return;
     }
 
@@ -74,33 +73,31 @@ export default function HistoryCard() {
 
   return (
     <MainCard sx={{ width: '540px' }}>
-      <CardActionArea onClick={() => dispatch(trackersActions.setShowHistory(false))}>
-        <CardHeader
-          avatar={
-            <Avatar
-              sx={{
-                bgcolor: selectedItem ? itemColor(selectedItem) : '#000',
-                fontSize: code && code.length > 2 ? '16px' : '20px',
-              }}
-            >
-              {code}
-            </Avatar>
-          }
-          title={selectedItem?.name}
-          titleTypographyProps={{ noWrap: true }}
-          subheader={selectedTeam?.chiro || ''}
-          action={
-            <IconButton
-              size="small"
-              onClick={() => {
-                dispatch(trackersActions.setShowHistory(false));
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          }
-        />
-      </CardActionArea>
+      <CardHeader
+        avatar={
+          <Avatar
+            sx={{
+              bgcolor: selectedItem ? itemColor(selectedItem) : '#000',
+              fontSize: code && code.length > 2 ? '16px' : '20px',
+            }}
+          >
+            {code}
+          </Avatar>
+        }
+        title={selectedItem?.name}
+        titleTypographyProps={{ noWrap: true }}
+        subheader={selectedTeam?.chiro || ''}
+        action={
+          <IconButton
+            size="small"
+            onClick={() => {
+              dispatch(trackersActions.setShowHistory(false));
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        }
+      />
 
       <CardContent>
         {logs ? (
