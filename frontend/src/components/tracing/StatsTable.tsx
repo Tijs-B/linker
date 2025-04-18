@@ -58,10 +58,12 @@ export default function StatsTable({
   }, [fiches, tochten]);
 
   const [minFicheTime, maxFicheTime] = useMemo(() => {
-    const ficheTimes = fiches.ids.flatMap((id) => [
-      stats.fiches[id].R.average,
-      stats.fiches[id].B.average,
-    ]);
+    const ficheTimes = fiches.ids.flatMap((id) => {
+      if ('id' in stats.fiches) {
+        return [stats.fiches[id].R.average, stats.fiches[id].B.average];
+      }
+      return [];
+    });
     const minFicheTime = Math.min(...ficheTimes);
     const maxFicheTime = Math.max(...ficheTimes);
     return [minFicheTime, maxFicheTime];
@@ -73,6 +75,7 @@ export default function StatsTable({
     );
   }, [checkpointLogs]);
 
+  const filteredIds = fiches.ids.filter((i) => i in stats);
   return (
     <TableContainer component={Paper}>
       <Table stickyHeader size="small">
@@ -87,7 +90,7 @@ export default function StatsTable({
           </TableRow>
           <TableRow>
             <TableCell />
-            {fiches.ids.map((id) => (
+            {filteredIds.map((id) => (
               <TableCell key={id} sx={{ pl: 1, pr: 1 }}>
                 {fiches.entities[id].display_name}
               </TableCell>
@@ -97,7 +100,7 @@ export default function StatsTable({
         <TableBody>
           <TableRow>
             <TableCell />
-            {fiches.ids.map((id) => (
+            {filteredIds.map((id) => (
               <TableCell
                 style={{
                   color: 'red',
@@ -116,7 +119,7 @@ export default function StatsTable({
           </TableRow>
           <TableRow>
             <TableCell />
-            {fiches.ids.map((id) => (
+            {filteredIds.map((id) => (
               <TableCell
                 style={{
                   color: 'blue',

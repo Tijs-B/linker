@@ -192,6 +192,7 @@ def import_groepen_en_deelnemers(filename: Path):
             defaults=dict(direction=richting, name=name, chiro=chiro),
         )
 
+    ContactPerson.objects.all().delete()
     personen = wb['LIJST Inschrijvingen personen']
 
     first_row = [cell.value for cell in personen['1']]
@@ -203,7 +204,10 @@ def import_groepen_en_deelnemers(filename: Path):
     team_col = first_row.index('Teamnaam')
 
     for row in personen.iter_rows(min_row=2):
-        g_id = int(row[g_id_Col].value)
+        g_id = row[g_id_Col].value
+        if g_id is None:
+            continue
+        g_id = int(g_id)
         if g_id == 0:
             continue
         if row[team_col].value == '#N/A' or row[team_col].value.lower() == 'annulatie':
