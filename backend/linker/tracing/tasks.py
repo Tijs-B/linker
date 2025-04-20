@@ -94,7 +94,7 @@ def tracker_far_away_notifications() -> None:
                 Tocht.objects.filter(route__distance_lte=(OuterRef('last_log__point'), D(m=TRACKER_FAR_AWAY_METERS)))
             )
         )
-        .filter(far_away=True, team__isnull=False, team__safe_weide='')
+        .filter(last_log__isnull=False, far_away=True, team__isnull=False, team__safe_weide='')
         .values_list('pk', flat=True)
     )
     for tracker in trackers_far_away:
@@ -112,7 +112,7 @@ def tracker_not_moving_notifications() -> None:
     minimum_log_count = TRACKER_NOT_MOVING_MINUTES // 5
 
     # iterate these trackers
-    for tracker in Tracker.objects.filter(team__isnull=False, team__safe_weide=''):
+    for tracker in Tracker.objects.filter(last_log__isnull=False, team__isnull=False, team__safe_weide=''):
         # Get the tracker logs in the time window
         tracker_logs = tracker.tracker_logs.filter(gps_datetime__gte=cutoff)
 
