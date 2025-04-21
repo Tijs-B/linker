@@ -1,3 +1,4 @@
+import contextlib
 import csv
 import json
 import re
@@ -9,9 +10,9 @@ from django.contrib.gis.geos import GEOSGeometry
 from openpyxl import load_workbook
 from requests import get
 
-from linker.map.models import Tocht, Basis, Weide, Fiche, Zijweg
+from linker.map.models import Basis, Fiche, Tocht, Weide, Zijweg
 from linker.people.constants import Direction, MemberType
-from linker.people.models import Team, ContactPerson, OrganizationMember
+from linker.people.models import ContactPerson, OrganizationMember, Team
 
 
 def import_gpkg(filename: Path):
@@ -52,10 +53,8 @@ def import_gpkg(filename: Path):
 
     Zijweg.objects.all().delete()
     for feature in ds['Zijwegen']:
-        try:
+        with contextlib.suppress(GDALException):
             Zijweg.objects.create(geom=feature.geom[0].ewkt)
-        except GDALException:
-            pass
 
 
 def _import_geojson_tochten(geojson: dict[str, Any]) -> None:

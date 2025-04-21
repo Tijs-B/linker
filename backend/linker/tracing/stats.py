@@ -150,7 +150,7 @@ def calculate_stats() -> dict:
 
     team_durations = {}
 
-    for team in team_fiche_durations.keys():
+    for team in team_fiche_durations:
         if len(team_fiche_durations[team]) > 0:
             avg_fiche_deviation = round(
                 sum(

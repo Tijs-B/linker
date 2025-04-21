@@ -1,16 +1,16 @@
-from django.db.models import F, CharField, Case, When, Value, Q
+from django.db.models import Case, CharField, F, Q, Value, When
 from django.db.models.functions import Concat
 from rest_framework import viewsets
 
-from .models import Weide, Zijweg, Fiche, MapNote, Tocht, Basis, ForbiddenArea
+from .models import Basis, Fiche, ForbiddenArea, MapNote, Tocht, Weide, Zijweg
 from .serializers import (
-    WeideSerializer,
-    ZijwegSerializer,
+    BasisSerializer,
     FicheSerializer,
+    ForbiddenAreaSerializer,
     MapNoteSerializer,
     TochtSerializer,
-    BasisSerializer,
-    ForbiddenAreaSerializer,
+    WeideSerializer,
+    ZijwegSerializer,
 )
 
 

@@ -10,13 +10,13 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Team, OrganizationMember, TeamNote, ContactPerson
+from .models import ContactPerson, OrganizationMember, Team, TeamNote
 from .permissions import CanUploadPicture
 from .serializers import (
-    TeamSerializer,
+    ContactPersonSerializer,
     OrganizationMemberSerializer,
     TeamNoteSerializer,
-    ContactPersonSerializer,
+    TeamSerializer,
 )
 
 

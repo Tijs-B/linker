@@ -1,5 +1,5 @@
-from django.contrib.gis.geos import LineString
 from django.contrib.gis.db import models
+from django.contrib.gis.geos import LineString
 from django.contrib.gis.measure import D
 from django.db import connection
 from enumfields import EnumField

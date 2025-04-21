@@ -1,8 +1,6 @@
 from logging import getLogger
-from typing import Optional
 
 from django.db import models
-
 
 logger = getLogger(__name__)
 
@@ -16,7 +14,7 @@ class Setting(models.Model):
         return f'{self.key}: {self.value}'
 
     @classmethod
-    def get_value_for_key(cls, key: str, default: Optional[str] = None) -> str:
+    def get_value_for_key(cls, key: str, default: str | None = None) -> str:
         try:
             return cls.objects.get(key=key).value
         except cls.DoesNotExist:
@@ -29,6 +27,9 @@ class Switch(models.Model):
     name = models.CharField(max_length=50, db_index=True, unique=True)
     description = models.TextField(blank=True)
     active = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return f'{self.name}'
 
     @classmethod
     def switch_is_active(cls, name: str) -> bool:

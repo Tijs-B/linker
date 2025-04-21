@@ -35,3 +35,6 @@ class ReadNotification(models.Model):
 
     class Meta:
         constraints = [UniqueConstraint(fields=['user', 'notification'], name='unique_user_notification')]
+
+    def __str__(self):
+        return f'{self.notification} ({self.user.username})'

@@ -33,5 +33,9 @@ line-length = 120
 [tool.ruff.format]
 quote-style = "single"
 
+[tool.ruff.lint]
+select = ["E", "W", "I", "F", "SIM", "UP", "TID", "DJ"]
+ignore = ["DJ001"]
+
 [tool.uv]
 package = false

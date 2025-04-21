@@ -1,7 +1,7 @@
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
 
-from .models import ContactPerson, OrganizationMember, TeamNote, Team
+from .models import ContactPerson, OrganizationMember, Team, TeamNote
 
 
 class ContactPersonSerializer(serializers.ModelSerializer):

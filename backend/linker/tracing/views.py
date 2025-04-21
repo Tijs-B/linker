@@ -13,7 +13,6 @@ from linker.tracing.models import CheckpointLog, Notification, ReadNotification
 from linker.tracing.serializers import CheckpointLogSerializer, NotificationSerializer
 from linker.tracing.stats import calculate_stats
 
-
 logger = getLogger(__name__)
 
 

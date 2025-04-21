@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from logging import getLogger
 from time import time
-from typing import Optional
 from zoneinfo import ZoneInfo
 
 import requests
@@ -15,7 +14,6 @@ from linker.config.models import Setting
 from linker.people.models import Team
 from linker.trackers.constants import SETTING_GEODYNAMICS_API_HISTORY_SECONDS, TrackerLogSource
 from linker.trackers.models import Tracker, TrackerLog
-
 
 logger = getLogger(__name__)
 
@@ -35,7 +33,7 @@ def post_import_actions() -> None:
     logger.info(f'Updated last log of {trackers_updated} trackers')
 
 
-def import_geodynamics_minisite_data(data: dict, fetch_datetime: Optional[datetime] = None) -> None:
+def import_geodynamics_minisite_data(data: dict, fetch_datetime: datetime | None = None) -> None:
     if fetch_datetime is None:
         fetch_datetime = now()
 

@@ -1,6 +1,6 @@
 from django.contrib.gis import admin
 
-from .models import Weide, Fiche, Zijweg, Tocht, MapNote, Basis, ForbiddenArea
+from .models import Basis, Fiche, ForbiddenArea, MapNote, Tocht, Weide, Zijweg
 
 admin.site.register(Zijweg, admin.GISModelAdmin)
 admin.site.register(Basis, admin.GISModelAdmin)

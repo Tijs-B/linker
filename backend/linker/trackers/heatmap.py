@@ -1,6 +1,6 @@
 from django.db import connection
 
-from linker.map.models import Tocht, Basis
+from linker.map.models import Basis, Tocht
 from linker.tracing.constants import GEBIED_MAX_DISTANCE
 
 
@@ -12,7 +12,7 @@ def get_all_tracks() -> str:
             """
 SELECT ST_AsGeoJSON(ST_Collect(f.line))
 FROM (
-    SELECT 
+    SELECT
         ST_MakeLine(trackers_trackerlog.point ORDER BY trackers_trackerlog.gps_datetime) as line
     FROM trackers_trackerlog
     INNER JOIN trackers_tracker

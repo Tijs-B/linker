@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Tocht, Fiche, Weide, Zijweg, MapNote, Basis, ForbiddenArea
+from .models import Basis, Fiche, ForbiddenArea, MapNote, Tocht, Weide, Zijweg
 
 
 class TochtSerializer(serializers.ModelSerializer):

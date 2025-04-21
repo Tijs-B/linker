@@ -1,30 +1,30 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import routers
 
 from linker.map.views import (
-    TochtViewSet,
+    BasisViewSet,
     FicheViewSet,
+    ForbiddenAreaViewSet,
+    MapNoteViewSet,
+    TochtViewSet,
     WeideViewSet,
     ZijwegViewSet,
-    MapNoteViewSet,
-    BasisViewSet,
-    ForbiddenAreaViewSet,
 )
 from linker.people.views import (
-    TeamViewSet,
-    OrganizationMemberViewSet,
-    TeamNoteViewSet,
     ContactPersonViewSet,
     LoginView,
-    UserView,
     LogoutView,
+    OrganizationMemberViewSet,
+    TeamNoteViewSet,
+    TeamViewSet,
+    UserView,
 )
-from linker.tracing.views import CheckpointLogViewSet, StatsView, NotificationViewSet
-from linker.trackers.views import TrackerViewSet, TrackerLogViewSet, HeatmapView
+from linker.tracing.views import CheckpointLogViewSet, NotificationViewSet, StatsView
+from linker.trackers.views import HeatmapView, TrackerLogViewSet, TrackerViewSet
 
 router = routers.DefaultRouter()
 router.register('teams', TeamViewSet, basename='team')

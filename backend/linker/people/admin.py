@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from enumfields.admin import EnumFieldListFilter
 
-from .models import ContactPerson, Team, OrganizationMember, TeamNote
+from .models import ContactPerson, OrganizationMember, Team, TeamNote
 
 
 @admin.register(OrganizationMember)

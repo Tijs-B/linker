@@ -1,21 +1,21 @@
 import datetime
 import gzip
-import zoneinfo
 import json
+import zoneinfo
 from pathlib import Path
-from typing import Optional
 
 from dateutil.parser import isoparse
 from django.conf import settings
 from django.utils.timezone import now
 
+from linker.config.models import Setting
+from linker.people.models import OrganizationMember, Team
+from linker.tracing.models import CheckpointLog
+from linker.utils import import_gpkg, import_groepen_en_deelnemers, import_organization_members
+
 from .constants import SETTING_SIMULATION_START
 from .geodynamics import import_geodynamics_minisite_data
-from .models import TrackerLog, Tracker
-from ..config.models import Setting
-from ..people.models import Team, OrganizationMember
-from ..tracing.models import CheckpointLog
-from ..utils import import_gpkg, import_groepen_en_deelnemers, import_organization_members
+from .models import Tracker, TrackerLog
 
 SIMULATION_START = datetime.datetime(year=2023, month=4, day=29, hour=12, tzinfo=zoneinfo.ZoneInfo('Europe/Brussels'))
 
@@ -36,7 +36,7 @@ def _get_timestamp_from_file_name(file: Path) -> datetime.datetime:
     )
 
 
-def simulate_download_tracker_data(until: Optional[datetime.datetime] = None):
+def simulate_download_tracker_data(until: datetime.datetime | None = None):
     if until is None:
         try:
             start_timestamp_str = Setting.get_value_for_key(SETTING_SIMULATION_START)
@@ -74,7 +74,7 @@ def couple_trackers():
         code = tracker.last_log.code
         if code.startswith('RK'):
             continue
-        if not code[0] == 'R' and not code[0] == 'B':
+        if code[0] != 'R' and code[0] != 'B':
             continue
         team_id = int(code[1:])
         team = Team.objects.get(number=team_id)

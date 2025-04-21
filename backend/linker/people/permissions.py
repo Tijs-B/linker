@@ -2,7 +2,6 @@ from logging import getLogger
 
 from rest_framework import permissions
 
-
 logger = getLogger(__name__)
 
 

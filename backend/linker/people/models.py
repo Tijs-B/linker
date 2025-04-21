@@ -1,10 +1,8 @@
-from typing import Optional
-
 from django.contrib.auth.models import User
 from django.db import models
 from enumfields import EnumField
 
-from linker.people.constants import MemberType, Direction
+from linker.people.constants import Direction, MemberType
 from linker.trackers.models import Tracker, TrackerLog
 
 
@@ -27,15 +25,15 @@ class OrganizationMember(models.Model):
     phone_number = models.CharField(max_length=13, blank=True)
     member_type = EnumField(MemberType, max_length=13)
 
+    def __str__(self):
+        return f'{self.member_type.value.title()} - {self.name}'
+
     @property
-    def last_log(self) -> Optional[TrackerLog]:
+    def last_log(self) -> TrackerLog | None:
         if self.tracker:
             return self.tracker.last_log
         else:
             return None
-
-    def __str__(self):
-        return f'{self.member_type.value.title()} - {self.name}'
 
 
 def group_picture_path(instance, filename):
@@ -57,15 +55,15 @@ class Team(models.Model):
     class Meta:
         permissions = [('can_upload_picture', 'Can upload a group picture')]
 
+    def __str__(self):
+        return f'{self.direction.value}{self.number:02d} {self.name}'
+
     @property
-    def last_log(self) -> Optional[TrackerLog]:
+    def last_log(self) -> TrackerLog | None:
         if self.tracker:
             return self.tracker.last_log
         else:
             return None
-
-    def __str__(self):
-        return f'{self.direction.value}{self.number:02d} {self.name}'
 
 
 class TeamNote(models.Model):

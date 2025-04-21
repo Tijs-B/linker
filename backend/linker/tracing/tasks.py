@@ -5,20 +5,20 @@ from celery import shared_task
 from django.contrib.gis.db.models import Collect
 from django.contrib.gis.db.models.functions import Centroid
 from django.contrib.gis.measure import D
-from django.db.models import Q, Exists, OuterRef
+from django.db.models import Exists, OuterRef, Q
 from django.utils.timezone import now
 
 from linker.config.models import Switch
-from linker.map.models import Tocht, ForbiddenArea
+from linker.map.models import ForbiddenArea, Tocht
 from linker.people.models import Team
 from linker.tracing.constants import (
     SWITCH_TRACE_TEAMS,
-    NotificationType,
-    TRACKER_LOG_SOS_TYPES,
-    TRACKER_LOG_BATTERY_LOW_TYPES,
-    TRACKER_NOT_MOVING_MINUTES,
     TRACKER_FAR_AWAY_METERS,
+    TRACKER_LOG_BATTERY_LOW_TYPES,
+    TRACKER_LOG_SOS_TYPES,
     TRACKER_NOT_MOVING_METERS,
+    TRACKER_NOT_MOVING_MINUTES,
+    NotificationType,
 )
 from linker.tracing.models import Notification
 from linker.tracing.utils import trace_team
