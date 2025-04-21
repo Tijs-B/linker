@@ -20,7 +20,7 @@ import utc from 'dayjs/plugin/utc';
 import { SnackbarProvider } from 'notistack';
 
 import Navigation from './Navigation';
-import ReloadPrompt from './components/ReloadPrompt.tsx';
+import RegisterServiceWorker from './components/RegisterServiceWorker.tsx';
 import { notifications } from './config';
 import { store } from './store';
 import AppThemeProvider from './theme/AppThemeProvider.tsx';
@@ -43,7 +43,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               </BrowserRouter>
             </LocalizationProvider>
           </MapProvider>
-          <ReloadPrompt />
+          <RegisterServiceWorker />
         </SnackbarProvider>
       </AppThemeProvider>
     </Provider>

@@ -24,6 +24,7 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         manifest,
         injectRegister: 'auto',
+        registerType: 'autoUpdate',
         pwaAssets: {
           overrideManifestIcons: true,
         },
@@ -38,14 +39,16 @@ export default defineConfig(({ mode }) => {
             {
               urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen|forbidden-areas)/,
               handler: 'StaleWhileRevalidate',
+              options: {expiration: {maxAgeSeconds: 4 * 60 * 60}}
             },
             {
               urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/api\//,
               handler: 'NetworkFirst',
+              options: {expiration: {maxAgeSeconds: 2 * 60 * 60}}
             },
             {
               urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/tiles\/belgium\.pmtiles/,
-              handler: 'StaleWhileRevalidate',
+              handler: 'CacheFirst',
               options: {
                 cacheableResponse: {
                   statuses: [0, 200, 204, 206],
