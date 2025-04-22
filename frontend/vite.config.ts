@@ -4,7 +4,9 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 import manifest from './manifest.json';
 
-const ReactCompilerConfig = { /* ... */ };
+const ReactCompilerConfig = {
+  /* ... */
+};
 
 export default defineConfig(({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
@@ -16,10 +18,8 @@ export default defineConfig(({ mode }) => {
       react({
         jsxImportSource: '@emotion/react',
         babel: {
-          plugins: [
-            ["babel-plugin-react-compiler", ReactCompilerConfig]
-          ]
-        }
+          plugins: [['babel-plugin-react-compiler', ReactCompilerConfig]],
+        },
       }),
       VitePWA({
         manifest,
@@ -37,14 +37,21 @@ export default defineConfig(({ mode }) => {
               handler: 'NetworkOnly',
             },
             {
-              urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen|forbidden-areas)/,
+              urlPattern:
+                /^https:\/\/link\d?(?:-test)?.tijsb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen|forbidden-areas)/,
               handler: 'StaleWhileRevalidate',
-              options: {expiration: {maxAgeSeconds: 4 * 60 * 60}}
+              options: {
+                expiration: { maxAgeSeconds: 4 * 60 * 60 },
+                cacheName: 'linker-map-data-2025',
+              },
             },
             {
               urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/api\//,
               handler: 'NetworkFirst',
-              options: {expiration: {maxAgeSeconds: 2 * 60 * 60}}
+              options: {
+                expiration: { maxAgeSeconds: 2 * 60 * 60 },
+                cacheName: 'linker-api-data-2025',
+              },
             },
             {
               urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/tiles\/belgium\.pmtiles/,
