@@ -75,7 +75,7 @@ export default function StatsTable({
     );
   }, [checkpointLogs]);
 
-  const filteredIds = fiches.ids.filter((i) => i in stats);
+  const filteredIds = fiches.ids.filter((i) => i in stats.fiches);
   return (
     <TableContainer component={Paper}>
       <Table stickyHeader size="small">
