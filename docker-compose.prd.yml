@@ -88,6 +88,8 @@ services:
     volumes:
       - ./map_data:/map_data:ro
     command: '--config /map_data/martin.yaml'
+    networks:
+      - linker_net
 
   nginx:
     build:
