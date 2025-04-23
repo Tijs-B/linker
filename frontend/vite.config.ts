@@ -81,6 +81,11 @@ export default defineConfig(({ mode }) => {
           target: process.env.VITE_BACKEND_URL,
           changeOrigin: true,
         },
+        '/tiles': {
+          target: process.env.VITE_TILES_URL,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/tiles/, ''),
+        }
       },
     },
   };

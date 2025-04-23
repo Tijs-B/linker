@@ -65,13 +65,3 @@ COPY deployment/nginx.conf /etc/nginx/conf.d
 
 COPY --from=frontend /app/dist /app/serve
 COPY --from=backend /app/static /app/serve/static
-COPY map_data/belgium.pmtiles /app/serve/tiles/belgium.pmtiles
-ADD map_data/fonts.tar.gz /app/serve/tiles/
-
-####################
-### FRONTEND DEV ###
-####################
-FROM frontend AS frontend-dev
-
-COPY map_data/belgium.pmtiles /app/public/tiles/belgium.pmtiles
-ADD map_data/fonts.tar.gz /app/public/tiles/

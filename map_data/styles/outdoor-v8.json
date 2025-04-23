@@ -4,11 +4,11 @@
   "sources": {
     "openmaptiles": {
       "type": "vector",
-      "url": "pmtiles:///tiles/belgium.pmtiles"
+      "url": "/tiles/openmaptiles,outdoor"
     }
   },
   "sprite": "https://maputnik.github.io/osm-liberty/sprites/osm-liberty",
-  "glyphs": "/tiles/fonts/{fontstack}/{range}.pbf",
+  "glyphs": "/tiles/font/{fontstack}/{range}",
   "layers": [
     {
       "id": "background",

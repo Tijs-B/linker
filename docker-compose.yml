@@ -70,8 +70,17 @@ services:
       - /app/public/tiles/
     environment:
       - VITE_BACKEND_URL=http://linker:8060
+      - VITE_TILES_URL=http://tiles:8064
     ports:
       - "8061:8061"
+
+  tiles:
+    image: ghcr.io/maplibre/martin
+    volumes:
+      - ./map_data:/map_data:ro
+    command: '--config /map_data/martin.yaml'
+    ports:
+      - '8064:8064'
 
 volumes:
   postgis-data:

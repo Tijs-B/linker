@@ -13,10 +13,10 @@
     },
     "openmaptiles": {
       "type": "vector",
-      "url": "pmtiles:///tiles/belgium.pmtiles"
+      "url": "/tiles/openmaptiles,outdoor"
     }
   },
-  "glyphs": "/tiles/fonts/{fontstack}/{range}.pbf",
+  "glyphs": "/tiles/font/{fontstack}/{range}",
   "layers": [
     { "id": "satellite", "type": "raster", "source": "esri_satellite" },
     {
@@ -260,7 +260,7 @@
         ["!=", ["get", "subclass"], "ferry"]
       ],
       "layout": {
-        "text-font": ["Klokantech Noto Sans Regular"],
+        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-size": ["interpolate", ["linear", 0.75, 1, 0.75, 1], ["zoom"], 10, 8, 16, 10, 24, 14],
         "text-field": ["coalesce", ["get", "name:en"], ["get", "name"]],
         "visibility": "visible",
@@ -288,7 +288,7 @@
         ["match", ["get", "class"], ["country", "state"], false, true]
       ],
       "layout": {
-        "text-font": ["Klokantech Noto Sans Regular"],
+        "text-font": ["KlokanTech Noto Sans Regular"],
         "text-size": [
           "interpolate",
           ["linear", 0.5, 1, 0.5, 1],
@@ -327,7 +327,7 @@
         ["<=", ["get", "rank"], 6]
       ],
       "layout": {
-        "text-font": ["Klokantech Noto Sans Italic"],
+        "text-font": ["KlokanTech Noto Sans Italic"],
         "text-size": [
           "interpolate",
           ["linear", 0.75, 1, 0.75, 1],
@@ -374,7 +374,7 @@
         ["match", ["get", "class"], ["country"], true, false]
       ],
       "layout": {
-        "text-font": ["Klokantech Noto Sans Bold"],
+        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-size": [
           "interpolate",
           ["linear", 0.75, 1, 0.75, 1],
@@ -408,7 +408,7 @@
       "maxzoom": 1,
       "filter": ["==", ["get", "class"], "continent"],
       "layout": {
-        "text-font": ["Klokantech Noto Sans Bold"],
+        "text-font": ["KlokanTech Noto Sans Bold"],
         "text-size": ["interpolate", ["linear"], ["zoom"], 0, 12, 2, 13],
         "text-field": ["to-string", ["get", "name"]],
         "visibility": "visible",

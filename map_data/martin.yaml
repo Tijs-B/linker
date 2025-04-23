@@ -1,0 +1,12 @@
+listen_addresses: 0.0.0.0:8064
+
+preferred_encoding: gzip
+
+mbtiles:
+  sources:
+    openmaptiles: /map_data/openmaptiles.mbtiles
+    outdoor: /map_data/outdoor.mbtiles
+
+styles: /map_data/styles
+
+fonts: /map_data/fonts
