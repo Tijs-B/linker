@@ -113,17 +113,20 @@ export default function BackgroundLayers({
           layout={{ visibility: showHeatmap || showSatellite ? 'none' : 'visible' }}
         />
       </Source>
-      <Source type="geojson" data="/api/heatmap/">
-        <Layer
-          id="heatmap"
-          type="line"
-          layout={{ visibility: showHeatmap ? 'visible' : 'none' }}
-          paint={{
-            'line-color': '#e8380c',
-            'line-opacity': 0.2,
-          }}
-        />
-      </Source>
+
+      {showHeatmap && (
+        <Source type="geojson" data="/api/heatmap/">
+          <Layer
+            id="heatmap"
+            type="line"
+            layout={{ visibility: showHeatmap ? 'visible' : 'none' }}
+            paint={{
+              'line-color': '#e8380c',
+              'line-opacity': 0.2,
+            }}
+          />
+        </Source>
+      )}
 
       <Source type="geojson" data={fichesData}>
         <Layer
