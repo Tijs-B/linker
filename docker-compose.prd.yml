@@ -83,6 +83,12 @@ services:
     networks:
       - linker_net
 
+  tiles:
+    image: ghcr.io/maplibre/martin
+    volumes:
+      - ./map_data:/map_data:ro
+    command: '--config /map_data/martin.yaml'
+
   nginx:
     build:
       context: .
@@ -94,6 +100,7 @@ services:
       - upload-media:/media
     depends_on:
       - linker
+      - tiles
     labels:
       caddy: link2.tijsb.be
       caddy.reverse_proxy: "{{upstreams 80}}"

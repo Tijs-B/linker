@@ -1,3 +1,4 @@
 data/
 planetiler.jar
 *.pmtiles
+*.mbtiles

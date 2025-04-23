@@ -15,10 +15,8 @@ import WhatshotIcon from '@mui/icons-material/Whatshot';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 import { IconButton, useMediaQuery, useTheme } from '@mui/material';
 
-import * as pmtiles from 'pmtiles';
 import bbox from '@turf/bbox';
 import { feature, featureCollection } from '@turf/helpers';
-import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import {
@@ -28,9 +26,6 @@ import {
 } from '../../services/linker.ts';
 import { OrganizationMember, Team } from '../../services/types.ts';
 import { trackersActions, useAppDispatch } from '../../store';
-import { darkStyle } from '../../styles/dark.ts';
-import { outdoorStyle } from '../../styles/outdoor.ts';
-import { satelliteStyle } from '../../styles/satellite.ts';
 import { generateAllIcons } from '../../utils/icons.ts';
 import BackgroundLayers from './BackgroundLayers.tsx';
 import CustomOverlay from './CustomOverlay.tsx';
@@ -77,15 +72,11 @@ export default function MainMap({
   const { data: teams } = useGetTeamsQuery();
   const { data: members } = useGetOrganizationMembersQuery();
 
-  const mapStyle = showHeatmap ? darkStyle : showSatellite ? satelliteStyle : outdoorStyle;
-
-  useEffect(() => {
-    const protocol = new pmtiles.Protocol();
-    maplibregl.addProtocol('pmtiles', protocol.tile);
-    return () => {
-      maplibregl.removeProtocol('pmtiles');
-    };
-  }, []);
+  const mapStyle = showHeatmap
+    ? '/tiles/style/dark-v8'
+    : showSatellite
+      ? '/tiles/style/satellite-v8'
+      : '/tiles/style/outdoor-v8';
 
   const addIcons = useCallback(() => {
     if (teams && members) {
