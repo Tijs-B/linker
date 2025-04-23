@@ -12,7 +12,7 @@ export default function RegisterServiceWorker() {
             console.log('Checking for sw update');
             r.update();
           },
-          1000 * 60 * 5 /* 20s for testing purposes */,
+          1000 * 20 /* 20s for testing purposes */,
         );
       }
     },
