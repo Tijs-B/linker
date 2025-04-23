@@ -54,17 +54,16 @@ export default defineConfig(({ mode }) => {
               },
             },
             {
-              urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/tiles\/belgium\.pmtiles/,
+              urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/tiles\/openmaptiles,outdoor\//,
               handler: 'CacheFirst',
               options: {
                 cacheableResponse: {
-                  statuses: [0, 200, 204, 206],
+                  statuses: [0, 200, 204],
                 },
-                rangeRequests: true,
               },
             },
             {
-              urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/tiles\/fonts\//,
+              urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/tiles\/font\//,
               handler: 'CacheFirst',
             },
             {
