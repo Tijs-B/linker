@@ -25,9 +25,9 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.has_perm('people.view_contactperson'):
-            contact_person_inner_queryset = ContactPerson.objects.order_by('name')
+            contact_person_inner_queryset = ContactPerson.objects.order_by('-is_favorite', 'name')
         else:
-            contact_person_inner_queryset = ContactPerson.objects.order_by('name')
+            contact_person_inner_queryset = ContactPerson.objects.none()
 
         queryset = (
             Team.objects.prefetch_related(
