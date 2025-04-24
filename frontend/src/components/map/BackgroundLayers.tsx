@@ -146,7 +146,7 @@ export default function BackgroundLayers({
             'text-opacity': showHeatmap ? 0 : 1,
             'text-color': grey[800],
           }}
-          minzoom={13}
+          minzoom={12}
         />
         <Layer
           id="fiches-circles"
@@ -159,7 +159,7 @@ export default function BackgroundLayers({
             'circle-stroke-width': 1.5,
           }}
           layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
-          minzoom={13}
+          minzoom={12}
         />
       </Source>
       <Source type="geojson" data={tochtenData}>
