@@ -162,6 +162,8 @@ export default function StatusCard({
     return getNavigationUrl(selectedTracker?.last_log?.point);
   }, [selectedTracker]);
 
+  const canSeeContactPersons = user ? user.permissions.includes('view_contactperson') : false;
+
   return (
     <MainCard sx={{ width: '360px' }}>
       <CardHeader
@@ -238,7 +240,7 @@ export default function StatusCard({
           </>
         )}
 
-        {selectedTeam && (
+        {selectedTeam && canSeeContactPersons && (
           <>
             <TeamCallButton team={selectedTeam} />
 

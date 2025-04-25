@@ -152,6 +152,9 @@ export default function TeamPage() {
 
   const tracker = trackers && team?.tracker ? trackers.entities[team.tracker] : null;
 
+  const canSeeTeamNotes = user ? user.permissions.includes('view_teamnote') : false;
+  const canSeeContactPersons = user ? user.permissions.includes('view_contactperson') : false;
+
   if (!team) {
     return <div>Team not found</div>;
   }
@@ -270,57 +273,61 @@ export default function TeamPage() {
           </Grid>
           <Grid size={{ xs: 12, md: 4 }}>
             <Stack flex="1 1 0" spacing={2}>
-              <Paper>
-                <Container sx={{ pt: 2, pb: 2 }}>
-                  <Stack spacing={1}>
-                    <Typography variant="h6">Notities</Typography>
-                    {team.team_notes && (
-                      <List>
-                        {team.team_notes.map((note) => (
-                          <ListItem
-                            key={note.id}
-                            secondaryAction={
-                              <IconButton onClick={() => deleteTeamNote(note.id)}>
-                                <DeleteIcon />
-                              </IconButton>
-                            }
-                          >
-                            <ListItemText
-                              primary={note.text}
-                              secondary={
-                                formatFromNow(note.created) +
-                                (note.author ? ` door ${note.author}` : '')
+              {canSeeTeamNotes && (
+                <Paper>
+                  <Container sx={{ pt: 2, pb: 2 }}>
+                    <Stack spacing={1}>
+                      <Typography variant="h6">Notities</Typography>
+                      {team.team_notes && (
+                        <List>
+                          {team.team_notes.map((note) => (
+                            <ListItem
+                              key={note.id}
+                              secondaryAction={
+                                <IconButton onClick={() => deleteTeamNote(note.id)}>
+                                  <DeleteIcon />
+                                </IconButton>
                               }
-                            />
-                          </ListItem>
-                        ))}
-                      </List>
-                    )}
-                    {team.team_notes.length === 0 && (
-                      <Typography variant="body2" color="textSecondary">
-                        Nog geen notities
-                      </Typography>
-                    )}
-                    <Stack direction="row" spacing={1}>
-                      <TextField
-                        value={newNoteText}
-                        onChange={(e) => setNewNoteText(e.target.value)}
-                        multiline
-                        slotProps={{ input: { spellCheck: false } }}
-                      />
-                      <Button variant="contained" onClick={createNote}>
-                        Post
-                      </Button>
+                            >
+                              <ListItemText
+                                primary={note.text}
+                                secondary={
+                                  formatFromNow(note.created) +
+                                  (note.author ? ` door ${note.author}` : '')
+                                }
+                              />
+                            </ListItem>
+                          ))}
+                        </List>
+                      )}
+                      {team.team_notes.length === 0 && (
+                        <Typography variant="body2" color="textSecondary">
+                          Nog geen notities
+                        </Typography>
+                      )}
+                      <Stack direction="row" spacing={1}>
+                        <TextField
+                          value={newNoteText}
+                          onChange={(e) => setNewNoteText(e.target.value)}
+                          multiline
+                          slotProps={{ input: { spellCheck: false } }}
+                        />
+                        <Button variant="contained" onClick={createNote}>
+                          Post
+                        </Button>
+                      </Stack>
                     </Stack>
-                  </Stack>
-                </Container>
-              </Paper>
-              <Paper>
-                <Container sx={{ pt: 2, pb: 2 }}>
-                  <Typography variant="h6">Leden</Typography>
-                  <ContactPersonsList team={team} />
-                </Container>
-              </Paper>
+                  </Container>
+                </Paper>
+              )}
+              {canSeeContactPersons && (
+                <Paper>
+                  <Container sx={{ pt: 2, pb: 2 }}>
+                    <Typography variant="h6">Leden</Typography>
+                    <ContactPersonsList team={team} />
+                  </Container>
+                </Paper>
+              )}
               <Paper>
                 <Container sx={{ pt: 2, pb: 2 }}>
                   <Stack spacing={1}>
