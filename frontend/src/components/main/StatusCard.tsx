@@ -240,18 +240,16 @@ export default function StatusCard({
           </>
         )}
 
-        {selectedTeam && canSeeContactPersons && (
-          <>
-            <TeamCallButton team={selectedTeam} />
+        {selectedTeam && canSeeContactPersons && <TeamCallButton team={selectedTeam} />}
 
-            <Tooltip title="Meer info">
-              <IconButton component={RouterLink} to={`/team/${selectedTeam.id}/`}>
-                <Badge badgeContent={selectedTeam.team_notes.length} color="primary">
-                  <InfoIcon />
-                </Badge>
-              </IconButton>
-            </Tooltip>
-          </>
+        {selectedTeam && (
+          <Tooltip title="Meer info">
+            <IconButton component={RouterLink} to={`/team/${selectedTeam.id}/`}>
+              <Badge badgeContent={selectedTeam.team_notes.length} color="primary">
+                <InfoIcon />
+              </Badge>
+            </IconButton>
+          </Tooltip>
         )}
       </CardActions>
     </MainCard>
