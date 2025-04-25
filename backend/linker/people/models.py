@@ -53,10 +53,7 @@ class Team(models.Model):
     safe_weide_updated_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
-        permissions = [
-            ('can_upload_picture', 'Can upload a group picture'),
-            ('can_see_tracing', 'Can see tracing information'),
-        ]
+        permissions = [('can_upload_picture', 'Can upload a group picture')]
 
     def __str__(self):
         return f'{self.direction.value}{self.number:02d} {self.name}'
