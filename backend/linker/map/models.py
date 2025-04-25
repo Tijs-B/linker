@@ -68,6 +68,7 @@ class MapNote(models.Model):
 class ForbiddenArea(models.Model):
     description = models.TextField(blank=True)
     area = models.MultiPolygonField()
+    route_allowed = models.BooleanField(default=False)
 
     def __str__(self):
         if not self.description:

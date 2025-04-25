@@ -138,6 +138,7 @@ export interface Basis {
 export interface ForbiddenArea {
   id: number;
   description: string;
+  route_allowed: boolean;
   area: MultiPolygon;
 }
 

@@ -14,6 +14,7 @@ from linker.people.models import Team
 from linker.tracing.constants import (
     SWITCH_TRACE_TEAMS,
     TRACKER_FAR_AWAY_METERS,
+    TRACKER_FORBIDDEN_AREA_AWAY_FROM_ROUTE_METERS,
     TRACKER_LOG_BATTERY_LOW_TYPES,
     TRACKER_LOG_SOS_TYPES,
     TRACKER_NOT_MOVING_METERS,
@@ -135,11 +136,29 @@ def tracker_not_moving_notifications() -> None:
 
 @shared_task
 def tracker_forbidden_area_notifications() -> None:
-    tracker_ids = list(
+    tracker_ids_route_not_allowed = list(
         Tracker.objects.filter(team__isnull=False, team__safe_weide='', last_log__isnull=False)
-        .filter(Exists(ForbiddenArea.objects.filter(area__contains=OuterRef('last_log__point'))))
+        .filter(Exists(ForbiddenArea.objects.filter(route_allowed=False, area__contains=OuterRef('last_log__point'))))
         .values_list('pk', flat=True)
     )
+    tracker_ids_route_allowed = list(
+        Tracker.objects.filter(team__isnull=False, team__safe_weide='', last_log__isnull=False)
+        .filter(Exists(ForbiddenArea.objects.filter(route_allowed=True, area__contains=OuterRef('last_log__point'))))
+        .annotate(
+            far_away=~Exists(
+                Tocht.objects.filter(
+                    route__distance_lte=(
+                        OuterRef('last_log__point'),
+                        D(m=TRACKER_FORBIDDEN_AREA_AWAY_FROM_ROUTE_METERS),
+                    )
+                )
+            )
+        )
+        .filter(far_away=True)
+        .values_list('pk', flat=True)
+    )
+
+    tracker_ids = list(set(tracker_ids_route_allowed + tracker_ids_route_not_allowed))
 
     for tracker in tracker_ids:
         Notification.objects.get_or_create(

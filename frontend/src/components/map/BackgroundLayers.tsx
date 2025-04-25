@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
-import { green, grey, red } from '@mui/material/colors';
+import { green, grey, orange, red } from '@mui/material/colors';
 
 import centroid from '@turf/centroid';
 import { feature, featureCollection } from '@turf/helpers';
@@ -73,7 +73,11 @@ export default function BackgroundLayers({
     }
     return featureCollection(
       Object.values(forbiddenAreas.entities).map((forbiddenArea) =>
-        feature(forbiddenArea.area, {}, { id: forbiddenArea.id }),
+        feature(
+          forbiddenArea.area,
+          { routeAllowed: forbiddenArea.route_allowed },
+          { id: forbiddenArea.id },
+        ),
       ),
     );
   }, [forbiddenAreas]);
@@ -235,9 +239,9 @@ export default function BackgroundLayers({
           type="fill"
           beforeId="weides"
           paint={{
-            'fill-color': red[500],
+            'fill-color': ['case', ['get', 'routeAllowed'], orange[700], red[500]],
             'fill-opacity': 0.5,
-            'fill-outline-color': red[800],
+            'fill-outline-color': ['case', ['get', 'routeAllowed'], orange[900], red[800]],
           }}
           layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
         />

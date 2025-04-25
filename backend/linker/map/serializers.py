@@ -52,5 +52,5 @@ class BasisSerializer(serializers.ModelSerializer):
 class ForbiddenAreaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ForbiddenArea
-        fields = ['id', 'description', 'area']
+        fields = ['id', 'description', 'area', 'route_allowed']
         read_only_fields = fields

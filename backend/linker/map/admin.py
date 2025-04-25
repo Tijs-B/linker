@@ -21,6 +21,7 @@ class MapNoteAdmin(admin.GISModelAdmin):
 @admin.register(ForbiddenArea)
 class ForbiddenAreaAdmin(admin.GISModelAdmin):
     search_fields = ('description',)
+    list_display = ('__str__', 'route_allowed')
 
 
 @admin.register(Fiche)
