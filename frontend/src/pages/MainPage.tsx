@@ -72,7 +72,7 @@ export default function MainPage() {
     isFetching: isFetchingTrackers,
     refetch: refetchTrackers,
   } = useGetTrackersQuery(undefined, {
-    pollingInterval: 10_000,
+    pollingInterval: 6_000,
     skipPollingIfUnfocused: true,
   });
   const { isFetching: isFetchingNotifications, refetch: refetchNotifications } =
