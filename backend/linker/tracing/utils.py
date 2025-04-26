@@ -22,8 +22,11 @@ def trace_team(team: Team):
     )
 
     logs = TrackerLog.objects.filter(tracker__team=team, team_is_safe=False)
-    last_checkpoint = team.checkpointlogs.latest('left')
-    if last_checkpoint is not None:
+    try:
+        last_checkpoint = team.checkpointlogs.latest('left')
+    except CheckpointLog.DoesNotExist:
+        pass
+    else:
         logs = logs.filter(gps_datetime__gte=last_checkpoint.arrived)
 
     logs = logs.annotate(closest_fiche=closest_fiche).order_by('gps_datetime').values('gps_datetime', 'closest_fiche')
