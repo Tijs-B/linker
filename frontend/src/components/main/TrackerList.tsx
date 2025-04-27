@@ -46,6 +46,17 @@ const TrackerRow = ({ data, index, style }: TrackerRowProps) => {
     }
   }, [data, dispatch, index]);
 
+  const safeChip = useMemo(() => {
+    const item = data.items[index];
+    if (!('safe_weide' in item) || !item.safe_weide) {
+      return null;
+    }
+    if (item.safe_weide.trim().toLowerCase() === 'bus') {
+      return <Chip color="warning" variant="filled" label="Op 't busje" />;
+    }
+    return <Chip color="primary" variant="filled" label={`Safe op ${item.safe_weide}`} />;
+  }, [data, index]);
+
   return (
     <div style={style}>
       <ListItem disablePadding dense>
@@ -63,9 +74,7 @@ const TrackerRow = ({ data, index, style }: TrackerRowProps) => {
               secondary: { noWrap: true },
             }}
           />
-          {'safe_weide' in item && item.safe_weide && (
-            <Chip color="primary" variant="filled" label={`Safe op ${item.safe_weide}`} />
-          )}
+          {safeChip}
         </ListItemButton>
       </ListItem>
     </div>

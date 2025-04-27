@@ -50,6 +50,7 @@ export default function MainToolbar({
   const theme = useTheme();
 
   const showSafe = useAppSelector((state) => state.filter.showSafe);
+  const showBus = useAppSelector((state) => state.filter.showBus);
   const showMembers = useAppSelector((state) => state.filter.showMembers);
   const showRed = useAppSelector((state) => state.filter.showRed);
   const showBlue = useAppSelector((state) => state.filter.showBlue);
@@ -108,6 +109,10 @@ export default function MainToolbar({
         <MenuItem onClick={() => dispatch(filterActions.toggleShowSafe())}>
           <ListItemIcon>{showSafe && <CheckIcon />}</ListItemIcon>
           Toon safe teams
+        </MenuItem>
+        <MenuItem onClick={() => dispatch(filterActions.toggleShowBus())}>
+          <ListItemIcon>{showBus && <CheckIcon />}</ListItemIcon>
+          Toon teams op de bus
         </MenuItem>
         <MenuItem onClick={() => dispatch(filterActions.toggleShowMembers())}>
           <ListItemIcon>{showMembers && <CheckIcon />}</ListItemIcon>

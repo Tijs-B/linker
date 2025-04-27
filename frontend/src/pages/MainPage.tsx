@@ -47,6 +47,7 @@ export default function MainPage() {
   const selectedId = useAppSelector((state) => state.trackers.selectedId);
   const showHistory = useAppSelector((state) => state.trackers.showHistory);
   const showSafe = useAppSelector((state) => state.filter.showSafe);
+  const showBus = useAppSelector((state) => state.filter.showBus);
   const showMembers = useAppSelector((state) => state.filter.showMembers);
   const showRed = useAppSelector((state) => state.filter.showRed);
   const showBlue = useAppSelector((state) => state.filter.showBlue);
@@ -161,13 +162,16 @@ export default function MainPage() {
     } else if (teams) {
       return teams.ids
         .map((id) => teams.entities[id])
-        .filter((team) => showSafe || !team.safe_weide)
+        .filter(
+          (team) => showSafe || !team.safe_weide || team.safe_weide.trim().toLowerCase() === 'bus',
+        )
+        .filter((team) => showBus || team.safe_weide.trim().toLowerCase() !== 'bus')
         .filter((team) => showRed || team.direction !== Direction.RED)
         .filter((team) => showBlue || team.direction !== Direction.BLUE);
     } else {
       return [];
     }
-  }, [teamFuse, keyword, teams, showSafe, showRed, showBlue]);
+  }, [teamFuse, keyword, teams, showSafe, showBus, showRed, showBlue]);
 
   const filteredMembers = useMemo(() => {
     if (!showMembers) {

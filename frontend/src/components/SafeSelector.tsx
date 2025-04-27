@@ -25,6 +25,7 @@ export default function SafeSelector({ team }: SafeSelectorProps) {
   const options = useMemo(() => {
     if (!weides) return [];
     const result = weides.ids.map((id) => weides.entities[id].name);
+    result.unshift('Bus');
     result.unshift('Unsafe');
     return result;
   }, [weides]);
