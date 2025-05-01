@@ -2,8 +2,6 @@ from datetime import timedelta
 from logging import getLogger
 
 from celery import shared_task
-from django.contrib.gis.db.models import Collect
-from django.contrib.gis.db.models.functions import Centroid
 from django.contrib.gis.measure import D
 from django.db.models import Exists, OuterRef, Q
 from django.utils.timezone import now
@@ -15,8 +13,6 @@ from linker.tracing.constants import (
     SWITCH_TRACE_TEAMS,
     TRACKER_FAR_AWAY_METERS,
     TRACKER_FORBIDDEN_AREA_AWAY_FROM_ROUTE_METERS,
-    TRACKER_NOT_MOVING_METERS,
-    TRACKER_NOT_MOVING_MINUTES,
     NotificationType,
 )
 from linker.tracing.models import Notification
@@ -103,33 +99,6 @@ def tracker_far_away_notifications() -> None:
     Notification.objects.filter(notification_type=NotificationType.TRACKER_FAR_AWAY).exclude(
         tracker_id__in=trackers_far_away
     ).delete()
-
-
-@shared_task
-def tracker_not_moving_notifications() -> None:
-    cutoff = now() - timedelta(minutes=TRACKER_NOT_MOVING_MINUTES)
-    minimum_log_count = TRACKER_NOT_MOVING_MINUTES // 5
-
-    # iterate these trackers
-    for tracker in Tracker.objects.filter(last_log__isnull=False, team__isnull=False, team__safe_weide=''):
-        # Get the tracker logs in the time window
-        tracker_logs = tracker.tracker_logs.filter(gps_datetime__gte=cutoff)
-
-        # If the number of logs is too low, remove the notification
-        if tracker_logs.count() < minimum_log_count:
-            Notification.objects.filter(notification_type=NotificationType.TRACKER_NOT_MOVING, tracker=tracker).delete()
-            continue
-
-        # Find the centroid
-        centroid = tracker_logs.aggregate(centroid=Centroid(Collect('point')))['centroid']
-
-        # Check if all tracker logs are within TRACKER_NOT_MOVING_METERS from the centroid
-        any_further = tracker_logs.filter(point__distance_gte=(centroid, D(M=TRACKER_NOT_MOVING_METERS))).exists()
-
-        if not any_further:
-            Notification.objects.get_or_create(notification_type=NotificationType.TRACKER_NOT_MOVING, tracker=tracker)
-        else:
-            Notification.objects.filter(notification_type=NotificationType.TRACKER_NOT_MOVING, tracker=tracker).delete()
 
 
 @shared_task

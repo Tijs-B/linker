@@ -5,7 +5,6 @@ import { FixedSizeList } from 'react-window';
 import Battery1BarIcon from '@mui/icons-material/Battery1Bar';
 import CheckIcon from '@mui/icons-material/Check';
 import CloudOffIcon from '@mui/icons-material/CloudOff';
-import CoffeeIcon from '@mui/icons-material/Coffee';
 import LockIcon from '@mui/icons-material/Lock';
 import SosIcon from '@mui/icons-material/Sos';
 import SportsBarIcon from '@mui/icons-material/SportsBar';
@@ -78,10 +77,6 @@ const NotificationRow = ({ data, index, style }: NotificationRowProps) => {
     case NotificationType.TRACKER_LOW_BATTERY:
       icon = <Battery1BarIcon />;
       title = `Tracker batterij`;
-      break;
-    case NotificationType.TRACKER_NOT_MOVING:
-      icon = <CoffeeIcon />;
-      title = `Tracker staat stil`;
       break;
     case NotificationType.TRACKER_IN_FORBIDDEN_AREA:
       icon = <LockIcon />;
