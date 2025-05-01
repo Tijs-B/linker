@@ -2,6 +2,8 @@ import { CSSProperties, useCallback, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
 
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { Badge, Chip, ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 
 import { css } from '@emotion/react';
@@ -22,6 +24,7 @@ import PersonAvatar from '../PersonAvatar';
 type TrackerRowDataItem = (OrganizationMember | Team) & {
   secondary: string;
   isOnline: boolean;
+  batteryPercentage: number | null;
 };
 
 interface TrackerRowProps {
@@ -52,18 +55,26 @@ const TrackerRow = ({ data, index, style }: TrackerRowProps) => {
       return null;
     }
     if (item.safe_weide.trim().toLowerCase() === 'bus') {
-      return <Chip color="warning" variant="filled" label="Op 't busje" />;
+      return <Chip color="warning" variant="outlined" icon={<DirectionsBusIcon />} label="Bus" />;
     }
     return <Chip color="primary" variant="filled" label={`Safe op ${item.safe_weide}`} />;
+  }, [data, index]);
+
+  const offlineIcon = useMemo(() => {
+    const item = data.items[index];
+    if (item.isOnline) {
+      return null;
+    }
+    return <LinkOffIcon fontSize="small" sx={{ mr: 1 }} />;
   }, [data, index]);
 
   return (
     <div style={style}>
       <ListItem disablePadding dense>
-        <ListItemButton onClick={onClick}>
+        <ListItemButton onClick={onClick} sx={{ pl: 1.5, pr: 1.5 }}>
           <ListItemAvatar>
             <Badge badgeContent={'team_notes' in item ? item.team_notes.length : 0} color="primary">
-              <PersonAvatar item={item} isOnline={item.isOnline} />
+              <PersonAvatar item={item} batteryPercentage={item.batteryPercentage} />
             </Badge>
           </ListItemAvatar>
           <ListItemText
@@ -74,6 +85,7 @@ const TrackerRow = ({ data, index, style }: TrackerRowProps) => {
               secondary: { noWrap: true },
             }}
           />
+          {offlineIcon}
           {safeChip}
         </ListItemButton>
       </ListItem>
@@ -98,7 +110,12 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
   const items = useMemo(() => {
     const allItems = [...teams, ...members];
     return allItems.map((item: Team | OrganizationMember) => {
-      const result = { secondary: '', isOnline: false, ...item };
+      const result: TrackerRowDataItem = {
+        secondary: '-',
+        isOnline: false,
+        batteryPercentage: null,
+        ...item,
+      };
       if (!item.tracker) {
         result.secondary = '⚠️ Geen tracker gekoppeld';
       } else if (
@@ -112,6 +129,7 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
       ) {
         const tracker = trackers.entities[item.tracker];
         result.isOnline = tracker.is_online;
+        result.batteryPercentage = tracker.battery_percentage;
         if (tracker.last_log) {
           result.secondary = getPositionDescription(
             tracker,

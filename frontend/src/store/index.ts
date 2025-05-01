@@ -93,5 +93,11 @@ export const selectSelectedTracker = createSelector(
 );
 
 export const selectFilterActive = createSelector([(state: RootState) => state.filter], (filter) => {
-  return !filter.showMembers || !filter.showSafe || !filter.showRed || !filter.showBlue;
+  return (
+    !filter.showMembers ||
+    !filter.showSafe ||
+    !filter.showBus ||
+    !filter.showRed ||
+    !filter.showBlue
+  );
 });

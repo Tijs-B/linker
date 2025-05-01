@@ -48,6 +48,7 @@ export interface Tracker {
   basis: number | null;
   forbidden_area: number | null;
   is_online: boolean;
+  battery_percentage: number | null;
 }
 
 export interface ContactPerson {

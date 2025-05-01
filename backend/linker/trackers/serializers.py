@@ -5,7 +5,7 @@ from enumfields.drf import EnumField
 from rest_framework import serializers
 from rest_framework_gis.fields import GeometryField
 
-from .constants import TRACKER_OFFLINE_MINUTES, TrackerLogSource
+from .constants import TRACKER_OFFLINE_MINUTES, TRACKER_VOLTAGE_RANGE, TrackerLogSource
 from .models import Tracker, TrackerLog
 
 
@@ -33,11 +33,19 @@ class TrackerSerializer(serializers.ModelSerializer):
     forbidden_area = serializers.IntegerField(read_only=True)
 
     is_online = serializers.SerializerMethodField()
+    battery_percentage = serializers.SerializerMethodField()
 
     def get_is_online(self, obj):
         if obj.last_log is None:
             return False
         return obj.last_log.gps_datetime >= now() - timedelta(minutes=TRACKER_OFFLINE_MINUTES)
+
+    def get_battery_percentage(self, obj):
+        if obj.avg_voltage is None:
+            return None
+        v_min, v_max = TRACKER_VOLTAGE_RANGE
+        value = round(100 * (obj.avg_voltage - v_min) / (v_max - v_min))
+        return min(100, max(0, value))
 
     class Meta:
         model = Tracker
@@ -52,5 +60,6 @@ class TrackerSerializer(serializers.ModelSerializer):
             'basis',
             'forbidden_area',
             'is_online',
+            'battery_percentage',
         ]
         read_only_fields = fields

@@ -66,9 +66,9 @@ class TrackerLogAdmin(admin.GISModelAdmin):
         'has_gps',
         'has_power',
     )
-    list_display = ('gps_datetime', 'tracker_url')
+    list_display = ('gps_datetime', 'tracker_url', 'source')
     ordering = ('-gps_datetime',)
-    list_filter = ('tracker',)
+    list_filter = ('tracker', 'source')
 
     @admin.display(description='tracker')
     def tracker_url(self, obj):

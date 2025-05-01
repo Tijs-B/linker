@@ -15,15 +15,13 @@ from linker.tracing.constants import (
     SWITCH_TRACE_TEAMS,
     TRACKER_FAR_AWAY_METERS,
     TRACKER_FORBIDDEN_AREA_AWAY_FROM_ROUTE_METERS,
-    TRACKER_LOG_BATTERY_LOW_TYPES,
-    TRACKER_LOG_SOS_TYPES,
     TRACKER_NOT_MOVING_METERS,
     TRACKER_NOT_MOVING_MINUTES,
     NotificationType,
 )
 from linker.tracing.models import Notification
 from linker.tracing.utils import trace_team
-from linker.trackers.constants import TRACKER_OFFLINE_MINUTES
+from linker.trackers.constants import TRACKER_LOG_BATTERY_LOW_TYPES, TRACKER_LOG_SOS_TYPES, TRACKER_OFFLINE_MINUTES
 from linker.trackers.models import Tracker, TrackerLog
 
 logger = getLogger(__name__)

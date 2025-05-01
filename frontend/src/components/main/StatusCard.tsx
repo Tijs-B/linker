@@ -156,7 +156,6 @@ export default function StatusCard({
   const { data: user } = useGetUserQuery();
 
   const lastLog = selectedTracker?.last_log;
-  const trackerIsOnline = Boolean(selectedTracker) && selectedTracker!.is_online;
 
   const navigateUrl = useMemo(() => {
     return getNavigationUrl(selectedTracker?.last_log?.point);
@@ -167,7 +166,12 @@ export default function StatusCard({
   return (
     <MainCard sx={{ width: '360px' }}>
       <CardHeader
-        avatar={<PersonAvatar item={selectedTeam || selectedMember} isOnline={trackerIsOnline} />}
+        avatar={
+          <PersonAvatar
+            item={selectedTeam || selectedMember}
+            batteryPercentage={selectedTracker ? selectedTracker.battery_percentage : null}
+          />
+        }
         title={(selectedTeam || selectedMember)?.name}
         titleTypographyProps={{ noWrap: true }}
         subheader={selectedTeam?.chiro || ''}

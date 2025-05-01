@@ -1,6 +1,7 @@
 from django.contrib.gis.measure import D
 from django.core.cache import cache
-from django.db.models import OuterRef, Subquery
+from django.db.models import FloatField, OuterRef, Subquery
+from django.db.models.expressions import RawSQL
 from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -21,34 +22,45 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TrackerSerializer
 
     def get_queryset(self):
-        return (
-            Tracker.objects.select_related('last_log', 'team', 'organizationmember')
-            .order_by('tracker_name')
-            .annotate(
-                fiche=Subquery(
-                    Fiche.objects.filter(
-                        point__distance_lte=(OuterRef('last_log__point'), D(m=FICHE_MAX_DISTANCE))
-                    ).values('pk')[:1]
-                ),
-                tocht=Subquery(
-                    Tocht.objects.filter(
-                        route__distance_lte=(OuterRef('last_log__point'), D(m=TOCHT_MAX_DISTANCE))
-                    ).values('pk')[:1]
-                ),
-                weide=Subquery(
-                    Weide.objects.filter(
-                        polygon__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))
-                    ).values('pk')[:1]
-                ),
-                basis=Subquery(
-                    Basis.objects.filter(
-                        point__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))
-                    ).values('pk')[:1]
-                ),
-                forbidden_area=Subquery(
-                    ForbiddenArea.objects.filter(area__contains=OuterRef('last_log__point')).values('pk')[:1]
-                ),
-            )
+        return Tracker.objects.select_related('last_log').annotate(
+            fiche=Subquery(
+                Fiche.objects.filter(point__distance_lte=(OuterRef('last_log__point'), D(m=FICHE_MAX_DISTANCE))).values(
+                    'pk'
+                )[:1]
+            ),
+            tocht=Subquery(
+                Tocht.objects.filter(route__distance_lte=(OuterRef('last_log__point'), D(m=TOCHT_MAX_DISTANCE))).values(
+                    'pk'
+                )[:1]
+            ),
+            weide=Subquery(
+                Weide.objects.filter(
+                    polygon__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))
+                ).values('pk')[:1]
+            ),
+            basis=Subquery(
+                Basis.objects.filter(point__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))).values(
+                    'pk'
+                )[:1]
+            ),
+            forbidden_area=Subquery(
+                ForbiddenArea.objects.filter(area__contains=OuterRef('last_log__point')).values('pk')[:1]
+            ),
+            avg_voltage=RawSQL(
+                """
+                    SELECT AVG(analog_input)
+                    FROM (
+                        SELECT tl.analog_input
+                        FROM trackers_trackerlog tl
+                        WHERE tl.tracker_id = trackers_tracker.id
+                        AND analog_input IS NOT NULL
+                        ORDER BY tl.gps_datetime DESC
+                        LIMIT 20
+                    )
+                    """,
+                params=[],
+                output_field=FloatField(),
+            ),
         )
 
     @action(detail=True, methods=['get'])
