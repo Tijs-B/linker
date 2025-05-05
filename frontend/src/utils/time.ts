@@ -4,7 +4,7 @@ export function toHoursMinutes(timestamp: string | undefined): string {
   if (!timestamp) {
     return '-';
   }
-  return dayjs(timestamp).tz('Europe/Brussels').format('HH:MM');
+  return dayjs(timestamp).tz('Europe/Brussels').format('HH:mm');
 }
 
 export function secondsToHoursMinutes(
