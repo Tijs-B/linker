@@ -23,6 +23,7 @@ import {
   useGetOrganizationMembersQuery,
   useGetTeamsQuery,
   useGetTochtenQuery,
+  useGetUserQuery,
 } from '../../services/linker.ts';
 import { OrganizationMember, Team } from '../../services/types.ts';
 import { trackersActions, useAppDispatch } from '../../store';
@@ -71,6 +72,9 @@ export default function MainMap({
   const { data: tochten } = useGetTochtenQuery();
   const { data: teams } = useGetTeamsQuery();
   const { data: members } = useGetOrganizationMembersQuery();
+  const { data: user } = useGetUserQuery();
+
+  const canAddMapNote = user ? user.permissions.includes('add_mapnote') : false;
 
   const mapStyle = showHeatmap
     ? '/tiles/style/dark-v8'
@@ -216,14 +220,16 @@ export default function MainMap({
           </IconButton>
         </CustomOverlay>
 
-        <CustomOverlay>
-          <IconButton onClick={onToggleMapNoteCreation}>
-            <FlagIcon
-              color={'primary'}
-              sx={{ color: creatingMapNote ? '' : '#000', marginTop: '2px' }}
-            />
-          </IconButton>
-        </CustomOverlay>
+        {canAddMapNote && (
+          <CustomOverlay>
+            <IconButton onClick={onToggleMapNoteCreation}>
+              <FlagIcon
+                color={'primary'}
+                sx={{ color: creatingMapNote ? '' : '#000', marginTop: '2px' }}
+              />
+            </IconButton>
+          </CustomOverlay>
+        )}
 
         <CustomOverlay>
           <IconButton onClick={onToggleZijwegen}>

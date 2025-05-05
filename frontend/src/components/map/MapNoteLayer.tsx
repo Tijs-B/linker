@@ -21,6 +21,7 @@ import { feature, featureCollection } from '@turf/helpers';
 import {
   useDeleteMapNoteMutation,
   useGetMapNotesQuery,
+  useGetUserQuery,
   useUpdateMapNoteMutation,
 } from '../../services/linker.ts';
 import { MapNote } from '../../services/types.ts';
@@ -44,6 +45,7 @@ export default function MapNoteLayer({ visible }: { visible: boolean }) {
   });
   const deleteMapNote = useDeleteMapNoteMutation()[0];
   const updateMapNote = useUpdateMapNoteMutation()[0];
+  const { data: user } = useGetUserQuery();
 
   const geojsonData = useMemo(() => {
     if (!mapNotes) {
@@ -127,6 +129,9 @@ export default function MapNoteLayer({ visible }: { visible: boolean }) {
 
   const navigateUrl = getNavigationUrl(selectedNote?.point);
 
+  const canChangeMapNote = user ? user.permissions.includes('change_mapnote') : false;
+  const canDeleteMapNote = user ? user.permissions.includes('delete_mapnote') : false;
+
   return (
     <>
       <Source type="geojson" data={geojsonData}>
@@ -162,6 +167,7 @@ export default function MapNoteLayer({ visible }: { visible: boolean }) {
             multiline
             slotProps={{ input: { spellCheck: false } }}
             required
+            disabled={!canChangeMapNote}
           />
           <DialogContentText>
             {selectedNote?.author && (
@@ -184,10 +190,11 @@ export default function MapNoteLayer({ visible }: { visible: boolean }) {
             variant="outlined"
             color="error"
             startIcon={<DeleteIcon />}
+            disabled={!canDeleteMapNote}
           >
             Verwijder
           </Button>
-          <Button onClick={onUpdateMapNote} variant="contained">
+          <Button onClick={onUpdateMapNote} variant="contained" disabled={!canChangeMapNote}>
             Update
           </Button>
         </DialogActions>
