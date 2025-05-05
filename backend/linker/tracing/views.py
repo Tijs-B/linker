@@ -9,6 +9,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from linker.people.permissions import CanViewStats
 from linker.tracing.models import CheckpointLog, Notification, ReadNotification
 from linker.tracing.serializers import CheckpointLogSerializer, NotificationSerializer
 from linker.tracing.stats import calculate_stats
@@ -22,7 +23,7 @@ class CheckpointLogViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class StatsView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, CanViewStats)
 
     def get(self, request: Request) -> Response:
         if not (stats := cache.get('tracing_stats')):

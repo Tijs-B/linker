@@ -53,7 +53,7 @@ class Team(models.Model):
     safe_weide_updated_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
-        permissions = [('can_upload_picture', 'Can upload a group picture')]
+        permissions = [('can_upload_picture', 'Can upload a group picture'), ('view_stats', 'Can view team stats')]
 
     def __str__(self):
         return f'{self.direction.value}{self.number:02d} {self.name}'

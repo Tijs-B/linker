@@ -154,6 +154,7 @@ export default function TeamPage() {
 
   const canSeeTeamNotes = user ? user.permissions.includes('view_teamnote') : false;
   const canSeeContactPersons = user ? user.permissions.includes('view_contactperson') : false;
+  const canSeeStats = user ? user.permissions.includes('view_stats') : false;
 
   if (!team) {
     return <div>Team not found</div>;
@@ -181,23 +182,24 @@ export default function TeamPage() {
               <Paper>
                 <Container sx={{ pt: 2, pb: 2 }}>
                   <Typography variant="h6">Tracing</Typography>
-                  {user && !user.permissions.includes('change_team') && (
-                    <Alert severity="warning">
-                      Maak geen beslissingen op basis van deze gegevens. Contacteer altijd de basis.
-                    </Alert>
-                  )}
                   <Table>
                     <TableBody>
-                      <TableRow>
-                        <TableCell>Gem. afwijking voor tochten</TableCell>
-                        <TableCell>
-                          {secondsToHoursMinutes(teamStats?.avgPartialTochtDeviation)}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Gem. afwijking voor fiches</TableCell>
-                        <TableCell>{secondsToHoursMinutes(teamStats?.avgFicheDeviation)}</TableCell>
-                      </TableRow>
+                      {canSeeStats && (
+                        <>
+                          <TableRow>
+                            <TableCell>Gem. afwijking per tocht</TableCell>
+                            <TableCell>
+                              {secondsToHoursMinutes(teamStats?.avgPartialTochtDeviation)}
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Gem. afwijking per tochttechniek</TableCell>
+                            <TableCell>
+                              {secondsToHoursMinutes(teamStats?.avgFicheDeviation)}
+                            </TableCell>
+                          </TableRow>
+                        </>
+                      )}
                       <TableRow>
                         <TableCell>GPS-locatie</TableCell>
                         <TableCell>{positionDescription}</TableCell>
@@ -205,11 +207,11 @@ export default function TeamPage() {
                       <TableRow>
                         <TableCell>Safe?</TableCell>
                         <TableCell>
-                          <SafeSelector team={team} />
+                          <SafeSelector team={team} />{' '}
                           {team.safe_weide_updated_at && team.safe_weide_updated_by && (
                             <>
-                              {formatFromNow(team.safe_weide_updated_at)} door{' '}
-                              {team.safe_weide_updated_by}
+                              ({formatFromNow(team.safe_weide_updated_at)} door{' '}
+                              {team.safe_weide_updated_by})
                             </>
                           )}
                         </TableCell>

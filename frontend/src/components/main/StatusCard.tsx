@@ -64,6 +64,7 @@ function TeamRows({ team }: { team: Team }) {
   const { data: checkpointLogs } = useGetCheckpointLogsQuery();
   const { data: fiches } = useGetFichesQuery();
   const { data: stats } = useGetStatsQuery();
+  const { data: user } = useGetUserQuery();
 
   const lastCheckpointLog = checkpointLogs && getLastCheckpointLog(team.id, checkpointLogs);
   const fiche = lastCheckpointLog && fiches && fiches.entities[lastCheckpointLog.fiche];
@@ -83,18 +84,20 @@ function TeamRows({ team }: { team: Team }) {
           </Typography>
         </TableCell>
       </TableRow>
-      <TableRow>
-        <TableCell css={cell}>
-          <Typography variant="body2">Snelheid</Typography>
-        </TableCell>
-        <TableCell css={cell}>
-          <Typography variant="body2" color="textSecondary">
-            {teamStats && teamStats.avgPartialTochtDeviation
-              ? secondsToHoursMinutes(teamStats.avgPartialTochtDeviation)
-              : '-'}
-          </Typography>
-        </TableCell>
-      </TableRow>
+      {user && user.permissions.includes('view_stats') && (
+        <TableRow>
+          <TableCell css={cell}>
+            <Typography variant="body2">Snelheid</Typography>
+          </TableCell>
+          <TableCell css={cell}>
+            <Typography variant="body2" color="textSecondary">
+              {teamStats && teamStats.avgPartialTochtDeviation
+                ? secondsToHoursMinutes(teamStats.avgPartialTochtDeviation)
+                : '-'}
+            </Typography>
+          </TableCell>
+        </TableRow>
+      )}
       <TableRow>
         <TableCell css={cell}>
           <Typography variant="body2">Safe</Typography>

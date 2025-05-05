@@ -111,8 +111,8 @@ export default function TeamTable({
         <TableHead>
           <TableRow>
             <TableCell />
-            <TableCell>Gem. afwijking voor tochten</TableCell>
-            <TableCell>Gem. afwijking voor fiches</TableCell>
+            <TableCell>Gem. afwijking per tocht</TableCell>
+            <TableCell>Gem. afwijking per tochttechniek</TableCell>
             <TableCell>Locatie</TableCell>
             <TableCell>Veilig op weide</TableCell>
           </TableRow>

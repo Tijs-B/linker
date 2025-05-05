@@ -39,13 +39,15 @@ export default function BottomMenu() {
           component={RouterLink}
           to="/"
         />
-        <BottomNavigationAction
-          label="Tracing"
-          icon={<FormatListNumberedIcon />}
-          value="tracing"
-          component={RouterLink}
-          to="/tracing/"
-        />
+        {user?.permissions.includes('view_stats') && (
+          <BottomNavigationAction
+            label="Tracing"
+            icon={<FormatListNumberedIcon />}
+            value="tracing"
+            component={RouterLink}
+            to="/tracing/"
+          />
+        )}
         {user?.is_staff && (
           <BottomNavigationAction
             label="Admin"
