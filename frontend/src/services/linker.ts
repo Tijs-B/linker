@@ -50,9 +50,6 @@ export const linkerApi = createApi({
       return headers;
     },
   }),
-  refetchOnFocus: true,
-  refetchOnReconnect: true,
-  refetchOnMountOrArgChange: 30,
   tagTypes: ['Team', 'MapNote', 'Tracker', 'TrackerLogs', 'Notifications'],
   endpoints: (build) => ({
     getTrackers: build.query<EntityState<Tracker, number>, void>({

@@ -13,7 +13,7 @@ import FlagIcon from '@mui/icons-material/Flag';
 import SatelliteIcon from '@mui/icons-material/Satellite';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
-import { IconButton, useMediaQuery, useTheme } from '@mui/material';
+import { Box, IconButton, Paper, useMediaQuery, useTheme } from '@mui/material';
 
 import bbox from '@turf/bbox';
 import { feature, featureCollection } from '@turf/helpers';
@@ -34,7 +34,7 @@ import MapPadding from './MapPadding.tsx';
 import TrackerHistoryLayer from './TrackerHistoryLayer.tsx';
 import TrackerLayer from './TrackerLayer.tsx';
 
-const BOUNDS_OPTIONS = { padding: { top: 30, left: 30, right: 30, bottom: 30 } };
+const BOUNDS_OPTIONS = { padding: { top: 60, left: 60, right: 60, bottom: 60 } };
 const DEFAULT_INITIAL_BOUNDS = {
   bounds: [5.709597, 50.298247, 5.832838, 50.358745] as [number, number, number, number],
   fitBoundsOptions: BOUNDS_OPTIONS,
@@ -61,6 +61,7 @@ export default function MainMap({
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const dispatch = useAppDispatch();
 
+  const [timestamp, setTimestamp] = useState('');
   const [cursor, setCursor] = useState('inherit');
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showSatellite, setShowSatellite] = useState(false);
@@ -71,6 +72,16 @@ export default function MainMap({
   const { data: tochten } = useGetTochtenQuery();
   const { data: teams } = useGetTeamsQuery();
   const { data: members } = useGetOrganizationMembersQuery();
+
+  useEffect(() => {
+    function set_timestamp(ts: string) {
+      setTimestamp(ts);
+    }
+    window.set_timestamp = set_timestamp;
+    return () => {
+      delete window.set_timestamp;
+    };
+  }, [setTimestamp]);
 
   const mapStyle = showHeatmap
     ? '/tiles/style/dark-v8'
@@ -188,51 +199,57 @@ export default function MainMap({
         />
         <TrackerHistoryLayer visible={!showHeatmap} />
 
-        <NavigationControl />
-        <GeolocateControl trackUserLocation positionOptions={{ enableHighAccuracy: true }} />
-        <ScaleControl position="bottom-right" />
+        {/*<NavigationControl />*/}
+        {/*<GeolocateControl trackUserLocation positionOptions={{ enableHighAccuracy: true }} />*/}
+        {/*<ScaleControl position="bottom-right" />*/}
 
-        <CustomOverlay>
-          <IconButton onClick={onToggleHeatmap}>
-            <WhatshotIcon
-              color="primary"
-              sx={{ color: showHeatmap ? '' : '#000', marginTop: '2px' }}
-            />
-          </IconButton>
-        </CustomOverlay>
+        {/*<CustomOverlay>*/}
+        {/*  <IconButton onClick={onToggleHeatmap}>*/}
+        {/*    <WhatshotIcon*/}
+        {/*      color="primary"*/}
+        {/*      sx={{ color: showHeatmap ? '' : '#000', marginTop: '2px' }}*/}
+        {/*    />*/}
+        {/*  </IconButton>*/}
+        {/*</CustomOverlay>*/}
 
-        <CustomOverlay>
-          <IconButton onClick={onToggleSatellite}>
-            <SatelliteIcon
-              color="primary"
-              sx={{ color: showSatellite ? '' : '#000', marginTop: '2px' }}
-            />
-          </IconButton>
-        </CustomOverlay>
+        {/*<CustomOverlay>*/}
+        {/*  <IconButton onClick={onToggleSatellite}>*/}
+        {/*    <SatelliteIcon*/}
+        {/*      color="primary"*/}
+        {/*      sx={{ color: showSatellite ? '' : '#000', marginTop: '2px' }}*/}
+        {/*    />*/}
+        {/*  </IconButton>*/}
+        {/*</CustomOverlay>*/}
 
-        <CustomOverlay>
-          <IconButton onClick={onResetBounds}>
-            <ZoomOutMapIcon sx={{ color: '#000', marginTop: '2px' }} />
-          </IconButton>
-        </CustomOverlay>
+        {/*<CustomOverlay>*/}
+        {/*  <IconButton onClick={onResetBounds}>*/}
+        {/*    <ZoomOutMapIcon sx={{ color: '#000', marginTop: '2px' }} />*/}
+        {/*  </IconButton>*/}
+        {/*</CustomOverlay>*/}
 
-        <CustomOverlay>
-          <IconButton onClick={onToggleMapNoteCreation}>
-            <FlagIcon
-              color={'primary'}
-              sx={{ color: creatingMapNote ? '' : '#000', marginTop: '2px' }}
-            />
-          </IconButton>
-        </CustomOverlay>
+        {/*<CustomOverlay>*/}
+        {/*  <IconButton onClick={onToggleMapNoteCreation}>*/}
+        {/*    <FlagIcon*/}
+        {/*      color={'primary'}*/}
+        {/*      sx={{ color: creatingMapNote ? '' : '#000', marginTop: '2px' }}*/}
+        {/*    />*/}
+        {/*  </IconButton>*/}
+        {/*</CustomOverlay>*/}
 
-        <CustomOverlay>
-          <IconButton onClick={onToggleZijwegen}>
-            <CallSplitIcon
-              color={'primary'}
-              sx={{ color: showZijwegen ? '' : '#000', marginTop: '2px' }}
-            />
-          </IconButton>
-        </CustomOverlay>
+        {/*<CustomOverlay>*/}
+        {/*  <IconButton onClick={onToggleZijwegen}>*/}
+        {/*    <CallSplitIcon*/}
+        {/*      color={'primary'}*/}
+        {/*      sx={{ color: showZijwegen ? '' : '#000', marginTop: '2px' }}*/}
+        {/*    />*/}
+        {/*  </IconButton>*/}
+        {/*</CustomOverlay>*/}
+
+        <Box sx={{ position: 'absolute', top: 20, left: 400 }}>
+          <Paper sx={{ pt: 0.5, pb: 0.5, pl: 1.5, pr: 1.5 }}>
+            <h2>{timestamp}</h2>
+          </Paper>
+        </Box>
 
         {desktop && <MapPadding left={parseInt(theme.dimensions.drawerWidthDesktop, 10)} />}
       </Map>

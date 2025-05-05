@@ -90,10 +90,11 @@ export default function TrackerLayer({
 
       features.push(feature(currentLog.point, props));
 
-      if (!tracker.is_online) {
-        offlineFeatures.push(feature(currentLog.point));
-      }
+      // if (!tracker.is_online) {
+      //   offlineFeatures.push(feature(currentLog.point));
+      // }
     }
+    console.log('trackers updated');
     return [featureCollection(features), featureCollection(offlineFeatures)];
   }, [allTrackers, filteredMembers, filteredTeams, historyLog, selectedItem]);
 

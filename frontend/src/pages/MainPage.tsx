@@ -18,6 +18,7 @@ import StatusCard from '../components/main/StatusCard';
 import TrackerList from '../components/main/TrackerList.tsx';
 import MainMap from '../components/map/MainMap';
 import {
+  linkerApi,
   useGetNotificationsQuery,
   useGetOrganizationMembersQuery,
   useGetTeamsQuery,
@@ -57,7 +58,6 @@ export default function MainPage() {
     isFetching: isFetchingTeams,
     refetch: refetchTeams,
   } = useGetTeamsQuery(undefined, {
-    pollingInterval: 60_000,
     skipPollingIfUnfocused: true,
   });
   const {
@@ -65,7 +65,6 @@ export default function MainPage() {
     isFetching: isFetchingMembers,
     refetch: refetchMembers,
   } = useGetOrganizationMembersQuery(undefined, {
-    pollingInterval: 60_000,
     skipPollingIfUnfocused: true,
   });
   const {
@@ -73,15 +72,29 @@ export default function MainPage() {
     isFetching: isFetchingTrackers,
     refetch: refetchTrackers,
   } = useGetTrackersQuery(undefined, {
-    pollingInterval: 6_000,
     skipPollingIfUnfocused: true,
   });
   const { isFetching: isFetchingNotifications, refetch: refetchNotifications } =
-    useGetNotificationsQuery(undefined, { pollingInterval: 30_000, skipPollingIfUnfocused: true });
+    useGetNotificationsQuery(undefined, { skipPollingIfUnfocused: true });
   const { currentData: user, error: queryError } = useGetUserQuery(undefined, {
-    pollingInterval: 5_000,
     skipPollingIfUnfocused: true,
   });
+
+  useEffect(() => {
+    function updateTracker(tracker_id: number, coordinates: number[]) {
+      dispatch(
+        linkerApi.util.updateQueryData('getTrackers', undefined, (draftTrackers) => {
+          if (draftTrackers.entities[tracker_id].last_log) {
+            draftTrackers.entities[tracker_id].last_log.point.coordinates = coordinates;
+          }
+        }),
+      );
+    }
+    window.updateTracker = updateTracker;
+    return () => {
+      delete window.updateTracker;
+    };
+  }, [dispatch]);
 
   // Check query error for network errors
   useEffect(() => {
