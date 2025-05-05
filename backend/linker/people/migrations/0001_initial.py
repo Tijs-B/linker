@@ -7,6 +7,11 @@ import linker.people.models
 from django.db import migrations, models
 
 
+
+def group_picture_path(instance, filename):
+    return f'G{instance.number:02d}_{filename}'
+
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -36,7 +41,7 @@ class Migration(migrations.Migration):
                 ('number', models.PositiveIntegerField(unique=True)),
                 ('name', models.CharField(max_length=100)),
                 ('chiro', models.CharField(max_length=100)),
-                ('group_picture', models.ImageField(upload_to=linker.people.models.group_picture_path)),
+                ('group_picture', models.ImageField(upload_to=group_picture_path)),
                 ('eind_weide_1', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='map.weide')),
                 ('eind_weide_2', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='map.weide')),
                 ('start_weide_1', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='map.weide')),

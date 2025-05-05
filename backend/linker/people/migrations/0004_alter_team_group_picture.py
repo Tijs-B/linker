@@ -4,6 +4,10 @@ import linker.people.models
 from django.db import migrations, models
 
 
+def group_picture_path(instance, filename):
+    return f'G{instance.number:02d}_{filename}'
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -14,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='team',
             name='group_picture',
-            field=models.ImageField(blank=True, null=True, upload_to=linker.people.models.group_picture_path),
+            field=models.ImageField(blank=True, null=True, upload_to=group_picture_path),
         ),
     ]

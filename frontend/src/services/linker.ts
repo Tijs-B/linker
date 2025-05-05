@@ -251,14 +251,6 @@ export const linkerApi = createApi({
       }),
       invalidatesTags: ['MapNote'],
     }),
-    uploadGroupPicture: build.mutation<void, { id: number; data: FormData }>({
-      query: ({ id, data }) => ({
-        url: `/teams/${id}/group-picture/`,
-        method: 'PATCH',
-        body: data,
-      }),
-      invalidatesTags: ['Team'],
-    }),
     markNotificationAsRead: build.mutation<void, number>({
       query: (id) => ({
         url: `/notifications/${id}/mark-as-read/`,
@@ -303,7 +295,6 @@ export const {
   useUpdateMapNoteMutation,
   useUpdateTeamMutation,
   useUpdateContactPersonMutation,
-  useUploadGroupPictureMutation,
   useMarkNotificationAsReadMutation,
   useMarkAllNotificationsAsReadMutation,
 } = linkerApi;

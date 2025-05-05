@@ -36,24 +36,19 @@ class OrganizationMember(models.Model):
             return None
 
 
-def group_picture_path(instance, filename):
-    return f'G{instance.number:02d}_{filename}'
-
-
 class Team(models.Model):
     direction = EnumField(Direction)
     number = models.PositiveIntegerField(unique=True)
     name = models.CharField(max_length=100)
     chiro = models.CharField(max_length=100)
     tracker = models.OneToOneField(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
-    group_picture = models.ImageField(upload_to=group_picture_path, blank=True, null=True)
 
     safe_weide = models.CharField(max_length=64, blank=True)
     safe_weide_updated_at = models.DateTimeField(blank=True, null=True)
     safe_weide_updated_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
-        permissions = [('can_upload_picture', 'Can upload a group picture'), ('view_stats', 'Can view team stats')]
+        permissions = [('view_stats', 'Can view team stats')]
 
     def __str__(self):
         return f'{self.direction.value}{self.number:02d} {self.name}'

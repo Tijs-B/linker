@@ -49,7 +49,6 @@ class TeamAdmin(admin.ModelAdmin):
         'name',
         'chiro',
         'tracker',
-        'group_picture',
         'safe_weide',
         'safe_weide_updated_at',
         'checkpoints',

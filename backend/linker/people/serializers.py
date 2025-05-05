@@ -44,7 +44,6 @@ class TeamSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
             'tracker',
             'contact_persons',
             'team_notes',
-            'group_picture',
             'safe_weide',
             'safe_weide_updated_at',
             'safe_weide_updated_by',

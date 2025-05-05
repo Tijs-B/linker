@@ -1,14 +1,12 @@
-import { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Alert,
   AppBar,
   Avatar,
-  Box,
   Button,
   Container,
   Grid,
@@ -27,7 +25,6 @@ import {
   Toolbar,
   Tooltip,
   Typography,
-  styled,
 } from '@mui/material';
 
 import SafeSelector from '../components/SafeSelector.jsx';
@@ -44,7 +41,6 @@ import {
   useGetTrackersQuery,
   useGetUserQuery,
   useGetWeidesQuery,
-  useUploadGroupPictureMutation,
 } from '../services/linker.ts';
 import { teamColor } from '../theme/colors.ts';
 import { getPositionDescription } from '../utils/data.ts';
@@ -54,18 +50,6 @@ import {
   formatFromNow,
   secondsToHoursMinutes,
 } from '../utils/time.ts';
-
-const VisuallyHiddenInput = styled('input')({
-  clip: 'rect(0 0 0 0)',
-  clipPath: 'inset(50%)',
-  height: 1,
-  overflow: 'hidden',
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  whiteSpace: 'nowrap',
-  width: 1,
-});
 
 export default function TeamPage() {
   const { teamId } = useParams();
@@ -81,10 +65,8 @@ export default function TeamPage() {
   const { data: user } = useGetUserQuery();
   const deleteTeamNote = useDeleteTeamNoteMutation()[0];
   const createTeamNote = useCreateTeamNoteMutation()[0];
-  const uploadGroupPicture = useUploadGroupPictureMutation()[0];
 
   const [newNoteText, setNewNoteText] = useState('');
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const team = teams && teamId !== undefined ? teams.entities[Number(teamId)] : null;
   const teamStats = stats && teamId !== undefined ? stats.teams[+teamId] : null;
@@ -131,24 +113,6 @@ export default function TeamPage() {
       setNewNoteText('');
     }
   }, [createTeamNote, newNoteText, teamId]);
-
-  const onFileInputChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setUploadedFile(event.target.files[0]);
-    }
-  }, []);
-
-  const onUpload = useCallback(() => {
-    if (uploadedFile && teamId) {
-      const data = new FormData();
-      data.append('picture', uploadedFile);
-      uploadGroupPicture({
-        id: Number(teamId),
-        data,
-      });
-      setUploadedFile(null);
-    }
-  }, [uploadedFile, teamId, uploadGroupPicture]);
 
   const tracker = trackers && team?.tracker ? trackers.entities[team.tracker] : null;
 
@@ -330,42 +294,6 @@ export default function TeamPage() {
                   </Container>
                 </Paper>
               )}
-              <Paper>
-                <Container sx={{ pt: 2, pb: 2 }}>
-                  <Stack spacing={1}>
-                    <Typography variant="h6">Groepsfoto</Typography>
-                    {team.group_picture ? (
-                      <a href={team.group_picture} target="_blank">
-                        <Box
-                          component="img"
-                          src={team.group_picture}
-                          sx={{
-                            maxWidth: '100%',
-                          }}
-                        />
-                      </a>
-                    ) : (
-                      <Typography variant="body2">Nog geen groepsfoto.</Typography>
-                    )}
-                    {uploadedFile && <Typography variant="body2">{uploadedFile.name}</Typography>}
-                    <Stack direction="row" spacing={1}>
-                      <Button
-                        component="label"
-                        role={undefined}
-                        variant="contained"
-                        color="secondary"
-                        startIcon={<CloudUploadIcon />}
-                      >
-                        Kies foto
-                        <VisuallyHiddenInput type="file" onChange={onFileInputChange} />
-                      </Button>
-                      <Button variant="contained" onClick={onUpload}>
-                        Upload
-                      </Button>
-                    </Stack>
-                  </Stack>
-                </Container>
-              </Paper>
             </Stack>
           </Grid>
         </Grid>

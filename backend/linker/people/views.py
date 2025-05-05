@@ -7,11 +7,8 @@ from django.http import HttpResponse, JsonResponse
 from django.utils.timezone import now
 from django.views import View
 from rest_framework import viewsets
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 
 from .models import ContactPerson, OrganizationMember, Team, TeamNote
-from .permissions import CanUploadPicture
 from .serializers import (
     ContactPersonSerializer,
     OrganizationMemberSerializer,
@@ -40,23 +37,11 @@ class TeamViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    def get_permissions(self):
-        if self.action == 'upload_group_picture':
-            return [IsAuthenticated(), CanUploadPicture()]
-        return super().get_permissions()
-
     def perform_update(self, serializer: TeamSerializer):
         if serializer.validated_data.get('safe_weide'):
             serializer.save(safe_weide_updated_at=now(), safe_weide_updated_by=self.request.user)
         else:
             serializer.save()
-
-    @action(detail=True, methods=['patch'], url_path='group-picture')
-    def upload_group_picture(self, request, pk=None):
-        team = self.get_object()
-        team.group_picture = request.FILES['picture']
-        team.save()
-        return HttpResponse(status=200)
 
 
 class OrganizationMemberViewSet(viewsets.ReadOnlyModelViewSet):
