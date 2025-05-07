@@ -37,8 +37,7 @@ export default function CreateTrackerLogDialog({
   }
 
   const match = inputTime.match(/(\d{2}):(\d{2})/);
-  const timeIsValid = match && parseInt(match[1]) <= 23 && parseInt(match[2]) <= 59;
-  const dateTime = timeIsValid
+  const dateTime = match
     ? dayjs().tz('Europe/Brussels').hour(parseInt(match[1])).minute(parseInt(match[2]))
     : null;
   const error =
@@ -80,13 +79,16 @@ export default function CreateTrackerLogDialog({
         <TextField
           autoFocus
           label="Tijdstip op dit punt"
-          sx={{ mt: 2 }}
+          sx={{ mt: 2, minWidth: 200 }}
           value={inputTime}
-          onChange={(e) => {
-            setInputTime(e.target.value);
-          }}
+          onChange={(e) => setInputTime(e.target.value)}
           error={!!error}
           helperText={error}
+          type="time"
+          slotProps={{
+            htmlInput: { max: dayjs().tz('Europe/Brussels').format('HH:mm') },
+            inputLabel: { shrink: true },
+          }}
         />
       </DialogContent>
       <DialogActions>

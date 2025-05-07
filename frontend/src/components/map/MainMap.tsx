@@ -189,6 +189,7 @@ export default function MainMap({
           visible={!showHeatmap}
           filteredTeams={filteredTeams}
           filteredMembers={filteredMembers}
+          trackersClickable={!creatingMarker}
         />
         <TrackerHistoryLayer visible={!showHeatmap} />
 

@@ -18,12 +18,14 @@ interface TrackerLayerProps {
   visible: boolean;
   filteredTeams: Team[];
   filteredMembers: OrganizationMember[];
+  trackersClickable: boolean;
 }
 
 export default function TrackerLayer({
   visible,
   filteredTeams,
   filteredMembers,
+  trackersClickable,
 }: TrackerLayerProps) {
   const dispatch = useAppDispatch();
   const selectedItem = useAppSelector(selectSelectedItem);
@@ -41,7 +43,7 @@ export default function TrackerLayer({
       return;
     }
     const onClick = (event: MapLayerMouseEvent) => {
-      if (event.features) {
+      if (trackersClickable && event.features) {
         const features = [...event.features];
         features.sort((a, b) => b.properties.sortKey - a.properties.sortKey);
         if (features[0]) {
@@ -56,7 +58,7 @@ export default function TrackerLayer({
     return () => {
       mainMap.off('click', 'trackers', onClick);
     };
-  }, [mainMap, dispatch]);
+  }, [mainMap, dispatch, trackersClickable]);
 
   const [trackerData, offlineData] = useMemo(() => {
     if (!allTrackers) {
