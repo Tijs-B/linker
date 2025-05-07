@@ -2,7 +2,6 @@ import { ReactNode } from 'react';
 
 import { ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
-import { nlNL } from '@mui/x-date-pickers/locales';
 
 declare module '@mui/material/styles' {
   interface Theme {
@@ -20,23 +19,20 @@ declare module '@mui/material/styles' {
   }
 }
 
-const theme = createTheme(
-  {
-    palette: {
-      primary: {
-        main: '#689f38',
-      },
-      secondary: {
-        main: '#ffc400',
-      },
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#689f38',
     },
-    dimensions: {
-      drawerWidthDesktop: '360px',
-      popupMaxWidth: '360px',
+    secondary: {
+      main: '#ffc400',
     },
   },
-  nlNL,
-);
+  dimensions: {
+    drawerWidthDesktop: '360px',
+    popupMaxWidth: '360px',
+  },
+});
 
 export default function AppThemeProvider({ children }: { children: ReactNode }) {
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;

@@ -2,17 +2,16 @@ import { useCallback, useState } from 'react';
 import { LngLat } from 'react-map-gl/maplibre';
 
 import {
-  Alert,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  TextField,
 } from '@mui/material';
-import { TimePicker } from '@mui/x-date-pickers';
 
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 import { useCreateTrackerLogMutation } from '../../services/linker.ts';
 import { selectSelectedItem, selectSelectedTracker, useAppSelector } from '../../store';
@@ -29,13 +28,25 @@ export default function CreateTrackerLogDialog({
   const selectedTracker = useAppSelector(selectSelectedTracker);
   const selectedItem = useAppSelector(selectSelectedItem);
   const createTrackerLog = useCreateTrackerLogMutation()[0];
-  const [dateTime, setDateTime] = useState<Dayjs | null>(dayjs().tz('Europe/Brussels'));
+  const [inputTime, setInputTime] = useState<string>(dayjs().tz('Europe/Brussels').format('HH:mm'));
   const [prevPosition, setPrevPosition] = useState(position);
 
   if (position !== prevPosition) {
     setPrevPosition(position);
-    setDateTime(dayjs().tz('Europe/Brussels'));
+    setInputTime(dayjs().tz('Europe/Brussels').format('HH:mm'));
   }
+
+  const match = inputTime.match(/(\d{2}):(\d{2})/);
+  const timeIsValid = match && parseInt(match[1]) <= 23 && parseInt(match[2]) <= 59;
+  const dateTime = timeIsValid
+    ? dayjs().tz('Europe/Brussels').hour(parseInt(match[1])).minute(parseInt(match[2]))
+    : null;
+  const error =
+    dateTime === null
+      ? 'Geen geldig tijdstip'
+      : dateTime.isAfter(dayjs())
+        ? 'Tijdstip mag niet in de toekomst liggen'
+        : null;
 
   const onAccept = useCallback(() => {
     if (!position || !selectedTracker) {
@@ -52,9 +63,7 @@ export default function CreateTrackerLogDialog({
       tracker: selectedTracker.id,
       gps_datetime: timestamp.toISOString(),
     });
-  }, [position, selectedTracker, onComplete, dateTime, createTrackerLog]);
-
-  const isInFuture = !!dateTime && dateTime.isAfter(dayjs());
+  }, [position, selectedTracker, onComplete, createTrackerLog, dateTime]);
 
   if (selectedTracker === null || selectedItem === null) {
     return null;
@@ -68,21 +77,23 @@ export default function CreateTrackerLogDialog({
           Je staat op het punt tracker <code>{selectedTracker.tracker_name}</code>, gebruikt door{' '}
           {selectedItem.name}, te verplaatsen.
         </DialogContentText>
-        <TimePicker
+        <TextField
           autoFocus
-          timezone="Europe/Brussels"
           label="Tijdstip op dit punt"
           sx={{ mt: 2 }}
-          value={dateTime}
-          onChange={setDateTime}
+          value={inputTime}
+          onChange={(e) => {
+            setInputTime(e.target.value);
+          }}
+          error={!!error}
+          helperText={error}
         />
-        {isInFuture && <Alert severity="warning">Tijdstip moet in het verleden zijn</Alert>}
       </DialogContent>
       <DialogActions>
         <Button color="error" onClick={onComplete}>
           Annuleren
         </Button>
-        <Button variant="contained" color="success" onClick={onAccept} disabled={isInFuture}>
+        <Button variant="contained" color="success" onClick={onAccept} disabled={!!error}>
           Verplaatsen
         </Button>
       </DialogActions>

@@ -15,7 +15,6 @@
     "@fontsource/roboto": "^5.0.3",
     "@mui/icons-material": "^7.0.1",
     "@mui/material": "^7.0.1",
-    "@mui/x-date-pickers": "^8.0.0",
     "@reduxjs/toolkit": "^2.2.1",
     "@turf/bbox": "^7.2.0",
     "@turf/centroid": "^7.2.0",

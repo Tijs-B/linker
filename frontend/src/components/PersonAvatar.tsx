@@ -46,7 +46,7 @@ export default function PersonAvatar({
             zIndex: 1,
           }}
           variant="determinate"
-          value={Math.max(2, batteryPercentage)}
+          value={batteryPercentage}
         />
       )}
     </Box>
