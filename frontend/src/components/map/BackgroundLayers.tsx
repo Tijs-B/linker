@@ -111,8 +111,9 @@ export default function BackgroundLayers({
               18,
               0.25,
             ],
-            'hillshade-shadow-color': 'rgba(43, 79, 28, 1)',
             'hillshade-highlight-color': 'rgba(200, 200, 126, 1)',
+            'hillshade-method': 'igor',
+            'hillshade-shadow-color': 'rgba(43, 79, 28, 1)',
           }}
           layout={{ visibility: showHeatmap || showSatellite ? 'none' : 'visible' }}
         />
