@@ -26,9 +26,14 @@ class TeamViewSet(viewsets.ModelViewSet):
         else:
             contact_person_inner_queryset = ContactPerson.objects.none()
 
+        if self.request.user.has_perm('people.view_teamnote'):
+            team_note_inner_queryset = TeamNote.objects.order_by('created').select_related('author')
+        else:
+            team_note_inner_queryset = TeamNote.objects.none()
+
         queryset = (
             Team.objects.prefetch_related(
-                Prefetch('team_notes', queryset=TeamNote.objects.order_by('created').select_related('author')),
+                Prefetch('team_notes', queryset=team_note_inner_queryset),
                 Prefetch('contact_persons', queryset=contact_person_inner_queryset),
             )
             .select_related('safe_weide_updated_by')
