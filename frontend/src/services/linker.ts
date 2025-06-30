@@ -172,10 +172,12 @@ export const linkerApi = createApi({
         method: 'POST',
       }),
       onQueryStarted(_, { dispatch }) {
+        dispatch(linkerApi.util.resetApiState());
         dispatch(
-          linkerApi.util.updateQueryData('getUser', undefined, (draft) => {
-            draft.username = null;
-            draft.permissions = [];
+          linkerApi.util.upsertQueryData('getUser', undefined, {
+            username: null,
+            permissions: [],
+            is_staff: false,
           }),
         );
       },
