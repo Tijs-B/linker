@@ -10,9 +10,9 @@ import {
   TableRow,
 } from '@mui/material';
 
-import { EntityState } from '@reduxjs/toolkit';
+import type { EntityState } from '@reduxjs/toolkit';
 
-import { CheckpointLog, Fiche, Stats, Team, Tocht } from '../../services/types.ts';
+import type { CheckpointLog, Fiche, Stats, Team, Tocht } from '../../services/types.ts';
 import { toHoursMinutes } from '../../utils/time.ts';
 import PersonAvatar from '../PersonAvatar.jsx';
 

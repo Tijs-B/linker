@@ -1,5 +1,6 @@
-import { ChangeEvent, useCallback, useState } from 'react';
-import { LngLat } from 'react-map-gl/maplibre';
+import type { ChangeEvent } from 'react';
+import { useCallback, useState } from 'react';
+import type { LngLat } from 'react-map-gl/maplibre';
 
 import {
   Button,

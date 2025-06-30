@@ -1,5 +1,5 @@
 import isMobile from 'is-mobile';
-import { SnackbarProviderProps } from 'notistack';
+import type { SnackbarProviderProps } from 'notistack';
 
 const notifications: SnackbarProviderProps = {
   anchorOrigin: {

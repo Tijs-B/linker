@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ControlPosition, IControl, MapInstance, useControl } from 'react-map-gl/maplibre';
+import type { ControlPosition, IControl, MapInstance } from 'react-map-gl/maplibre';
+import { useControl } from 'react-map-gl/maplibre';
 
 class OverlayControl implements IControl {
   _map: MapInstance | null = null;

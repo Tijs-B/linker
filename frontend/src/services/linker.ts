@@ -2,10 +2,10 @@ import { createEntityAdapter } from '@reduxjs/toolkit';
 import type { EntityState } from '@reduxjs/toolkit';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { feature, featureCollection } from '@turf/helpers';
-import { FeatureCollection, LineString, Point } from 'geojson';
+import type { FeatureCollection, LineString, Point } from 'geojson';
 
 import { getCookie } from '../utils/cookie';
-import {
+import type {
   Basis,
   CheckpointLog,
   ContactPerson,

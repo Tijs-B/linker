@@ -1,4 +1,5 @@
-import { CSSProperties, useCallback, useMemo } from 'react';
+import type { CSSProperties } from 'react';
+import { useCallback, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
 
@@ -14,9 +15,10 @@ import {
   useGetForbiddenAreasQuery,
   useGetTochtenQuery,
   useGetTrackersQuery,
+  useGetUserQuery,
   useGetWeidesQuery,
 } from '../../services/linker.ts';
-import { OrganizationMember, Team } from '../../services/types.ts';
+import type { OrganizationMember, Team } from '../../services/types.ts';
 import { trackersActions, useAppDispatch } from '../../store';
 import { getPositionDescription } from '../../utils/data';
 import PersonAvatar from '../PersonAvatar';
@@ -106,9 +108,17 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
   const { data: basis } = useGetBasisQuery();
   const { data: forbiddenAreas } = useGetForbiddenAreasQuery();
   const { data: trackers } = useGetTrackersQuery();
+  const { data: user } = useGetUserQuery();
 
   const items = useMemo(() => {
-    const allItems = [...teams, ...members];
+    const canViewTeamDetails = Boolean(user && user.permissions.includes('view_team_details'));
+
+    let allItems;
+    if (canViewTeamDetails) {
+      allItems = [...teams, ...members];
+    } else {
+      allItems = members;
+    }
     return allItems.map((item: Team | OrganizationMember) => {
       const result: TrackerRowDataItem = {
         secondary: '-',
@@ -116,7 +126,9 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
         batteryPercentage: null,
         ...item,
       };
-      if (!item.tracker) {
+      if (!canViewTeamDetails) {
+        return result;
+      } else if (!item.tracker) {
         result.secondary = '⚠️ Geen tracker gekoppeld';
       } else if (
         fiches &&
@@ -142,7 +154,7 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
       }
       return result;
     });
-  }, [teams, members, fiches, tochten, weides, basis, forbiddenAreas, trackers]);
+  }, [user, teams, members, fiches, tochten, weides, basis, forbiddenAreas, trackers]);
 
   return (
     <AutoSizer

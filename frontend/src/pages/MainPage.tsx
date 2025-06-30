@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { LngLat, useMap } from 'react-map-gl/maplibre';
+import type { LngLat } from 'react-map-gl/maplibre';
+import { useMap } from 'react-map-gl/maplibre';
 import { Navigate } from 'react-router-dom';
 
 import { Paper, useMediaQuery, useTheme } from '@mui/material';
 
 import { css } from '@emotion/react';
 import Fuse from 'fuse.js';
-import { SnackbarKey, useSnackbar } from 'notistack';
+import type { SnackbarKey } from 'notistack';
+import { useSnackbar } from 'notistack';
 
 import BottomMenu from '../components/main/BottomMenu';
 import CreateMapNoteDialog from '../components/main/CreateMapNoteDialog.tsx';
@@ -24,7 +26,8 @@ import {
   useGetTrackersQuery,
   useGetUserQuery,
 } from '../services/linker';
-import { Direction, Team } from '../services/types.ts';
+import type { Team } from '../services/types.ts';
+import { Direction } from '../services/types.ts';
 import { trackersActions, useAppDispatch, useAppSelector } from '../store/index.ts';
 
 export default function MainPage() {
@@ -108,6 +111,13 @@ export default function MainPage() {
       setListOpen(false);
     }
   }, [desktop, selectedId]);
+
+  // Close the list on desktop if the user doesn't have permissions to view team details
+  useEffect(() => {
+    if (desktop && user && !user.permissions.includes('view_team_details')) {
+      setListOpen(false);
+    }
+  }, [user, desktop]);
 
   // Stop creating marker when escape is pressed
   useEffect(() => {

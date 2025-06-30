@@ -10,9 +10,9 @@ import {
   TableRow,
 } from '@mui/material';
 
-import { EntityState } from '@reduxjs/toolkit';
+import type { EntityState } from '@reduxjs/toolkit';
 
-import { Fiche, Stats, Tocht } from '../../services/types.ts';
+import type { Fiche, Stats, Tocht } from '../../services/types.ts';
 import { secondsToHoursMinutes } from '../../utils/time.ts';
 
 interface TochtenTableProps {

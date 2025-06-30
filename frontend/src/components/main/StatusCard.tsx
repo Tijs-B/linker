@@ -34,7 +34,7 @@ import {
   useGetStatsQuery,
   useGetUserQuery,
 } from '../../services/linker.ts';
-import { Team } from '../../services/types.ts';
+import type { Team } from '../../services/types.ts';
 import {
   selectSelectedMember,
   selectSelectedTeam,
@@ -63,28 +63,34 @@ const cell = css`
 function TeamRows({ team }: { team: Team }) {
   const { data: checkpointLogs } = useGetCheckpointLogsQuery();
   const { data: fiches } = useGetFichesQuery();
-  const { data: stats } = useGetStatsQuery();
   const { data: user } = useGetUserQuery();
+  const { data: stats } = useGetStatsQuery(undefined, {
+    skip: !user || !user.permissions.includes('view_stats'),
+  });
 
   const lastCheckpointLog = checkpointLogs && getLastCheckpointLog(team.id, checkpointLogs);
   const fiche = lastCheckpointLog && fiches && fiches.entities[lastCheckpointLog.fiche];
   const teamStats = stats && stats.teams[team.id];
+  const canViewStats = Boolean(user && user.permissions.includes('view_stats'));
+  const canViewTeamDetails = Boolean(user && user.permissions.includes('view_team_details'));
 
   return (
     <>
-      <TableRow>
-        <TableCell css={cell}>
-          <Typography variant="body2">Laatste fiche</Typography>
-        </TableCell>
-        <TableCell css={cell}>
-          <Typography variant="body2" color="textSecondary">
-            {lastCheckpointLog && fiche
-              ? `${fiche.display_name} (${formatDateTimeShorter(lastCheckpointLog.arrived)})`
-              : '-'}
-          </Typography>
-        </TableCell>
-      </TableRow>
-      {user && user.permissions.includes('view_stats') && (
+      {canViewTeamDetails && (
+        <TableRow>
+          <TableCell css={cell}>
+            <Typography variant="body2">Laatste fiche</Typography>
+          </TableCell>
+          <TableCell css={cell}>
+            <Typography variant="body2" color="textSecondary">
+              {lastCheckpointLog && fiche
+                ? `${fiche.display_name} (${formatDateTimeShorter(lastCheckpointLog.arrived)})`
+                : '-'}
+            </Typography>
+          </TableCell>
+        </TableRow>
+      )}
+      {canViewStats && (
         <TableRow>
           <TableCell css={cell}>
             <Typography variant="body2">Snelheid</Typography>
@@ -98,14 +104,16 @@ function TeamRows({ team }: { team: Team }) {
           </TableCell>
         </TableRow>
       )}
-      <TableRow>
-        <TableCell css={cell}>
-          <Typography variant="body2">Safe</Typography>
-        </TableCell>
-        <TableCell css={cell}>
-          <SafeSelector team={team} />
-        </TableCell>
-      </TableRow>
+      {canViewTeamDetails && (
+        <TableRow>
+          <TableCell css={cell}>
+            <Typography variant="body2">Safe</Typography>
+          </TableCell>
+          <TableCell css={cell}>
+            <SafeSelector team={team} />
+          </TableCell>
+        </TableRow>
+      )}
     </>
   );
 }
@@ -160,11 +168,15 @@ export default function StatusCard({
 
   const lastLog = selectedTracker?.last_log;
 
-  const navigateUrl = useMemo(() => {
-    return getNavigationUrl(selectedTracker?.last_log?.point);
-  }, [selectedTracker]);
+  const navigateUrl = useMemo(
+    () => getNavigationUrl(selectedTracker?.last_log?.point),
+    [selectedTracker],
+  );
 
-  const canSeeContactPersons = user ? user.permissions.includes('view_contactperson') : false;
+  const canSeeContactPersons = Boolean(user && user.permissions.includes('view_contactperson'));
+  const canViewTeamDetails = Boolean(user && user.permissions.includes('view_team_details'));
+  const canViewTrackerLogs = Boolean(user && user.permissions.includes('view_trackerlog'));
+  const canAddTrackerLog = Boolean(user && user.permissions.includes('add_trackerlog'));
 
   return (
     <MainCard sx={{ width: '360px' }}>
@@ -213,16 +225,18 @@ export default function StatusCard({
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Geschiedenis">
-          <IconButton
-            onClick={() => dispatch(trackersActions.setShowHistory(true))}
-            disabled={!lastLog}
-          >
-            <HistoryIcon />
-          </IconButton>
-        </Tooltip>
+        {canViewTrackerLogs && (
+          <Tooltip title="Geschiedenis">
+            <IconButton
+              onClick={() => dispatch(trackersActions.setShowHistory(true))}
+              disabled={!lastLog}
+            >
+              <HistoryIcon />
+            </IconButton>
+          </Tooltip>
+        )}
 
-        {user && user.permissions.includes('add_trackerlog') && (
+        {canAddTrackerLog && (
           <Tooltip title="Manuele locatie">
             <IconButton
               onClick={onStartTrackerLogCreation}
@@ -249,7 +263,7 @@ export default function StatusCard({
 
         {selectedTeam && canSeeContactPersons && <TeamCallButton team={selectedTeam} />}
 
-        {selectedTeam && (
+        {selectedTeam && canViewTeamDetails && (
           <Tooltip title="Meer info">
             <IconButton component={RouterLink} to={`/team/${selectedTeam.id}/`}>
               <Badge badgeContent={selectedTeam.team_notes.length} color="primary">

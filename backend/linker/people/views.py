@@ -10,15 +10,24 @@ from rest_framework import viewsets
 
 from .models import ContactPerson, OrganizationMember, Team, TeamNote
 from .serializers import (
+    BasicTeamSerializer,
     ContactPersonSerializer,
     OrganizationMemberSerializer,
     TeamNoteSerializer,
     TeamSerializer,
+    TeamWithNumberSerializer,
 )
 
 
 class TeamViewSet(viewsets.ModelViewSet):
-    serializer_class = TeamSerializer
+    def get_serializer_class(self):
+        if self.request.user.has_perm('people.view_team_details') and self.request.user.has_perm(
+            'people.view_team_number'
+        ):
+            return TeamSerializer
+        elif self.request.user.has_perm('people.view_team_number'):
+            return TeamWithNumberSerializer
+        return BasicTeamSerializer
 
     def get_queryset(self):
         if self.request.user.has_perm('people.view_contactperson'):
@@ -40,9 +49,12 @@ class TeamViewSet(viewsets.ModelViewSet):
             .order_by('number')
         )
 
+        if not self.request.user.has_perm('people.view_all_teams'):
+            queryset = queryset.filter(safe_weide='')
+
         return queryset
 
-    def perform_update(self, serializer: TeamSerializer):
+    def perform_update(self, serializer):
         if serializer.validated_data.get('safe_weide'):
             serializer.save(safe_weide_updated_at=now(), safe_weide_updated_by=self.request.user)
         else:

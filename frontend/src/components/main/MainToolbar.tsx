@@ -59,6 +59,7 @@ export default function MainToolbar({
 
   const { data: user } = useGetUserQuery();
   const canViewNotifications = Boolean(user?.permissions.includes('view_notification'));
+  const canViewTeamDetails = Boolean(user?.permissions.includes('view_team_details'));
   const { data: notifications } = useGetNotificationsQuery(undefined, {
     skip: !canViewNotifications,
   });
@@ -96,11 +97,13 @@ export default function MainToolbar({
       <IconButton edge="start" onClick={() => setListOpen(!listOpen)}>
         {listOpen ? <MapIcon /> : <ViewListIcon />}
       </IconButton>
-      <IconButton edge="start" onClick={(e) => setMenuAnchorEl(e.currentTarget)}>
-        <Badge variant="dot" invisible={!filterActive} color="primary">
-          <FilterIcon />
-        </Badge>
-      </IconButton>
+      {canViewTeamDetails && (
+        <IconButton edge="start" onClick={(e) => setMenuAnchorEl(e.currentTarget)}>
+          <Badge variant="dot" invisible={!filterActive} color="primary">
+            <FilterIcon />
+          </Badge>
+        </IconButton>
+      )}
       <Menu
         anchorEl={menuAnchorEl}
         open={Boolean(menuAnchorEl)}

@@ -1,4 +1,5 @@
-import { CSSProperties, useCallback, useMemo } from 'react';
+import type { CSSProperties } from 'react';
+import { useCallback, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
 
@@ -27,7 +28,8 @@ import {
   useGetTeamsQuery,
   useMarkNotificationAsReadMutation,
 } from '../../services/linker.ts';
-import { Notification, NotificationType, OrganizationMember, Team } from '../../services/types.ts';
+import type { Notification, OrganizationMember, Team } from '../../services/types.ts';
+import { NotificationType } from '../../services/types.ts';
 import { trackersActions, useAppDispatch } from '../../store';
 import { formatDateTimeShorter } from '../../utils/time.ts';
 

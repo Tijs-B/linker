@@ -16,6 +16,11 @@ class Tracker(models.Model):
 
     last_log = models.OneToOneField('TrackerLog', on_delete=models.SET_NULL, blank=True, null=True, related_name='+')
 
+    class Meta:
+        permissions = [
+            ('view_heatmap', 'Can view heatmap'),
+        ]
+
     def __str__(self):
         if self.tracker_name:
             return self.tracker_name

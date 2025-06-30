@@ -1,4 +1,5 @@
-import { Card, SxProps, Theme, useTheme } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material';
+import { Card, useTheme } from '@mui/material';
 
 // const root = css`
 //   pointer-events: none;

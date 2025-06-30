@@ -10,9 +10,9 @@ import {
   TableRow,
 } from '@mui/material';
 
-import { EntityState } from '@reduxjs/toolkit';
+import type { EntityState } from '@reduxjs/toolkit';
 
-import { OrganizationMember, Team, Tracker } from '../../services/types.ts';
+import type { OrganizationMember, Team, Tracker } from '../../services/types.ts';
 
 interface TrackersTableProps {
   trackers: EntityState<Tracker, number>;

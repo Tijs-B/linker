@@ -15,6 +15,7 @@ from linker.tracing.constants import FICHE_MAX_DISTANCE, GEBIED_MAX_DISTANCE, TO
 from linker.trackers.constants import TrackerLogSource
 from linker.trackers.heatmap import get_all_tracks
 from linker.trackers.models import Tracker, TrackerLog
+from linker.trackers.permissions import CanViewHeatmap, CanViewTrackerLogs
 from linker.trackers.serializers import TrackerLogSerializer, TrackerSerializer
 
 
@@ -22,48 +23,51 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TrackerSerializer
 
     def get_queryset(self):
-        return Tracker.objects.select_related('last_log').annotate(
-            fiche=Subquery(
-                Fiche.objects.filter(point__distance_lte=(OuterRef('last_log__point'), D(m=FICHE_MAX_DISTANCE))).values(
-                    'pk'
-                )[:1]
-            ),
-            tocht=Subquery(
-                Tocht.objects.filter(route__distance_lte=(OuterRef('last_log__point'), D(m=TOCHT_MAX_DISTANCE))).values(
-                    'pk'
-                )[:1]
-            ),
-            weide=Subquery(
-                Weide.objects.filter(
-                    polygon__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))
-                ).values('pk')[:1]
-            ),
-            basis=Subquery(
-                Basis.objects.filter(point__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))).values(
-                    'pk'
-                )[:1]
-            ),
-            forbidden_area=Subquery(
-                ForbiddenArea.objects.filter(area__contains=OuterRef('last_log__point')).values('pk')[:1]
-            ),
-            avg_voltage=RawSQL(
-                """
-                    SELECT AVG(analog_input)
-                    FROM (
-                        SELECT tl.analog_input
-                        FROM trackers_trackerlog tl
-                        WHERE tl.tracker_id = trackers_tracker.id
-                        AND analog_input IS NOT NULL
-                        ORDER BY tl.gps_datetime DESC
-                        LIMIT 20
-                    )
-                    """,
-                params=[],
-                output_field=FloatField(),
-            ),
-        )
+        queryset = Tracker.objects.select_related('last_log')
+        if self.request.user.has_perm('trackers.view_trackerlog'):
+            queryset = queryset.annotate(
+                fiche=Subquery(
+                    Fiche.objects.filter(
+                        point__distance_lte=(OuterRef('last_log__point'), D(m=FICHE_MAX_DISTANCE))
+                    ).values('pk')[:1]
+                ),
+                tocht=Subquery(
+                    Tocht.objects.filter(
+                        route__distance_lte=(OuterRef('last_log__point'), D(m=TOCHT_MAX_DISTANCE))
+                    ).values('pk')[:1]
+                ),
+                weide=Subquery(
+                    Weide.objects.filter(
+                        polygon__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))
+                    ).values('pk')[:1]
+                ),
+                basis=Subquery(
+                    Basis.objects.filter(
+                        point__distance_lte=(OuterRef('last_log__point'), D(m=WEIDE_MAX_DISTANCE))
+                    ).values('pk')[:1]
+                ),
+                forbidden_area=Subquery(
+                    ForbiddenArea.objects.filter(area__contains=OuterRef('last_log__point')).values('pk')[:1]
+                ),
+                avg_voltage=RawSQL(
+                    """
+                        SELECT AVG(analog_input)
+                        FROM (
+                            SELECT tl.analog_input
+                            FROM trackers_trackerlog tl
+                            WHERE tl.tracker_id = trackers_tracker.id
+                            AND analog_input IS NOT NULL
+                            ORDER BY tl.gps_datetime DESC
+                            LIMIT 20
+                        )
+                        """,
+                    params=[],
+                    output_field=FloatField(),
+                ),
+            )
+        return queryset
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], permission_classes=(IsAuthenticated, CanViewTrackerLogs))
     def track(self, request, pk=None):
         tracker = self.get_object()
         track = tracker.get_track_geojson()
@@ -100,7 +104,7 @@ class TrackerLogViewSet(CreateModelMixin, viewsets.GenericViewSet):
 
 
 class HeatmapView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, CanViewHeatmap, CanViewTrackerLogs)
 
     def get(self, request: Request) -> HttpResponse:
         if not (result := cache.get('heatmap-cache')):

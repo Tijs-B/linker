@@ -1,9 +1,16 @@
-import { EntityState } from '@reduxjs/toolkit';
+import type { EntityState } from '@reduxjs/toolkit';
 import distance from '@turf/distance';
-import { Point } from 'geojson';
+import type { Point } from 'geojson';
 import isMobile from 'is-mobile';
 
-import { CheckpointLog, Fiche, ForbiddenArea, Tocht, Tracker, Weide } from '../services/types.ts';
+import type {
+  CheckpointLog,
+  Fiche,
+  ForbiddenArea,
+  Tocht,
+  Tracker,
+  Weide,
+} from '../services/types.ts';
 
 export function getLastCheckpointLog(
   team: number,

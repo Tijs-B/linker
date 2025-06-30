@@ -1,10 +1,11 @@
 import { useEffect, useMemo } from 'react';
-import { Layer, MapLayerMouseEvent, Source, useMap } from 'react-map-gl/maplibre';
+import type { MapLayerMouseEvent } from 'react-map-gl/maplibre';
+import { Layer, Source, useMap } from 'react-map-gl/maplibre';
 
 import { feature, featureCollection } from '@turf/helpers';
 
 import { useGetTrackersQuery } from '../../services/linker.ts';
-import { OrganizationMember, Team } from '../../services/types.ts';
+import type { OrganizationMember, Team } from '../../services/types.ts';
 import {
   selectSelectedItem,
   selectSelectedTracker,

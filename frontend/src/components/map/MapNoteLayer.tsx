@@ -1,5 +1,7 @@
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { Layer, MapLayerMouseEvent, Source, useMap } from 'react-map-gl/maplibre';
+import type { ChangeEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { MapLayerMouseEvent } from 'react-map-gl/maplibre';
+import { Layer, Source, useMap } from 'react-map-gl/maplibre';
 
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -24,7 +26,7 @@ import {
   useGetUserQuery,
   useUpdateMapNoteMutation,
 } from '../../services/linker.ts';
-import { MapNote } from '../../services/types.ts';
+import type { MapNote } from '../../services/types.ts';
 import { getNavigationUrl } from '../../utils/data.ts';
 import { formatFromNow } from '../../utils/time.ts';
 

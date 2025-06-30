@@ -48,7 +48,12 @@ class Team(models.Model):
     safe_weide_updated_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
-        permissions = [('view_stats', 'Can view team stats')]
+        permissions = [
+            ('view_stats', 'Can view team stats'),
+            ('view_all_teams', 'Can view all teams'),
+            ('view_team_details', 'Can view team details'),
+            ('view_team_number', 'Can view team number'),
+        ]
 
     def __str__(self):
         return f'{self.direction.value}{self.number:02d} {self.name}'

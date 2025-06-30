@@ -1,9 +1,10 @@
-import { SyntheticEvent, useCallback, useMemo } from 'react';
+import type { SyntheticEvent } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { Autocomplete, FormControl, TextField } from '@mui/material';
 
 import { useGetUserQuery, useGetWeidesQuery, useUpdateTeamMutation } from '../services/linker.ts';
-import { Team } from '../services/types.ts';
+import type { Team } from '../services/types.ts';
 
 interface SafeSelectorProps {
   team: Team;

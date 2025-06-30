@@ -1,7 +1,8 @@
-import { Avatar, Box, CircularProgress, SxProps, Theme } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material';
+import { Avatar, Box, CircularProgress } from '@mui/material';
 import { green, orange, red } from '@mui/material/colors';
 
-import { OrganizationMember, Team } from '../services/types.ts';
+import type { OrganizationMember, Team } from '../services/types.ts';
 import { itemColor } from '../theme/colors.ts';
 
 interface PersonAvatarProps {

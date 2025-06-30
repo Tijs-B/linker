@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { LngLat } from 'react-map-gl/maplibre';
+import type { LngLat } from 'react-map-gl/maplibre';
 
 import {
   Button,

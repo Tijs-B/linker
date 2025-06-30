@@ -12,9 +12,17 @@ import {
 } from '@mui/material';
 import { green, red } from '@mui/material/colors';
 
-import { EntityState } from '@reduxjs/toolkit';
+import type { EntityState } from '@reduxjs/toolkit';
 
-import { Fiche, ForbiddenArea, Stats, Team, Tocht, Tracker, Weide } from '../../services/types.ts';
+import type {
+  Fiche,
+  ForbiddenArea,
+  Stats,
+  Team,
+  Tocht,
+  Tracker,
+  Weide,
+} from '../../services/types.ts';
 import { getPositionDescription } from '../../utils/data.ts';
 import { secondsToHoursMinutes } from '../../utils/time.ts';
 import PersonAvatar from '../PersonAvatar.jsx';

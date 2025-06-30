@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 
 import { useUpdateContactPersonMutation } from '../../services/linker.ts';
-import { ContactPerson, Team } from '../../services/types.ts';
+import type { ContactPerson, Team } from '../../services/types.ts';
 
 interface ContactPersonItemProps {
   person: ContactPerson;

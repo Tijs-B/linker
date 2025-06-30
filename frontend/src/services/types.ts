@@ -1,4 +1,4 @@
-import { LineString, MultiPolygon, Point, Polygon } from 'geojson';
+import type { LineString, MultiPolygon, Point, Polygon } from 'geojson';
 
 export enum Direction {
   RED = 'R',

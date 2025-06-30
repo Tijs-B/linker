@@ -2,7 +2,7 @@ import { yellow } from '@mui/material/colors';
 
 import dDinUrl from '../assets/fonts/D-DIN-Bold.subset.woff2';
 import dDinCondensedUrl from '../assets/fonts/D-DINCondensed-Bold.subset.woff2';
-import { OrganizationMember, Team } from '../services/types.ts';
+import type { OrganizationMember, Team } from '../services/types.ts';
 import { itemColor } from '../theme/colors.ts';
 
 const TRACKER_BORDER_PATH = new Path2D(
@@ -148,9 +148,10 @@ export async function generateAllIcons(
     codesPerColor[color].push(item.code);
   }
 
-  Object.entries(codesPerColor).forEach(([color, codes]) =>
-    generateTrackers(color, codes, context, addToMap),
-  );
+  Object.entries(codesPerColor).forEach(([color, codes]) => {
+    const uniqueCodes = [...new Set(codes)];
+    generateTrackers(color, uniqueCodes, context, addToMap);
+  });
 
   generateMapNoteIcon(yellow[400], context, addToMap);
   generateTrackerOutline(context, addToMap);

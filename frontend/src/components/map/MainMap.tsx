@@ -1,12 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import Map, {
-  GeolocateControl,
-  LngLat,
-  MapLayerMouseEvent,
-  MapRef,
-  NavigationControl,
-  ScaleControl,
-} from 'react-map-gl/maplibre';
+import type { LngLat, MapLayerMouseEvent, MapRef } from 'react-map-gl/maplibre';
+import Map, { GeolocateControl, NavigationControl, ScaleControl } from 'react-map-gl/maplibre';
 
 import CallSplitIcon from '@mui/icons-material/CallSplit';
 import FlagIcon from '@mui/icons-material/Flag';
@@ -25,7 +19,7 @@ import {
   useGetTochtenQuery,
   useGetUserQuery,
 } from '../../services/linker.ts';
-import { OrganizationMember, Team } from '../../services/types.ts';
+import type { OrganizationMember, Team } from '../../services/types.ts';
 import { trackersActions, useAppDispatch } from '../../store';
 import { generateAllIcons } from '../../utils/icons.ts';
 import BackgroundLayers from './BackgroundLayers.tsx';
@@ -75,6 +69,7 @@ export default function MainMap({
   const { data: user } = useGetUserQuery();
 
   const canAddMapNote = user ? user.permissions.includes('add_mapnote') : false;
+  const canViewHeatmap = user ? user.permissions.includes('view_heatmap') : false;
 
   const mapStyle = showHeatmap
     ? '/tiles/style/dark-v8'
@@ -197,14 +192,16 @@ export default function MainMap({
         <GeolocateControl trackUserLocation positionOptions={{ enableHighAccuracy: true }} />
         <ScaleControl position="bottom-right" />
 
-        <CustomOverlay>
-          <IconButton onClick={onToggleHeatmap}>
-            <WhatshotIcon
-              color="primary"
-              sx={{ color: showHeatmap ? '' : '#000', marginTop: '2px' }}
-            />
-          </IconButton>
-        </CustomOverlay>
+        {canViewHeatmap && (
+          <CustomOverlay>
+            <IconButton onClick={onToggleHeatmap}>
+              <WhatshotIcon
+                color="primary"
+                sx={{ color: showHeatmap ? '' : '#000', marginTop: '2px' }}
+              />
+            </IconButton>
+          </CustomOverlay>
+        )}
 
         <CustomOverlay>
           <IconButton onClick={onToggleSatellite}>
@@ -241,7 +238,9 @@ export default function MainMap({
           </IconButton>
         </CustomOverlay>
 
-        {desktop && <MapPadding left={parseInt(theme.dimensions.drawerWidthDesktop, 10)} />}
+        {desktop && user && user.permissions.includes('view_team_details') && (
+          <MapPadding left={parseInt(theme.dimensions.drawerWidthDesktop, 10)} />
+        )}
       </Map>
     </>
   );

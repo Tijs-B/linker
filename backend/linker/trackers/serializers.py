@@ -26,11 +26,11 @@ class TrackerLogSerializer(serializers.Serializer):
 
 class TrackerSerializer(serializers.ModelSerializer):
     last_log = TrackerLogSerializer()
-    fiche = serializers.IntegerField(read_only=True)
-    weide = serializers.IntegerField(read_only=True)
-    tocht = serializers.IntegerField(read_only=True)
-    basis = serializers.IntegerField(read_only=True)
-    forbidden_area = serializers.IntegerField(read_only=True)
+    fiche = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
+    weide = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
+    tocht = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
+    basis = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
+    forbidden_area = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
 
     is_online = serializers.SerializerMethodField()
     battery_percentage = serializers.SerializerMethodField()
@@ -41,7 +41,7 @@ class TrackerSerializer(serializers.ModelSerializer):
         return obj.last_log.gps_datetime >= now() - timedelta(minutes=TRACKER_OFFLINE_MINUTES)
 
     def get_battery_percentage(self, obj):
-        if obj.avg_voltage is None:
+        if getattr(obj, 'avg_voltage', None) is None:
             return None
         v_min, v_max = TRACKER_VOLTAGE_RANGE
         value = round(100 * (obj.avg_voltage - v_min) / (v_max - v_min))

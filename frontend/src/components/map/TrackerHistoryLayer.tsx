@@ -4,13 +4,16 @@ import { red } from '@mui/material/colors';
 
 import { skipToken } from '@reduxjs/toolkit/query';
 
-import { useGetTrackerTrackQuery } from '../../services/linker.ts';
+import { useGetTrackerTrackQuery, useGetUserQuery } from '../../services/linker.ts';
 import { selectSelectedItem, useAppSelector } from '../../store';
 
 export default function TrackerHistoryLayer({ visible }: { visible: boolean }) {
   const selectedItem = useAppSelector(selectSelectedItem);
+  const { data: user } = useGetUserQuery();
   const { currentData: track } = useGetTrackerTrackQuery(
-    selectedItem?.tracker ? selectedItem.tracker : skipToken,
+    selectedItem?.tracker && user && user.permissions.includes('view_trackerlog')
+      ? selectedItem.tracker
+      : skipToken,
   );
 
   const trackData = track || { type: 'LineString', coordinates: [] };

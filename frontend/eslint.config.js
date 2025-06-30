@@ -10,7 +10,9 @@ export default tseslint.config(
   {
     extends: [
       js.configs.recommended,
-      ...tseslint.configs.recommended,
+      tseslint.configs.recommended,
+      reactHooks.configs['recommended-latest'],
+      reactRefresh.configs.vite,
     ],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -23,14 +25,13 @@ export default tseslint.config(
     },
 
     plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
       'react-compiler': reactCompiler,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react-compiler/react-compiler': 'error',
+      "@typescript-eslint/consistent-type-imports": "error"
     },
   },
 );
