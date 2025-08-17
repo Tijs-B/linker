@@ -8,3 +8,4 @@ backend/.env
 celerybeat-schedule
 .DS_Store
 db_dump
+*.dump
