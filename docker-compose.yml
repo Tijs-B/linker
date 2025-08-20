@@ -60,7 +60,7 @@ services:
   frontend:
     build:
       context: .
-      target: frontend-dev
+      target: frontend
     command: npm run dev -- --port 8061 --host 0.0.0.0
     volumes:
       - ./frontend:/app
