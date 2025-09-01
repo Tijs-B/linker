@@ -57,20 +57,20 @@ services:
     ports:
       - "8063:6379"
 
-  frontend:
-    build:
-      context: .
-      target: frontend
-    command: npm run dev -- --port 8061 --host 0.0.0.0
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules/
-      - /app/public/tiles/
-    environment:
-      - VITE_BACKEND_URL=http://linker:8060
-      - VITE_TILES_URL=http://tiles:8064
-    ports:
-      - "8061:8061"
+  # frontend:
+  #   build:
+  #     context: .
+  #     target: frontend
+  #   command: npm run dev -- --port 8061 --host 0.0.0.0
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules/
+  #     - /app/public/tiles/
+  #   environment:
+  #     - VITE_BACKEND_URL=http://linker:8060
+  #     - VITE_TILES_URL=http://tiles:8064
+  #   ports:
+  #     - "8061:8061"
 
   tiles:
     image: ghcr.io/maplibre/martin
