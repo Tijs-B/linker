@@ -316,8 +316,9 @@ export default function MainPage() {
   `;
 
   const middle = css`
-    flex: 1;
-    display: grid;
+    flex: 1 1 0;
+    min-height: 0;
+    position: relative;
   `;
 
   const footer = css`
@@ -326,14 +327,21 @@ export default function MainPage() {
   `;
 
   const contentMap = css`
+    width: 100%;
+    height: 100%;
+    position: absolute;
     pointer-events: auto;
-    grid-area: 1 / 1;
   `;
 
   const contentList = css`
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
     pointer-events: auto;
-    grid-area: 1 / 1;
     z-index: 4;
+    display: flex;
   `;
 
   // Navigate to login page if unauthenticated
@@ -394,11 +402,9 @@ export default function MainPage() {
             )}
           </Paper>
         </div>
-        {desktop && (
-          <div css={footer}>
-            <BottomMenu />
-          </div>
-        )}
+        <div css={footer}>
+          <BottomMenu />
+        </div>
       </div>
       {selectedId !== null && !showHistory && !trackerLogLngLat && (
         <StatusCard

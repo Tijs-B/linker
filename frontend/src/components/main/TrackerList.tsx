@@ -1,13 +1,10 @@
-import type { CSSProperties } from 'react';
 import { useCallback, useMemo } from 'react';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList } from 'react-window';
+import { List } from 'react-window';
+import { type RowComponentProps } from 'react-window';
 
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { Badge, Chip, ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
-
-import { css } from '@emotion/react';
 
 import {
   useGetBasisQuery,
@@ -30,29 +27,33 @@ type TrackerRowDataItem = (OrganizationMember | Team) & {
 };
 
 interface TrackerRowProps {
-  index: number;
-  style: CSSProperties;
-  data: { items: TrackerRowDataItem[]; onTrackerClick: (tracker: number) => void };
+  items: TrackerRowDataItem[];
+  onTrackerClick: (tracker: number) => void;
 }
 
-const TrackerRow = ({ data, index, style }: TrackerRowProps) => {
-  const item = data.items[index];
+const TrackerRow = ({
+  items,
+  index,
+  style,
+  onTrackerClick,
+}: RowComponentProps<TrackerRowProps>) => {
+  const item = items[index];
   const dispatch = useAppDispatch();
 
   const onClick = useCallback(() => {
-    const item = data.items[index];
+    const item = items[index];
     if ('member_type' in item) {
       dispatch(trackersActions.selectMember(item.id));
     } else {
       dispatch(trackersActions.selectTeam(item.id));
     }
     if (item.tracker) {
-      data.onTrackerClick(item.tracker);
+      onTrackerClick(item.tracker);
     }
-  }, [data, dispatch, index]);
+  }, [items, dispatch, index, onTrackerClick]);
 
   const safeChip = useMemo(() => {
-    const item = data.items[index];
+    const item = items[index];
     if (!('safe_weide' in item) || !item.safe_weide) {
       return null;
     }
@@ -60,15 +61,15 @@ const TrackerRow = ({ data, index, style }: TrackerRowProps) => {
       return <Chip color="warning" variant="outlined" icon={<DirectionsBusIcon />} label="Bus" />;
     }
     return <Chip color="primary" variant="filled" label={`Safe op ${item.safe_weide}`} />;
-  }, [data, index]);
+  }, [items, index]);
 
   const offlineIcon = useMemo(() => {
-    const item = data.items[index];
+    const item = items[index];
     if (item.isOnline) {
       return null;
     }
     return <LinkOffIcon fontSize="small" sx={{ mr: 1 }} />;
-  }, [data, index]);
+  }, [items, index]);
 
   return (
     <div style={style}>
@@ -157,22 +158,11 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
   }, [user, teams, members, fiches, tochten, weides, basis, forbiddenAreas, trackers]);
 
   return (
-    <AutoSizer
-      css={css`
-        max-height: 100%;
-      `}
-    >
-      {({ height, width }) => (
-        <FixedSizeList
-          width={width}
-          height={height}
-          itemCount={items.length}
-          itemData={{ items, onTrackerClick: onClick }}
-          itemSize={60}
-        >
-          {TrackerRow}
-        </FixedSizeList>
-      )}
-    </AutoSizer>
+    <List
+      rowCount={items.length}
+      rowComponent={TrackerRow}
+      rowHeight={60}
+      rowProps={{ items, onTrackerClick: onClick }}
+    />
   );
 }

@@ -1,7 +1,6 @@
-import type { CSSProperties } from 'react';
 import { useCallback, useMemo } from 'react';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList } from 'react-window';
+import { List as WindowList } from 'react-window';
+import { type RowComponentProps } from 'react-window';
 
 import Battery1BarIcon from '@mui/icons-material/Battery1Bar';
 import CheckIcon from '@mui/icons-material/Check';
@@ -39,27 +38,29 @@ type NotificationRowDataItem = Notification & {
 };
 
 interface NotificationRowProps {
-  index: number;
-  style: CSSProperties;
-  data: {
-    items: NotificationRowDataItem[];
-    onTrackerClick: (tracker: number) => void;
-    onMarkAsRead: (notification: number) => void;
-  };
+  items: NotificationRowDataItem[];
+  onTrackerClick: (tracker: number) => void;
+  onMarkAsRead: (notification: number) => void;
 }
 
-const NotificationRow = ({ data, index, style }: NotificationRowProps) => {
-  const item = data.items[index];
+const NotificationRow = ({
+  index,
+  items,
+  style,
+  onTrackerClick,
+  onMarkAsRead,
+}: RowComponentProps<NotificationRowProps>) => {
+  const item = items[index];
 
   const onClick = useCallback(() => {
-    const item = data.items[index];
-    data.onTrackerClick(item.tracker);
-  }, [data, index]);
+    const item = items[index];
+    onTrackerClick(item.tracker);
+  }, [items, index]);
 
-  const onMarkAsRead = useCallback(() => {
-    const item = data.items[index];
-    data.onMarkAsRead(item.id);
-  }, [data, index]);
+  const onMarkThisAsRead = useCallback(() => {
+    const item = items[index];
+    onMarkAsRead(item.id);
+  }, [items, index]);
 
   let icon;
   let title;
@@ -98,7 +99,7 @@ const NotificationRow = ({ data, index, style }: NotificationRowProps) => {
         disablePadding
         dense
         secondaryAction={
-          <IconButton edge="end" onClick={onMarkAsRead} disabled={item.read}>
+          <IconButton edge="end" onClick={onMarkThisAsRead} disabled={item.read}>
             <CheckIcon />
           </IconButton>
         }
@@ -191,22 +192,14 @@ export default function NotificationList({ onTrackerClick }: NotificationListPro
   }
 
   return (
-    <AutoSizer
+    <WindowList
       css={css`
         max-height: 100%;
       `}
-    >
-      {({ height, width }) => (
-        <FixedSizeList
-          width={width}
-          height={height}
-          itemCount={notifications ? notifications.length : 0}
-          itemData={{ items: items, onTrackerClick: onClick, onMarkAsRead: onMarkAsRead }}
-          itemSize={60}
-        >
-          {NotificationRow}
-        </FixedSizeList>
-      )}
-    </AutoSizer>
+      rowCount={notifications ? notifications.length : 0}
+      rowComponent={NotificationRow}
+      rowHeight={60}
+      rowProps={{ items, onTrackerClick: onClick, onMarkAsRead: onMarkAsRead }}
+    />
   );
 }
