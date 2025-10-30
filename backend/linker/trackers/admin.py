@@ -1,4 +1,6 @@
 from django.contrib.gis import admin
+from django.db.models.query import QuerySet
+from django.http.request import HttpRequest
 from django.urls import reverse
 from django.utils.html import format_html
 
@@ -6,7 +8,7 @@ from linker.trackers.models import Tracker, TrackerLog
 
 
 @admin.register(Tracker)
-class TrackerAdmin(admin.ModelAdmin):
+class TrackerAdmin(admin.ModelAdmin[Tracker]):
     readonly_fields = ('last_log',)
     list_display = ('tracker_id', 'tracker_name', 'used_by')
     search_fields = ('tracker_id', 'tracker_name')
@@ -15,12 +17,12 @@ class TrackerAdmin(admin.ModelAdmin):
         'tracker_id',
     )
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Tracker]:
         qs = super().get_queryset(request)
         return qs.select_related('organizationmember', 'team')
 
     @admin.display()
-    def used_by(self, obj):
+    def used_by(self, obj: Tracker) -> str:
         if hasattr(obj, 'team'):
             url = reverse('admin:people_team_change', args=(obj.team.id,))
             return format_html('<a href={url}>{team}</a>', url=url, team=obj.team)
@@ -29,6 +31,8 @@ class TrackerAdmin(admin.ModelAdmin):
             return format_html(
                 '<a href={url}>{organization_member}</a>', url=url, organization_member=obj.organizationmember
             )
+        else:
+            return '-'
 
 
 @admin.register(TrackerLog)
@@ -71,6 +75,6 @@ class TrackerLogAdmin(admin.GISModelAdmin):
     list_filter = ('tracker', 'source')
 
     @admin.display(description='tracker')
-    def tracker_url(self, obj):
+    def tracker_url(self, obj: TrackerLog) -> str:
         url = reverse('admin:trackers_tracker_change', args=(obj.tracker.id,))
         return format_html('<a href={url}>{tracker}</a>', url=url, tracker=obj.tracker)

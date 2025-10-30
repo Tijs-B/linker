@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Any, cast
 
 from django.utils.timezone import now
 from enumfields.drf import EnumField
@@ -9,14 +10,14 @@ from .constants import TRACKER_OFFLINE_MINUTES, TRACKER_VOLTAGE_RANGE, TrackerLo
 from .models import Tracker, TrackerLog
 
 
-class TrackerLogSerializer(serializers.Serializer):
+class TrackerLogSerializer(serializers.Serializer[TrackerLog]):
     id = serializers.IntegerField(read_only=True)
     gps_datetime = serializers.DateTimeField(default=now)
     point = GeometryField(precision=6)
     source = EnumField(TrackerLogSource, default=TrackerLogSource.MANUAL)
     tracker = serializers.PrimaryKeyRelatedField(queryset=Tracker.objects.all())
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict[str, Any]) -> TrackerLog:
         tracker_log = TrackerLog.objects.create(**validated_data)
         tracker = tracker_log.tracker
         tracker.last_log = tracker.tracker_logs.latest('gps_datetime')
@@ -24,7 +25,7 @@ class TrackerLogSerializer(serializers.Serializer):
         return tracker_log
 
 
-class TrackerSerializer(serializers.ModelSerializer):
+class TrackerSerializer(serializers.ModelSerializer[Tracker]):
     last_log = TrackerLogSerializer()
     fiche = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
     weide = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
@@ -35,17 +36,19 @@ class TrackerSerializer(serializers.ModelSerializer):
     is_online = serializers.SerializerMethodField()
     battery_percentage = serializers.SerializerMethodField()
 
-    def get_is_online(self, obj):
+    def get_is_online(self, obj: Tracker) -> bool:
         if obj.last_log is None:
             return False
         return obj.last_log.gps_datetime >= now() - timedelta(minutes=TRACKER_OFFLINE_MINUTES)
 
-    def get_battery_percentage(self, obj):
+    def get_battery_percentage(self, obj: Tracker) -> int | None:
+        if not hasattr(obj, 'avg_voltage'):
+            return None
         if getattr(obj, 'avg_voltage', None) is None:
             return None
         v_min, v_max = TRACKER_VOLTAGE_RANGE
         value = round(100 * (obj.avg_voltage - v_min) / (v_max - v_min))
-        return min(100, max(0, value))
+        return cast(int, min(100, max(0, value)))
 
     class Meta:
         model = Tracker

@@ -1,3 +1,4 @@
+# type: ignore
 import datetime
 import gzip
 import json
@@ -20,10 +21,10 @@ from .models import Tracker, TrackerLog
 SIMULATION_START = datetime.datetime(year=2023, month=4, day=29, hour=12, tzinfo=zoneinfo.ZoneInfo('Europe/Brussels'))
 
 
-def restart_simulation():
+def restart_simulation() -> None:
     timestamp = now()
     TrackerLog.objects.filter(fetch_datetime__gt=SIMULATION_START).delete()
-    CheckpointLog.objects.filter(timestamp__gt=SIMULATION_START).delete()
+    CheckpointLog.objects.filter(arrived__gt=SIMULATION_START).delete()
     for tracker in Tracker.objects.all():
         tracker.last_log = tracker.tracker_logs.latest('gps_datetime')
         tracker.save()
@@ -36,7 +37,7 @@ def _get_timestamp_from_file_name(file: Path) -> datetime.datetime:
     )
 
 
-def simulate_download_tracker_data(until: datetime.datetime | None = None):
+def simulate_download_tracker_data(until: datetime.datetime | None = None) -> None:
     if until is None:
         try:
             start_timestamp_str = Setting.get_value_for_key(SETTING_SIMULATION_START)
@@ -67,7 +68,7 @@ def simulate_download_tracker_data(until: datetime.datetime | None = None):
         tracker.save()
 
 
-def couple_trackers():
+def couple_trackers() -> None:
     for tracker in Tracker.objects.all():
         if hasattr(tracker, 'team'):
             continue
@@ -101,7 +102,7 @@ def couple_trackers():
             member.save()
 
 
-def import_all():
+def import_all() -> None:
     simulation_path = Path(settings.SIMULATION_PATH)
     import_gpkg(simulation_path / 'Link 2023.gpkg')
     import_organization_members(simulation_path / 'organization_members.csv')

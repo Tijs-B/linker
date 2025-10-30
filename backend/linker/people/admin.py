@@ -7,37 +7,37 @@ from .models import ContactPerson, OrganizationMember, Team, TeamNote
 
 
 @admin.register(OrganizationMember)
-class OrganizationMemberAdmin(admin.ModelAdmin):
+class OrganizationMemberAdmin(admin.ModelAdmin[OrganizationMember]):
     list_display = ('__str__', 'code')
     search_fields = ('name',)
     list_filter = (('member_type', EnumFieldListFilter),)
 
 
 @admin.register(ContactPerson)
-class ContactPersonAdmin(admin.ModelAdmin):
+class ContactPersonAdmin(admin.ModelAdmin[ContactPerson]):
     list_display = ('name', 'team_url', 'is_favorite')
     ordering = ('team__number', '-is_favorite', 'name')
     search_fields = ('name',)
     list_filter = ('is_favorite', 'team')
 
     @admin.display(description='team')
-    def team_url(self, obj):
+    def team_url(self, obj: ContactPerson) -> str:
         url = reverse('admin:people_team_change', args=(obj.team.id,))
         return format_html('<a href={url}>{team}</a>', url=url, team=obj.team)
 
 
-class ContactPersonInline(admin.TabularInline):
+class ContactPersonInline(admin.TabularInline[ContactPerson, Team]):
     model = ContactPerson
     extra = 0
 
 
-class TeamNoteInline(admin.TabularInline):
+class TeamNoteInline(admin.TabularInline[TeamNote, Team]):
     model = TeamNote
     extra = 0
 
 
 @admin.register(Team)
-class TeamAdmin(admin.ModelAdmin):
+class TeamAdmin(admin.ModelAdmin[Team]):
     inlines = [ContactPersonInline, TeamNoteInline]
     ordering = ('number',)
     list_display = ('__str__', 'chiro', 'safe_weide')
@@ -56,7 +56,7 @@ class TeamAdmin(admin.ModelAdmin):
     readonly_fields = ('checkpoints', 'safe_weide_updated_at')
 
     @admin.display()
-    def checkpoints(self, obj: Team):
+    def checkpoints(self, obj: Team) -> str:
         url = f'{reverse("admin:tracing_checkpointlog_changelist")}?team={obj.pk}'
         nb_checkpoints = obj.checkpointlogs.count()
         return format_html(f'<a href={url}>{nb_checkpoints} checkpoints</a>')

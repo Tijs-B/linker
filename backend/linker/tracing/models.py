@@ -15,7 +15,7 @@ class CheckpointLog(models.Model):
     fiche = models.ForeignKey(Fiche, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='checkpointlogs')
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.team.direction.value}{self.team.number:02d} on {self.fiche}'
 
 
@@ -25,7 +25,7 @@ class Notification(models.Model):
     tracker = models.ForeignKey(Tracker, on_delete=models.CASCADE)
     severity = models.IntegerField(default=0)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'Notification {self.notification_type.value} for {self.tracker}'
 
 
@@ -36,5 +36,5 @@ class ReadNotification(models.Model):
     class Meta:
         constraints = [UniqueConstraint(fields=['user', 'notification'], name='unique_user_notification')]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.notification} ({self.user.username})'

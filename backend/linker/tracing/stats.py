@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.db.models import Prefetch
 
 from linker.map.models import Fiche, Tocht
@@ -37,7 +39,7 @@ def get_next_tocht_fiche_full_map(all_fiches: list[Fiche]) -> dict[Direction, di
     return {Direction.RED: next_map, Direction.BLUE: prev_map}
 
 
-def calculate_stats() -> dict:
+def calculate_stats() -> dict[str, Any]:
     # Good luck :)
     all_fiches: list[Fiche] = list(
         Fiche.objects.filter(tocht__is_alternative=False).order_by('tocht__order', 'order').all()
@@ -64,7 +66,7 @@ def calculate_stats() -> dict:
 
         for current_index, current_log in enumerate(logs):
             current_fiche = current_log.fiche_id
-            if current_fiche in done:
+            if current_fiche in done or not current_log.left:
                 continue
 
             expected_fiche = next_fiche_map[team.direction][current_fiche]
@@ -101,9 +103,15 @@ def calculate_stats() -> dict:
         team_full_tocht_durations[team] = full_tocht_durations
         team_partial_tocht_durations[team] = partial_tocht_durations
 
-    all_fiche_durations = {fiche.id: {Direction.RED: [], Direction.BLUE: []} for fiche in all_fiches}
-    all_partial_tocht_durations = {tocht.id: {Direction.RED: [], Direction.BLUE: []} for tocht in all_tochten}
-    all_full_tocht_durations = {tocht.id: {Direction.RED: [], Direction.BLUE: []} for tocht in all_tochten}
+    all_fiche_durations: dict[int, dict[Direction, list[float]]] = {
+        fiche.id: {Direction.RED: [], Direction.BLUE: []} for fiche in all_fiches
+    }
+    all_partial_tocht_durations: dict[int, dict[Direction, list[float]]] = {
+        tocht.id: {Direction.RED: [], Direction.BLUE: []} for tocht in all_tochten
+    }
+    all_full_tocht_durations: dict[int, dict[Direction, list[float]]] = {
+        tocht.id: {Direction.RED: [], Direction.BLUE: []} for tocht in all_tochten
+    }
 
     for team, fiche_durations in team_fiche_durations.items():
         for fiche, duration in fiche_durations.items():
@@ -154,7 +162,7 @@ def calculate_stats() -> dict:
         if len(team_fiche_durations[team]) > 0:
             avg_fiche_deviation = round(
                 sum(
-                    duration - avg_fiche_durations[fiche][team.direction.value]['average']
+                    duration - (avg_fiche_durations[fiche][team.direction.value]['average'] or 0)
                     for fiche, duration in team_fiche_durations[team].items()
                 )
                 / len(team_fiche_durations[team])
@@ -165,7 +173,7 @@ def calculate_stats() -> dict:
         if len(team_full_tocht_durations[team]) > 0:
             avg_full_tocht_deviation = round(
                 sum(
-                    duration - avg_full_tocht_durations[tocht][team.direction.value]['average']
+                    duration - (avg_full_tocht_durations[tocht][team.direction.value]['average'] or 0)
                     for tocht, duration in team_full_tocht_durations[team].items()
                 )
                 / len(team_full_tocht_durations[team])
@@ -176,7 +184,7 @@ def calculate_stats() -> dict:
         if len(team_partial_tocht_durations[team]) > 0:
             avg_partial_tocht_deviation = round(
                 sum(
-                    duration - avg_partial_tocht_durations[tocht][team.direction.value]['average']
+                    duration - (avg_partial_tocht_durations[tocht][team.direction.value]['average'] or 0)
                     for tocht, duration in team_partial_tocht_durations[team].items()
                 )
                 / len(team_partial_tocht_durations[team])

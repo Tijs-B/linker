@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from logging import getLogger
 from time import time
+from typing import Any
 from zoneinfo import ZoneInfo
 
 import requests
@@ -33,7 +34,7 @@ def post_import_actions() -> None:
     logger.info(f'Updated last log of {trackers_updated} trackers')
 
 
-def import_geodynamics_minisite_data(data: dict, fetch_datetime: datetime | None = None) -> None:
+def import_geodynamics_minisite_data(data: dict[str, Any], fetch_datetime: datetime | None = None) -> None:
     if fetch_datetime is None:
         fetch_datetime = now()
 
@@ -95,7 +96,7 @@ def import_geodynamics_minisite_data(data: dict, fetch_datetime: datetime | None
     post_import_actions()
 
 
-def fetch_geodynamics_minisite_data():
+def fetch_geodynamics_minisite_data() -> None:
     url = settings.GEODYNAMICS_MINISITE_URL
     if url is None:
         logger.warning('GEODYNAMICS_MINISITE_URL is not configured in the settings')
@@ -109,7 +110,7 @@ def fetch_geodynamics_minisite_data():
     import_geodynamics_minisite_data(data=response.json())
 
 
-def import_geodynamics_api_data(data: list) -> None:
+def import_geodynamics_api_data(data: list[dict[str, Any]]) -> None:
     new_tracker_logs = []
     trackers = {tracker.tracker_id: tracker for tracker in Tracker.objects.all()}
 
@@ -147,7 +148,7 @@ def import_geodynamics_api_data(data: list) -> None:
     post_import_actions()
 
 
-def fetch_geodynamics_api_data():
+def fetch_geodynamics_api_data() -> None:
     auth = settings.GEODYNAMICS_API_AUTH
     base_url = settings.GEODYNAMICS_API_BASE_URL
     if base_url is None:

@@ -14,7 +14,7 @@ class ContactPerson(models.Model):
 
     team = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='contact_persons')
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.team.direction.value}{self.team.number:02d} {self.name}'
 
 
@@ -25,7 +25,7 @@ class OrganizationMember(models.Model):
     phone_number = models.CharField(max_length=13, blank=True)
     member_type = EnumField(MemberType, max_length=13)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.member_type.value.title()} - {self.name}'
 
     @property
@@ -55,7 +55,7 @@ class Team(models.Model):
             ('view_team_number', 'Can view team number'),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.direction.value}{self.number:02d} {self.name}'
 
     @property
@@ -72,5 +72,5 @@ class TeamNote(models.Model):
     text = models.TextField()
     author = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.team}: {self.text}'

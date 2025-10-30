@@ -21,9 +21,22 @@ dependencies = [
     "Pillow>=10.2.0",
     "psycopg>=3.1.18",
     "redis>=5.0.1",
-    "ruff>=0.9.6",
     "requests>=2.31.0",
     "watchdog>=3.0.0",
+    "django-stubs>=5.2.7",
+    "django-stubs-ext>=5.2.7",
+]
+
+[dependency-groups]
+dev = [
+    "celery-types>=0.23.0",
+    "djangorestframework-stubs>=3.16.5",
+    "mypy>=1.18.2",
+    "mypy-extensions>=1.1.0",
+    "ruff>=0.14.2",
+    "types-python-dateutil>=2.9.0.20251008",
+    "types-redis>=4.6.0.20241004",
+    "types-requests>=2.32.4.20250913",
 ]
 
 [tool.ruff]
@@ -39,3 +52,21 @@ ignore = ["DJ001"]
 
 [tool.uv]
 package = false
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "linker.settings"
+
+[[tool.mypy.overrides]]
+module = [
+    "*.migrations.*",
+    "migrations.*",
+    "settings",
+    "settings.*",
+]
+ignore_errors = true
+

@@ -1,12 +1,15 @@
 from json import loads
+from typing import Any
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Permission
 from django.db.models import Prefetch
-from django.http import HttpResponse, JsonResponse
+from django.db.models.query import QuerySet
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.utils.timezone import now
 from django.views import View
 from rest_framework import viewsets
+from rest_framework.serializers import BaseSerializer, Serializer
 
 from .models import ContactPerson, OrganizationMember, Team, TeamNote
 from .serializers import (
@@ -19,8 +22,8 @@ from .serializers import (
 )
 
 
-class TeamViewSet(viewsets.ModelViewSet):
-    def get_serializer_class(self):
+class TeamViewSet(viewsets.ModelViewSet[Team]):
+    def get_serializer_class(self) -> type[Serializer[Team]]:
         if self.request.user.has_perm('people.view_team_details') and self.request.user.has_perm(
             'people.view_team_number'
         ):
@@ -29,7 +32,7 @@ class TeamViewSet(viewsets.ModelViewSet):
             return TeamWithNumberSerializer
         return BasicTeamSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Team]:
         if self.request.user.has_perm('people.view_contactperson'):
             contact_person_inner_queryset = ContactPerson.objects.order_by('-is_favorite', 'name')
         else:
@@ -54,32 +57,32 @@ class TeamViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    def perform_update(self, serializer):
+    def perform_update(self, serializer: BaseSerializer[Team]) -> None:
         if serializer.validated_data.get('safe_weide'):
             serializer.save(safe_weide_updated_at=now(), safe_weide_updated_by=self.request.user)
         else:
             serializer.save()
 
 
-class OrganizationMemberViewSet(viewsets.ReadOnlyModelViewSet):
+class OrganizationMemberViewSet(viewsets.ReadOnlyModelViewSet[OrganizationMember]):
     queryset = OrganizationMember.objects.order_by('member_type', 'name')
     serializer_class = OrganizationMemberSerializer
 
 
-class TeamNoteViewSet(viewsets.ModelViewSet):
+class TeamNoteViewSet(viewsets.ModelViewSet[TeamNote]):
     queryset = TeamNote.objects.all().select_related('author')
     serializer_class = TeamNoteSerializer
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: BaseSerializer[TeamNote]) -> None:
         serializer.save(author=self.request.user)
 
 
-class ContactPersonViewSet(viewsets.ModelViewSet):
+class ContactPersonViewSet(viewsets.ModelViewSet[ContactPerson]):
     queryset = ContactPerson.objects.all()
     serializer_class = ContactPersonSerializer
 
 
-def get_user_info(request):
+def get_user_info(request: HttpRequest) -> dict[str, Any]:
     if request.user.is_authenticated:
         if request.user.is_superuser:
             all_permissions = Permission.objects.all()
@@ -96,7 +99,7 @@ def get_user_info(request):
 
 
 class LoginView(View):
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         data = loads(request.body)
         username = data.get('username')
         password = data.get('password')
@@ -109,11 +112,11 @@ class LoginView(View):
 
 
 class LogoutView(View):
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         logout(request)
         return HttpResponse(status=200)
 
 
 class UserView(View):
-    def get(self, request):
+    def get(self, request: HttpRequest) -> JsonResponse:
         return JsonResponse(get_user_info(request))

@@ -1,3 +1,5 @@
+from typing import cast
+
 from django.contrib.auth.models import User
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models import Collect
@@ -14,12 +16,15 @@ class Tocht(models.Model):
 
     route = models.LineStringField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.identifier
 
     @classmethod
     def centroid(cls) -> Point | None:
-        return cls.objects.filter(is_alternative=False).aggregate(centroid=Centroid(Collect('route')))['centroid']
+        return cast(
+            Point | None,
+            cls.objects.filter(is_alternative=False).aggregate(centroid=Centroid(Collect('route')))['centroid'],
+        )
 
 
 class Weide(models.Model):
@@ -28,7 +33,7 @@ class Weide(models.Model):
     tocht = models.OneToOneField(Tocht, null=True, blank=True, on_delete=models.SET_NULL)
     polygon = models.PolygonField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'Weide {self.identifier}'
 
 
@@ -44,7 +49,7 @@ class Fiche(models.Model):
     class Meta:
         unique_together = [['order', 'tocht']]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.tocht.identifier + str(self.order)
 
 
@@ -59,7 +64,7 @@ class MapNote(models.Model):
     point = models.PointField()
     author = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if len(self.content) > 30:
             return f'{self.content[:30]}...'
         return self.content
@@ -70,7 +75,7 @@ class ForbiddenArea(models.Model):
     area = models.MultiPolygonField()
     route_allowed = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if not self.description:
             return super().__str__()
         if len(self.description) > 30:

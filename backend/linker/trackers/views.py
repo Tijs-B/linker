@@ -2,12 +2,15 @@ from django.contrib.gis.measure import D
 from django.core.cache import cache
 from django.db.models import FloatField, OuterRef, Subquery
 from django.db.models.expressions import RawSQL
+from django.db.models.query import QuerySet
 from django.http import HttpResponse
+from django.http.request import HttpRequest
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
+from rest_framework.serializers import BaseSerializer
 from rest_framework.views import APIView
 
 from linker.map.models import Basis, Fiche, ForbiddenArea, Tocht, Weide
@@ -19,10 +22,10 @@ from linker.trackers.permissions import CanViewHeatmap, CanViewTrackerLogs
 from linker.trackers.serializers import TrackerLogSerializer, TrackerSerializer
 
 
-class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
+class TrackerViewSet(viewsets.ReadOnlyModelViewSet[Tracker]):
     serializer_class = TrackerSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Tracker]:
         queryset = Tracker.objects.select_related('last_log')
         if self.request.user.has_perm('trackers.view_trackerlog'):
             queryset = queryset.annotate(
@@ -68,21 +71,20 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset
 
     @action(detail=True, methods=['get'], permission_classes=(IsAuthenticated, CanViewTrackerLogs))
-    def track(self, request, pk=None):
+    def track(self, request: HttpRequest, pk: int | None = None) -> HttpResponse:
         tracker = self.get_object()
         track = tracker.get_track_geojson()
         return HttpResponse(track, content_type='application/geo+json')
 
     @action(detail=True, methods=['get'])
-    def logs(self, request, pk=None):
+    def logs(self, request: HttpRequest, pk: int | None = None) -> HttpResponse:
         tocht_centroid = Tocht.centroid()
         tracker = self.get_object()
         queryset = tracker.tracker_logs.filter(point__distance_lt=(tocht_centroid, D(m=GEBIED_MAX_DISTANCE)))
         queryset = queryset.order_by('gps_datetime')
-        queryset = queryset.values('id', 'gps_datetime', 'point', 'source', 'tracker_id')
 
         response = '['
-        for item in queryset:
+        for item in queryset.values('id', 'gps_datetime', 'point', 'source', 'tracker_id'):
             response += (
                 f'{{"id":{item["id"]},"gps_datetime":"{item["gps_datetime"].isoformat()}",'
                 f'"point":{item["point"].json},"source":"{item["source"].value}",'
@@ -95,11 +97,11 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet):
         return HttpResponse(response, content_type='application/json')
 
 
-class TrackerLogViewSet(CreateModelMixin, viewsets.GenericViewSet):
+class TrackerLogViewSet(CreateModelMixin, viewsets.GenericViewSet[TrackerLog]):
     serializer_class = TrackerLogSerializer
     queryset = TrackerLog.objects.all()
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: BaseSerializer[TrackerLog]) -> None:
         serializer.save(source=TrackerLogSource.MANUAL)
 
 

@@ -21,7 +21,7 @@ class Tracker(models.Model):
             ('view_heatmap', 'Can view heatmap'),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.tracker_name:
             return self.tracker_name
         else:
@@ -33,7 +33,8 @@ class Tracker(models.Model):
         queryset = queryset.filter(point__distance_lt=(tocht_centroid, D(m=GEBIED_MAX_DISTANCE)))
         if hasattr(self, 'team') and Switch.switch_is_active(SWITCH_EXCLUDE_BASIS_FROM_TRACK):
             basis = Basis.objects.first()
-            queryset = queryset.filter(point__distance_gt=(basis.point, D(m=SKIP_BASIS_DISTANCE)))
+            if basis:
+                queryset = queryset.filter(point__distance_gt=(basis.point, D(m=SKIP_BASIS_DISTANCE)))
         queryset = queryset.order_by('gps_datetime')
         points = list(queryset.values_list('point', flat=True))
         if len(points) == 1:
@@ -42,19 +43,20 @@ class Tracker(models.Model):
 
     def get_track_geojson(self) -> str:
         tocht_centroid = Tocht.centroid()
+        tocht_centroid_ewkb = tocht_centroid.hexewkb.decode('utf-8') if tocht_centroid else None
         with connection.cursor() as cursor:
             cursor.execute(
                 """SELECT ST_AsGeoJSON(ST_MakeLine(trackers_trackerlog.point ORDER BY trackers_trackerlog.gps_datetime))
                 FROM trackers_trackerlog
                 WHERE (
                     trackers_trackerlog.tracker_id = %s
-                    AND ST_DistanceSphere(trackers_trackerlog.point, %s::geometry) < %s
+                    AND (%s IS NULL OR ST_DistanceSphere(trackers_trackerlog.point, %s::geometry) < %s)
                     AND NOT trackers_trackerlog.team_is_safe
                 )""",
-                [self.id, tocht_centroid.hexewkb.decode('utf-8'), GEBIED_MAX_DISTANCE],
+                [self.id, tocht_centroid_ewkb, tocht_centroid_ewkb, GEBIED_MAX_DISTANCE],
             )
             row = cursor.fetchone()
-        return row[0]
+        return row[0]  # type: ignore[no-any-return]
 
 
 class TrackerLog(models.Model):
@@ -81,5 +83,5 @@ class TrackerLog(models.Model):
         unique_together = [['tracker', 'gps_datetime', 'tracker_type']]
         indexes = [models.Index(fields=('tracker', 'tracker_type'))]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.tracker} {self.gps_datetime}'

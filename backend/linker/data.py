@@ -15,20 +15,24 @@ from linker.people.constants import Direction, MemberType
 from linker.people.models import ContactPerson, OrganizationMember, Team
 
 
-def import_gpkg(filename: Path):
+def import_gpkg(filename: Path) -> None:
     ds = DataSource(filename)
 
     for feature in ds['Tocht']:
+        if not feature.geom:
+            continue
         identifier = str(feature['name'])[0].upper()
         Tocht.objects.update_or_create(
             identifier=identifier,
             order=ord(identifier) - ord('A') + 1,
-            defaults=dict(route=GEOSGeometry(feature.geom[0].ewkt)),
+            defaults=dict(route=GEOSGeometry(feature.geom[0].ewkt)),  # type: ignore[index]
         )
 
     for feature in ds['Weides']:
+        if not feature.geom:
+            continue
         name = str(feature['name'])
-        geometry = GEOSGeometry(feature.geom[0].ewkt)
+        geometry = GEOSGeometry(feature.geom[0].ewkt)  # type: ignore[index]
 
         if name.lower() == 'basis':
             basis = Basis.objects.first()
@@ -53,8 +57,10 @@ def import_gpkg(filename: Path):
 
     Zijweg.objects.all().delete()
     for feature in ds['Zijwegen']:
+        if not feature.geom:
+            continue
         with contextlib.suppress(GDALException):
-            Zijweg.objects.create(geom=feature.geom[0].ewkt)
+            Zijweg.objects.create(geom=feature.geom[0].ewkt)  # type: ignore[index]
 
 
 def _import_geojson_tochten(geojson: dict[str, Any]) -> None:
@@ -107,7 +113,7 @@ def _import_geojson_zijwegen(geojson: dict[str, Any]) -> None:
     for feature in geojson['features']:
         if feature.get('geometry') is not None:
             line = GEOSGeometry(json.dumps(feature['geometry']))
-            Zijweg.objects.create(geom=line)
+            Zijweg.objects.create(geom=line)  # type: ignore[misc]
 
 
 def _import_geojson_basis(geojson: dict[str, Any]) -> None:
@@ -122,8 +128,8 @@ def _import_geojson_basis(geojson: dict[str, Any]) -> None:
         basis.save()
 
 
-def import_geoserver(base_url: str):
-    params = {
+def import_geoserver(base_url: str) -> None:
+    params: dict[str, Any] = {
         'service': 'WFS',
         'version': '1.0.0',
         'request': 'GetFeature',
@@ -144,7 +150,7 @@ def import_geoserver(base_url: str):
     _import_geojson_zijwegen(zijwegen.json())
 
 
-def import_featureserv(base_url: str):
+def import_featureserv(base_url: str) -> None:
     params = {'limit': 10_000}
     stripped = base_url.rstrip('/')
 
@@ -164,7 +170,7 @@ def import_featureserv(base_url: str):
     _import_geojson_basis(basis.json())
 
 
-def import_groepen_en_deelnemers(filename: Path):
+def import_groepen_en_deelnemers(filename: Path) -> None:
     wb = load_workbook(str(filename), read_only=True, data_only=True)
 
     teams = wb['LIJST Inschrijvingen groepen']
@@ -179,16 +185,16 @@ def import_groepen_en_deelnemers(filename: Path):
         g_id = int(row[g_id_Col].value)
         if g_id == 0:
             continue
-        name = row[name_col].value
-        if name.lower() == 'annulatie' or name == '#N/A':
+        team_name = row[name_col].value
+        if team_name.lower() == 'annulatie' or team_name == '#N/A':
             continue
-        name = name[0].upper() + name[1:]
+        team_name = team_name[0].upper() + team_name[1:]
         chiro = row[chiro_col].value
         richting = Direction(row[richting_col].value)
 
         Team.objects.update_or_create(
             number=g_id,
-            defaults=dict(direction=richting, name=name, chiro=chiro),
+            defaults=dict(direction=richting, name=team_name, chiro=chiro),
         )
 
     ContactPerson.objects.all().delete()
@@ -215,13 +221,13 @@ def import_groepen_en_deelnemers(filename: Path):
             print(f'Warning: empty name in row {row}. Skipping')
             continue
         name = str(row[name_col].value.title())
-        email = str(row[email_col].value)
-        phone = ''.join(c for c in str(row[phone_col].value) if c.isdigit() or c == '+')
+        email: str | None = str(row[email_col].value)
+        phone: str | None = ''.join(c for c in str(row[phone_col].value) if c.isdigit() or c == '+')
         is_favorite = int(row[volgnr_col].value) == 1
 
-        if len(email) <= 1:
+        if not email or len(email) <= 1:
             email = None
-        if len(phone) <= 1:
+        if not phone or len(phone) <= 1:
             phone = None
 
         if phone is not None:
@@ -238,7 +244,7 @@ def import_groepen_en_deelnemers(filename: Path):
         )
 
 
-def import_organization_members(filename: Path):
+def import_organization_members(filename: Path) -> None:
     with filename.open('r') as f:
         data = list(csv.DictReader(f))
     OrganizationMember.objects.all().delete()

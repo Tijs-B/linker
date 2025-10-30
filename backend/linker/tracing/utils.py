@@ -13,7 +13,7 @@ from linker.trackers.models import TrackerLog
 logger = getLogger(__name__)
 
 
-def trace_team(team: Team):
+def trace_team(team: Team) -> None:
     logger.info(f'Tracing team {team}')
     closest_fiche = Subquery(
         Fiche.objects.filter(
@@ -29,15 +29,16 @@ def trace_team(team: Team):
     else:
         logs = logs.filter(gps_datetime__gte=last_checkpoint.arrived)
 
-    logs = logs.annotate(closest_fiche=closest_fiche).order_by('gps_datetime').values('gps_datetime', 'closest_fiche')
+    logs = logs.annotate(closest_fiche=closest_fiche).order_by('gps_datetime')
 
     if not logs.exists():
         return
 
-    current_fiche = logs[0]['closest_fiche']
-    current_arrived = logs[0]['gps_datetime']
-    current_left = logs[0]['gps_datetime']
-    for log in logs:
+    logs_values = list(logs.values('gps_datetime', 'closest_fiche'))
+    current_fiche = logs_values[0]['closest_fiche']
+    current_arrived = logs_values[0]['gps_datetime']
+    current_left = logs_values[0]['gps_datetime']
+    for log in logs_values:
         if log['closest_fiche'] != current_fiche:
             if current_fiche is not None:
                 matching = (
