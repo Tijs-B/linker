@@ -255,6 +255,7 @@ export default function BackgroundLayers({
         <Layer
           id="contour-labels"
           type="symbol"
+          beforeId="forbidden-areas"
           source-layer="contours"
           filter={['>', ['get', 'level'], 0]}
           minzoom={11}
@@ -281,6 +282,7 @@ export default function BackgroundLayers({
         <Layer
           id="contour-lines-index"
           type="line"
+          beforeId="contour-labels"
           source-layer="contours"
           filter={['>', ['get', 'level'], 0]}
           minzoom={11}
@@ -296,6 +298,7 @@ export default function BackgroundLayers({
         <Layer
           id="contour-lines"
           type="line"
+          beforeId="contour-lines-index"
           source-layer="contours"
           filter={['==', ['get', 'level'], 0]}
           minzoom={11}
