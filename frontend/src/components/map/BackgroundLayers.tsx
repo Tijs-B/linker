@@ -145,13 +145,12 @@ export default function BackgroundLayers({
             'text-font': ['D-DIN Condensed DINCondensed-Bold'],
             'text-max-width': 5,
             'text-offset': [0, 0.2],
-            visibility: showHeatmap ? 'none' : 'visible',
           }}
           paint={{
-            'text-opacity': showHeatmap ? 0 : 1,
+            'text-opacity': showHeatmap ? 0 : ['interpolate', ['linear'], ['zoom'], 11.7, 0, 12, 1],
             'text-color': grey[800],
           }}
-          minzoom={12}
+          minzoom={11.7}
         />
         <Layer
           id="fiches-circles"
@@ -162,9 +161,14 @@ export default function BackgroundLayers({
             'circle-radius': 10,
             'circle-stroke-color': grey[800],
             'circle-stroke-width': 1.5,
+            'circle-opacity': showHeatmap
+              ? 0
+              : ['interpolate', ['linear'], ['zoom'], 11.7, 0, 12, 1],
+            'circle-stroke-opacity': showHeatmap
+              ? 0
+              : ['interpolate', ['linear'], ['zoom'], 11.7, 0, 12, 1],
           }}
-          layout={{ visibility: showHeatmap ? 'none' : 'visible' }}
-          minzoom={12}
+          minzoom={11.7}
         />
       </Source>
       <Source type="geojson" data={tochtenData}>
