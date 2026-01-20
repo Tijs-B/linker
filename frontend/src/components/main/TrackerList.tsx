@@ -28,15 +28,10 @@ type TrackerRowDataItem = (OrganizationMember | Team) & {
 
 interface TrackerRowProps {
   items: TrackerRowDataItem[];
-  onTrackerClick: (tracker: number) => void;
+  onItemClick: (item: Team | OrganizationMember) => void;
 }
 
-const TrackerRow = ({
-  items,
-  index,
-  style,
-  onTrackerClick,
-}: RowComponentProps<TrackerRowProps>) => {
+const TrackerRow = ({ items, index, style, onItemClick }: RowComponentProps<TrackerRowProps>) => {
   const item = items[index];
   const dispatch = useAppDispatch();
 
@@ -47,10 +42,8 @@ const TrackerRow = ({
     } else {
       dispatch(trackersActions.selectTeam(item.id));
     }
-    if (item.tracker) {
-      onTrackerClick(item.tracker);
-    }
-  }, [items, dispatch, index, onTrackerClick]);
+    onItemClick(item);
+  }, [items, dispatch, index, onItemClick]);
 
   const safeChip = useMemo(() => {
     const item = items[index];
@@ -97,12 +90,12 @@ const TrackerRow = ({
 };
 
 interface TrackerListProps {
-  onClick: (tracker: number) => void;
+  onItemClick: (item: Team | OrganizationMember) => void;
   members: OrganizationMember[];
   teams: Team[];
 }
 
-export default function TrackerList({ members, teams, onClick }: TrackerListProps) {
+export default function TrackerList({ members, teams, onItemClick }: TrackerListProps) {
   const { data: fiches } = useGetFichesQuery();
   const { data: tochten } = useGetTochtenQuery();
   const { data: weides } = useGetWeidesQuery();
@@ -141,16 +134,10 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
         item.tracker
       ) {
         const tracker = trackers.entities[item.tracker];
-        result.isOnline = tracker.is_online;
+        result.isOnline = item.is_online;
         result.batteryPercentage = tracker.battery_percentage;
-        if (tracker.last_log) {
-          result.secondary = getPositionDescription(
-            tracker,
-            fiches,
-            tochten,
-            weides,
-            forbiddenAreas,
-          );
+        if (item.last_position_point) {
+          result.secondary = getPositionDescription(item, fiches, tochten, weides, forbiddenAreas);
         }
       }
       return result;
@@ -162,7 +149,7 @@ export default function TrackerList({ members, teams, onClick }: TrackerListProp
       rowCount={items.length}
       rowComponent={TrackerRow}
       rowHeight={60}
-      rowProps={{ items, onTrackerClick: onClick }}
+      rowProps={{ items, onItemClick }}
     />
   );
 }

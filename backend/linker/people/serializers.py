@@ -1,7 +1,31 @@
+from datetime import timedelta
+
+from django.utils.timezone import now
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
+from rest_framework_gis.fields import GeometryField
+
+from linker.trackers.constants import TRACKER_OFFLINE_MINUTES
 
 from .models import ContactPerson, OrganizationMember, Team, TeamNote
+
+
+class LocationSerializerMixin(metaclass=serializers.SerializerMetaclass):
+    fiche = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
+    weide = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
+    tocht = serializers.IntegerField(
+        source='nearest_tocht', read_only=True, required=False, default=None, allow_null=True
+    )
+    basis = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
+    forbidden_area = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
+    last_position_point = GeometryField(read_only=True, required=False, default=None, allow_null=True)
+    last_position_timestamp = serializers.DateTimeField(read_only=True, required=False, default=None, allow_null=True)
+    is_online = serializers.SerializerMethodField()
+
+    def get_is_online(self, obj: Team | OrganizationMember) -> bool:
+        if obj.last_position_timestamp is None:
+            return False
+        return obj.last_position_timestamp >= now() - timedelta(minutes=TRACKER_OFFLINE_MINUTES)
 
 
 class ContactPersonSerializer(serializers.ModelSerializer[ContactPerson]):
@@ -10,7 +34,9 @@ class ContactPersonSerializer(serializers.ModelSerializer[ContactPerson]):
         fields = ['id', 'name', 'phone_number', 'email_address', 'is_favorite', 'team']
 
 
-class OrganizationMemberSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer[OrganizationMember]):  # type: ignore[misc]
+class OrganizationMemberSerializer(
+    LocationSerializerMixin, EnumSupportSerializerMixin, serializers.ModelSerializer[OrganizationMember]
+):  # type: ignore[misc]
     class Meta:
         model = OrganizationMember
         fields = '__all__'
@@ -24,7 +50,7 @@ class TeamNoteSerializer(serializers.ModelSerializer[TeamNote]):
         fields = '__all__'
 
 
-class BasicTeamSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer[Team]):  # type: ignore[misc]
+class BasicTeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, serializers.ModelSerializer[Team]):  # type: ignore[misc]
     name = serializers.SerializerMethodField('return_empty')
     chiro = serializers.SerializerMethodField('return_empty')
     code = serializers.SerializerMethodField('return_empty')
@@ -47,10 +73,17 @@ class BasicTeamSerializer(EnumSupportSerializerMixin, serializers.ModelSerialize
             'safe_weide_updated_at',
             'safe_weide_updated_by',
             'code',
+            'fiche',
+            'weide',
+            'tocht',
+            'basis',
+            'forbidden_area',
+            'last_position_point',
+            'last_position_timestamp',
         ]
 
 
-class TeamWithNumberSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer[Team]):  # type: ignore[misc]
+class TeamWithNumberSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, serializers.ModelSerializer[Team]):  # type: ignore[misc]
     name = serializers.SerializerMethodField('return_empty')
     chiro = serializers.SerializerMethodField('return_empty')
     code = serializers.SerializerMethodField('get_code')
@@ -76,10 +109,17 @@ class TeamWithNumberSerializer(EnumSupportSerializerMixin, serializers.ModelSeri
             'safe_weide_updated_at',
             'safe_weide_updated_by',
             'code',
+            'fiche',
+            'weide',
+            'tocht',
+            'basis',
+            'forbidden_area',
+            'last_position_point',
+            'last_position_timestamp',
         ]
 
 
-class TeamSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer[Team]):  # type: ignore[misc]
+class TeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, serializers.ModelSerializer[Team]):  # type: ignore[misc]
     contact_persons = ContactPersonSerializer(many=True)
     team_notes = TeamNoteSerializer(many=True)
     code = serializers.SerializerMethodField('get_code')
@@ -103,5 +143,12 @@ class TeamSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer[Tea
             'safe_weide_updated_at',
             'safe_weide_updated_by',
             'code',
+            'fiche',
+            'weide',
+            'tocht',
+            'basis',
+            'forbidden_area',
+            'last_position_point',
+            'last_position_timestamp',
         ]
         read_only_fields = ['safe_weide_updated_at']

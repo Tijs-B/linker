@@ -4,18 +4,29 @@ import { red } from '@mui/material/colors';
 
 import { skipToken } from '@reduxjs/toolkit/query';
 
-import { useGetTrackerTrackQuery, useGetUserQuery } from '../../services/linker.ts';
-import { selectSelectedItem, useAppSelector } from '../../store';
+import {
+  useGetOrganizationMemberTrackQuery,
+  useGetTeamTrackQuery,
+  useGetUserQuery,
+} from '../../services/linker.ts';
+import { selectSelectedMember, selectSelectedTeam, useAppSelector } from '../../store';
 
 export default function TrackerHistoryLayer({ visible }: { visible: boolean }) {
-  const selectedItem = useAppSelector(selectSelectedItem);
+  const selectedTeam = useAppSelector(selectSelectedTeam);
+  const selectedMember = useAppSelector(selectSelectedMember);
+
   const { data: user } = useGetUserQuery();
-  const { currentData: track } = useGetTrackerTrackQuery(
-    selectedItem?.tracker && user && user.permissions.includes('view_trackerlog')
-      ? selectedItem.tracker
+  const { currentData: teamTrack } = useGetTeamTrackQuery(
+    selectedTeam && user && user.permissions.includes('view_position')
+      ? selectedTeam.id
       : skipToken,
   );
-
+  const { currentData: memberTrack } = useGetOrganizationMemberTrackQuery(
+    selectedMember && user && user.permissions.includes('view_position')
+      ? selectedMember.id
+      : skipToken,
+  );
+  const track = teamTrack || memberTrack;
   const trackData = track || { type: 'LineString', coordinates: [] };
 
   return (

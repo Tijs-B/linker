@@ -88,21 +88,14 @@ export default function TeamPage() {
   }, [teamId, checkpointLogs, fiches]);
 
   const positionDescription = useMemo(() => {
-    if (!(teams && trackers && fiches && tochten && weides && forbiddenAreas && teamId)) {
+    if (!(teams && fiches && tochten && weides && forbiddenAreas && teamId)) {
       return '-';
     }
-    const trackerId = teams.entities[+teamId].tracker;
-    if (!trackerId) {
+    if (!team) {
       return '-';
     }
-    return getPositionDescription(
-      trackers.entities[trackerId],
-      fiches,
-      tochten,
-      weides,
-      forbiddenAreas,
-    );
-  }, [teamId, teams, trackers, fiches, tochten, weides, forbiddenAreas]);
+    return getPositionDescription(team, fiches, tochten, weides, forbiddenAreas);
+  }, [team, teams, fiches, tochten, weides, forbiddenAreas]);
 
   const createNote = useCallback(() => {
     if (newNoteText && teamId) {
@@ -194,11 +187,11 @@ export default function TeamPage() {
                         <TableCell>
                           <Alert severity={tracker?.is_online ? 'success' : 'warning'}>
                             <Tooltip
-                              title={formatDateTimeLong(tracker?.last_log?.gps_datetime)}
+                              title={formatDateTimeLong(team.last_position_timestamp)}
                               enterTouchDelay={0}
                             >
                               <Typography variant="body2" color="textSecondary">
-                                Laatste update {formatFromNow(tracker?.last_log?.gps_datetime)}
+                                Laatste update {formatFromNow(team.last_position_timestamp)}
                               </Typography>
                             </Tooltip>
                           </Alert>

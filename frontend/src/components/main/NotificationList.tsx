@@ -32,14 +32,14 @@ import { NotificationType } from '../../services/types.ts';
 import { trackersActions, useAppDispatch } from '../../store';
 import { formatDateTimeShorter } from '../../utils/time.ts';
 
-type NotificationRowDataItem = Notification & {
+type NotificationRowDataItem = Omit<Notification, 'team'> & {
   team: Team | null;
   member: OrganizationMember | null;
 };
 
 interface NotificationRowProps {
   items: NotificationRowDataItem[];
-  onTrackerClick: (tracker: number) => void;
+  onItemClick: (item: Team | OrganizationMember) => void;
   onMarkAsRead: (notification: number) => void;
 }
 
@@ -47,14 +47,17 @@ const NotificationRow = ({
   index,
   items,
   style,
-  onTrackerClick,
+  onItemClick,
   onMarkAsRead,
 }: RowComponentProps<NotificationRowProps>) => {
   const item = items[index];
 
   const onClick = useCallback(() => {
     const item = items[index];
-    onTrackerClick(item.tracker);
+    if (!item.team || !item.member) {
+      return;
+    }
+    onItemClick(item.team || item.member);
   }, [items, index]);
 
   const onMarkThisAsRead = useCallback(() => {
@@ -124,10 +127,10 @@ const NotificationRow = ({
 };
 
 interface NotificationListProps {
-  onTrackerClick: (tracker: number) => void;
+  onItemClick: (item: Team | OrganizationMember) => void;
 }
 
-export default function NotificationList({ onTrackerClick }: NotificationListProps) {
+export default function NotificationList({ onItemClick }: NotificationListProps) {
   const { data: notifications } = useGetNotificationsQuery();
   const { data: teams } = useGetTeamsQuery();
   const { data: members } = useGetOrganizationMembersQuery();
@@ -135,41 +138,41 @@ export default function NotificationList({ onTrackerClick }: NotificationListPro
 
   const dispatch = useAppDispatch();
 
-  const items = useMemo(() => {
+  const items: NotificationRowDataItem[] = useMemo(() => {
     if (!teams || !members || !notifications) {
       return [];
     }
 
     return notifications.map((notification) => {
-      const team = Object.values(teams.entities).find((t) => t.tracker === notification.tracker);
-      const member = Object.values(members.entities).find(
-        (m) => m.tracker === notification.tracker,
-      );
+      let team: Team | null = null;
+      let member: OrganizationMember | null = null;
+      if (notification.team) {
+        team = teams.entities[notification.team];
+      } else if (notification.tracker) {
+        team =
+          Object.values(teams.entities).find((t) => t.tracker === notification.tracker) || null;
+        member =
+          Object.values(members.entities).find((m) => m.tracker === notification.tracker) || null;
+      }
 
       return {
+        ...notification,
         team: team || null,
         member: member || null,
-        ...notification,
       };
     });
   }, [notifications, teams, members]);
 
   const onClick = useCallback(
-    (tracker: number) => {
-      onTrackerClick(tracker);
-      if (teams) {
-        const team = Object.values(teams.entities).find((t) => t.tracker === tracker);
-        if (team) {
-          dispatch(trackersActions.selectTeam(team.id));
-        } else if (members) {
-          const member = Object.values(members.entities).find((m) => m.tracker === tracker);
-          if (member) {
-            dispatch(trackersActions.selectMember(member.id));
-          }
-        }
+    (item: Team | OrganizationMember) => {
+      onItemClick(item);
+      if ('member_type' in item) {
+        dispatch(trackersActions.selectMember(item.id));
+      } else {
+        dispatch(trackersActions.selectTeam(item.id));
       }
     },
-    [dispatch, onTrackerClick, teams, members],
+    [dispatch, onItemClick],
   );
 
   const onMarkAsRead = useCallback(
@@ -199,7 +202,7 @@ export default function NotificationList({ onTrackerClick }: NotificationListPro
       rowCount={notifications ? notifications.length : 0}
       rowComponent={NotificationRow}
       rowHeight={60}
-      rowProps={{ items, onTrackerClick: onClick, onMarkAsRead: onMarkAsRead }}
+      rowProps={{ items, onItemClick: onClick, onMarkAsRead: onMarkAsRead }}
     />
   );
 }

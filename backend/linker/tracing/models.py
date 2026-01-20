@@ -22,7 +22,8 @@ class CheckpointLog(models.Model):
 class Notification(models.Model):
     notification_type = EnumField(NotificationType, max_length=255)
     sent = models.DateTimeField(auto_now_add=True)
-    tracker = models.ForeignKey(Tracker, on_delete=models.CASCADE)
+    tracker = models.ForeignKey(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
+    team = models.ForeignKey(Team, on_delete=models.SET_NULL, blank=True, null=True)
     severity = models.IntegerField(default=0)
 
     def __str__(self) -> str:

@@ -36,6 +36,7 @@ import {
 } from '../../services/linker.ts';
 import type { Team } from '../../services/types.ts';
 import {
+  selectSelectedItem,
   selectSelectedMember,
   selectSelectedTeam,
   selectSelectedTracker,
@@ -161,16 +162,15 @@ export default function StatusCard({
 }: StatusCardProps) {
   const dispatch = useAppDispatch();
   const selectedTracker = useAppSelector(selectSelectedTracker);
+  const selectedItem = useAppSelector(selectSelectedItem);
   const selectedMember = useAppSelector(selectSelectedMember);
   const selectedTeam = useAppSelector(selectSelectedTeam);
 
   const { data: user } = useGetUserQuery();
 
-  const lastLog = selectedTracker?.last_log;
-
   const navigateUrl = useMemo(
-    () => getNavigationUrl(selectedTracker?.last_log?.point),
-    [selectedTracker],
+    () => getNavigationUrl(selectedItem?.last_position_point),
+    [selectedItem],
   );
 
   const canSeeContactPersons = Boolean(user && user.permissions.includes('view_contactperson'));
@@ -206,9 +206,12 @@ export default function StatusCard({
                 <Typography variant="body2">Laatste update</Typography>
               </TableCell>
               <TableCell css={cell}>
-                <Tooltip title={formatDateTimeLong(lastLog?.gps_datetime)} enterTouchDelay={0}>
+                <Tooltip
+                  title={formatDateTimeLong(selectedItem?.last_position_timestamp)}
+                  enterTouchDelay={0}
+                >
                   <Typography variant="body2" color="textSecondary">
-                    {formatFromNow(lastLog?.gps_datetime)}
+                    {formatFromNow(selectedItem?.last_position_timestamp)}
                   </Typography>
                 </Tooltip>
               </TableCell>
@@ -229,7 +232,7 @@ export default function StatusCard({
           <Tooltip title="Geschiedenis">
             <IconButton
               onClick={() => dispatch(trackersActions.setShowHistory(true))}
-              disabled={!lastLog}
+              disabled={!selectedItem?.last_position_point}
             >
               <HistoryIcon />
             </IconButton>

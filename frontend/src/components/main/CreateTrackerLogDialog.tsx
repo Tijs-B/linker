@@ -13,8 +13,14 @@ import {
 
 import dayjs from 'dayjs';
 
-import { useCreateTrackerLogMutation } from '../../services/linker.ts';
-import { selectSelectedItem, selectSelectedTracker, useAppSelector } from '../../store';
+import { useCreatePositionMutation } from '../../services/linker.ts';
+import {
+  selectSelectedItem,
+  selectSelectedMember,
+  selectSelectedTeam,
+  selectSelectedTracker,
+  useAppSelector,
+} from '../../store';
 
 interface CreateTrackerLogDialogProps {
   position: LngLat | null;
@@ -27,7 +33,9 @@ export default function CreateTrackerLogDialog({
 }: CreateTrackerLogDialogProps) {
   const selectedTracker = useAppSelector(selectSelectedTracker);
   const selectedItem = useAppSelector(selectSelectedItem);
-  const createTrackerLog = useCreateTrackerLogMutation()[0];
+  const selectedTeam = useAppSelector(selectSelectedTeam);
+  const selectedMember = useAppSelector(selectSelectedMember);
+  const createPosition = useCreatePositionMutation()[0];
   const [inputTime, setInputTime] = useState<string>(dayjs().tz('Europe/Brussels').format('HH:mm'));
   const [prevPosition, setPrevPosition] = useState(position);
 
@@ -48,21 +56,22 @@ export default function CreateTrackerLogDialog({
         : null;
 
   const onAccept = useCallback(() => {
-    if (!position || !selectedTracker) {
+    if (!position || (!selectedMember && !selectedTeam)) {
       return;
     }
     onComplete();
     const { lng, lat } = position;
     const timestamp = dateTime ? dateTime : dayjs().tz('Europe/Brussels');
-    createTrackerLog({
+    createPosition({
       point: {
         type: 'Point' as const,
         coordinates: [lng, lat],
       },
-      tracker: selectedTracker.id,
-      gps_datetime: timestamp.toISOString(),
+      timestamp: timestamp.toISOString(),
+      team: selectedTeam ? selectedTeam.id : null,
+      organization_member: selectedMember ? selectedMember.id : null,
     });
-  }, [position, selectedTracker, onComplete, createTrackerLog, dateTime]);
+  }, [position, selectedTeam, selectedMember, onComplete, createPosition, dateTime]);
 
   if (selectedTracker === null || selectedItem === null) {
     return null;

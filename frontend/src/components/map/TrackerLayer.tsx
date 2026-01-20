@@ -4,7 +4,6 @@ import { Layer, Source, useMap } from 'react-map-gl/maplibre';
 
 import { feature, featureCollection } from '@turf/helpers';
 
-import { useGetTrackersQuery } from '../../services/linker.ts';
 import type { OrganizationMember, Team } from '../../services/types.ts';
 import {
   selectSelectedItem,
@@ -33,9 +32,7 @@ export default function TrackerLayer({
   const selectedTracker = useAppSelector(selectSelectedTracker);
   const showHistory = useAppSelector((state) => state.trackers.showHistory);
 
-  const historyLog = useAppSelector((state) => state.trackers.historyLog);
-
-  const { data: allTrackers } = useGetTrackersQuery();
+  const historyItem = useAppSelector((state) => state.trackers.historyItem);
 
   const { mainMap } = useMap();
 
@@ -62,47 +59,39 @@ export default function TrackerLayer({
   }, [mainMap, dispatch, trackersClickable]);
 
   const [trackerData, offlineData] = useMemo(() => {
-    if (!allTrackers) {
-      return [featureCollection([]), featureCollection([])];
-    }
     const allItems =
-      historyLog && selectedItem?.tracker ? [selectedItem] : [...filteredMembers, ...filteredTeams];
+      historyItem && selectedItem ? [selectedItem] : [...filteredMembers, ...filteredTeams];
 
     const features = [];
     const offlineFeatures = [];
 
     for (const item of allItems) {
-      if (item.tracker === null) {
-        continue;
-      }
-      const tracker = allTrackers!.entities[item.tracker!];
-      const lastLog = tracker?.last_log;
-      const currentLog = historyLog || lastLog;
-      if (!currentLog) {
+      const currentPoint = historyItem?.point || item.last_position_point;
+      if (!currentPoint) {
         continue;
       }
 
       const props = {
         image: `tracker-${item.code}-${itemColor(item)}`,
-        sortKey: selectedItem === item ? 100 : 100 - currentLog.point.coordinates[1],
+        sortKey: selectedItem === item ? 100 : 100 - currentPoint.coordinates[1],
         action:
           'member_type' in item
             ? trackersActions.selectMember(item.id)
             : trackersActions.selectTeam(item.id),
       };
 
-      features.push(feature(currentLog.point, props));
+      features.push(feature(currentPoint, props));
 
-      if (!tracker.is_online) {
-        offlineFeatures.push(feature(currentLog.point));
+      if (!item.is_online) {
+        offlineFeatures.push(feature(currentPoint));
       }
     }
     return [featureCollection(features), featureCollection(offlineFeatures)];
-  }, [allTrackers, filteredMembers, filteredTeams, historyLog, selectedItem]);
+  }, [filteredMembers, filteredTeams, historyItem, selectedItem]);
 
   const selectedData = useMemo(() => {
-    if (!showHistory && selectedTracker?.last_log) {
-      return featureCollection([feature(selectedTracker.last_log.point)]);
+    if (!showHistory && selectedItem?.last_position_point) {
+      return featureCollection([feature(selectedItem.last_position_point)]);
     } else {
       return featureCollection([]);
     }

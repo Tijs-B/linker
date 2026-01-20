@@ -25,7 +25,7 @@ from linker.people.views import (
     UserView,
 )
 from linker.tracing.views import CheckpointLogViewSet, NotificationViewSet, StatsView
-from linker.trackers.views import HeatmapView, TrackerLogViewSet, TrackerViewSet
+from linker.trackers.views import HeatmapView, PositionViewSet, TrackerViewSet
 
 router = routers.DefaultRouter()
 router.register('teams', TeamViewSet, basename='team')
@@ -45,7 +45,7 @@ router.register('checkpoint-logs', CheckpointLogViewSet)
 router.register('notifications', NotificationViewSet, basename='notification')
 
 router.register('trackers', TrackerViewSet, basename='tracker')
-router.register('tracker-logs', TrackerLogViewSet)
+router.register('positions', PositionViewSet)
 
 
 urlpatterns = [

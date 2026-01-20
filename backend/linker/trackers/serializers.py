@@ -1,67 +1,56 @@
-from datetime import timedelta
-from typing import Any, cast
+from typing import Any
 
 from django.utils.timezone import now
 from enumfields.drf import EnumField
 from rest_framework import serializers
 from rest_framework_gis.fields import GeometryField
 
-from .constants import TRACKER_OFFLINE_MINUTES, TRACKER_VOLTAGE_RANGE, TrackerLogSource
-from .models import Tracker, TrackerLog
+from linker.people.models import OrganizationMember, Team
+
+from .constants import TRACKER_VOLTAGE_RANGE, PositionSource
+from .models import Position, Tracker
 
 
-class TrackerLogSerializer(serializers.Serializer[TrackerLog]):
+class PositionSerializer(serializers.ModelSerializer[Position]):
     id = serializers.IntegerField(read_only=True)
-    gps_datetime = serializers.DateTimeField(default=now)
+    timestamp = serializers.DateTimeField(default=now)
     point = GeometryField(precision=6)
-    source = EnumField(TrackerLogSource, default=TrackerLogSource.MANUAL)
-    tracker = serializers.PrimaryKeyRelatedField(queryset=Tracker.objects.all())
+    source = EnumField(PositionSource, default=PositionSource.MANUAL)
 
-    def create(self, validated_data: dict[str, Any]) -> TrackerLog:
-        tracker_log = TrackerLog.objects.create(**validated_data)
-        tracker = tracker_log.tracker
-        tracker.last_log = tracker.tracker_logs.latest('gps_datetime')
-        tracker.save()
-        return tracker_log
+    organization_member = serializers.PrimaryKeyRelatedField(
+        queryset=OrganizationMember.objects.all(), allow_null=True, required=False
+    )
+    team = serializers.PrimaryKeyRelatedField(queryset=Team.objects.all(), allow_null=True, required=False)
+
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        if (data.get('organization_member') is not None and data.get('team') is not None) or (
+            data.get('team') is None and data.get('organization_member') is None
+        ):
+            raise serializers.ValidationError('Exactly one of organization_member or team must be provided.')
+        return data
+
+    class Meta:
+        model = Position
+        fields = ['id', 'timestamp', 'point', 'source', 'organization_member', 'team']
 
 
 class TrackerSerializer(serializers.ModelSerializer[Tracker]):
-    last_log = TrackerLogSerializer()
-    fiche = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
-    weide = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
-    tocht = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
-    basis = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
-    forbidden_area = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
-
-    is_online = serializers.SerializerMethodField()
+    is_online = serializers.BooleanField(read_only=True)
     battery_percentage = serializers.SerializerMethodField()
 
-    def get_is_online(self, obj: Tracker) -> bool:
-        if obj.last_log is None:
-            return False
-        return obj.last_log.gps_datetime >= now() - timedelta(minutes=TRACKER_OFFLINE_MINUTES)
-
     def get_battery_percentage(self, obj: Tracker) -> int | None:
-        if not hasattr(obj, 'avg_voltage'):
-            return None
-        if getattr(obj, 'avg_voltage', None) is None:
+        if getattr(obj, 'avg_voltage') is None:
             return None
         v_min, v_max = TRACKER_VOLTAGE_RANGE
         value = round(100 * (obj.avg_voltage - v_min) / (v_max - v_min))
-        return cast(int, min(100, max(0, value)))
+        return min(100, max(0, value))
 
     class Meta:
         model = Tracker
         fields = [
             'id',
-            'last_log',
             'tracker_id',
             'tracker_name',
-            'fiche',
-            'weide',
-            'tocht',
-            'basis',
-            'forbidden_area',
             'is_online',
             'battery_percentage',
         ]

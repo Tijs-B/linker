@@ -18,7 +18,7 @@ from linker.tracing.constants import (
 from linker.tracing.models import Notification
 from linker.tracing.utils import trace_team
 from linker.trackers.constants import TRACKER_LOG_BATTERY_LOW_TYPES, TRACKER_LOG_SOS_TYPES, TRACKER_OFFLINE_MINUTES
-from linker.trackers.models import Tracker, TrackerLog
+from linker.trackers.models import Position, Tracker, TrackerLog
 
 logger = getLogger(__name__)
 
@@ -83,56 +83,52 @@ def tracker_battery_notifications() -> None:
 
 @shared_task
 def tracker_far_away_notifications() -> None:
-    trackers_far_away = list(
-        Tracker.objects.annotate(
-            far_away=~Exists(
-                Tocht.objects.filter(route__distance_lte=(OuterRef('last_log__point'), D(m=TRACKER_FAR_AWAY_METERS)))
-            )
-        )
-        .filter(last_log__isnull=False, far_away=True, team__isnull=False, team__safe_weide='')
-        .values_list('pk', flat=True)
-    )
-    for tracker in trackers_far_away:
-        Notification.objects.get_or_create(notification_type=NotificationType.TRACKER_FAR_AWAY, tracker_id=tracker)
+    teams_far_away = Position.objects.filter(
+        ~Exists(Tocht.objects.filter(route__distance_lte=(OuterRef('point'), D(m=TRACKER_FAR_AWAY_METERS)))),
+        timestamp__gte=now() - timedelta(minutes=10),
+        team__isnull=False,
+        team__safe_weide='',
+    ).values_list('team_id', flat=True)
+
+    for team_id in teams_far_away:
+        Notification.objects.get_or_create(notification_type=NotificationType.TRACKER_FAR_AWAY, team_id=team_id)
 
     # Delete notifications not in this list
     Notification.objects.filter(notification_type=NotificationType.TRACKER_FAR_AWAY).exclude(
-        tracker_id__in=trackers_far_away
+        team_id__in=teams_far_away
     ).delete()
 
 
 @shared_task
 def tracker_forbidden_area_notifications() -> None:
-    tracker_ids_route_not_allowed = list(
-        Tracker.objects.filter(team__isnull=False, team__safe_weide='', last_log__isnull=False)
-        .filter(Exists(ForbiddenArea.objects.filter(route_allowed=False, area__contains=OuterRef('last_log__point'))))
-        .values_list('pk', flat=True)
+    in_forbidden_area_route_not_allowed = Exists(
+        ForbiddenArea.objects.filter(route_allowed=False, area__contains=OuterRef('point'))
     )
-    tracker_ids_route_allowed = list(
-        Tracker.objects.filter(team__isnull=False, team__safe_weide='', last_log__isnull=False)
-        .filter(Exists(ForbiddenArea.objects.filter(route_allowed=True, area__contains=OuterRef('last_log__point'))))
-        .annotate(
-            far_away=~Exists(
-                Tocht.objects.filter(
-                    route__distance_lte=(
-                        OuterRef('last_log__point'),
-                        D(m=TRACKER_FORBIDDEN_AREA_AWAY_FROM_ROUTE_METERS),
-                    )
-                )
-            )
+    in_forbidden_area_route_allowed = Exists(
+        ForbiddenArea.objects.filter(route_allowed=True, area__contains=OuterRef('point'))
+    )
+    close_to_route = Exists(
+        Tocht.objects.filter(
+            route__distance_lte=(OuterRef('point'), D(m=TRACKER_FORBIDDEN_AREA_AWAY_FROM_ROUTE_METERS))
         )
-        .filter(far_away=True)
-        .values_list('pk', flat=True)
     )
 
-    tracker_ids = list(set(tracker_ids_route_allowed + tracker_ids_route_not_allowed))
+    team_ids = set(
+        Position.objects.filter(
+            in_forbidden_area_route_not_allowed | (in_forbidden_area_route_allowed & ~close_to_route),
+            team__isnull=False,
+            team__safe_weide='',
+        )
+        .values_list('team_id', flat=True)
+        .distinct()
+    )
 
-    for tracker in tracker_ids:
+    for team_id in team_ids:
         Notification.objects.get_or_create(
-            notification_type=NotificationType.TRACKER_IN_FORBIDDEN_AREA, tracker_id=tracker, severity=1
+            notification_type=NotificationType.TRACKER_IN_FORBIDDEN_AREA, team_id=team_id, severity=1
         )
 
     # Delete notifications not in this list
-    Notification.objects.filter(notification_type=NotificationType.TRACKER_IN_FORBIDDEN_AREA).exclude(
-        tracker_id__in=tracker_ids
-    ).delete()
+    Notification.objects.filter(
+        team__isnull=False, notification_type=NotificationType.TRACKER_IN_FORBIDDEN_AREA
+    ).exclude(team_id__in=team_ids).delete()

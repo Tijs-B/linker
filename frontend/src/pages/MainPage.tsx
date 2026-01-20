@@ -26,7 +26,7 @@ import {
   useGetTrackersQuery,
   useGetUserQuery,
 } from '../services/linker';
-import type { Team } from '../services/types.ts';
+import type { OrganizationMember, Team } from '../services/types.ts';
 import { Direction } from '../services/types.ts';
 import { trackersActions, useAppDispatch, useAppSelector } from '../store/index.ts';
 
@@ -60,7 +60,7 @@ export default function MainPage() {
     isFetching: isFetchingTeams,
     refetch: refetchTeams,
   } = useGetTeamsQuery(undefined, {
-    pollingInterval: 60_000,
+    pollingInterval: 10_000,
     skipPollingIfUnfocused: true,
   });
   const {
@@ -68,17 +68,16 @@ export default function MainPage() {
     isFetching: isFetchingMembers,
     refetch: refetchMembers,
   } = useGetOrganizationMembersQuery(undefined, {
-    pollingInterval: 60_000,
+    pollingInterval: 10_000,
     skipPollingIfUnfocused: true,
   });
-  const {
-    data: trackers,
-    isFetching: isFetchingTrackers,
-    refetch: refetchTrackers,
-  } = useGetTrackersQuery(undefined, {
-    pollingInterval: 6_000,
-    skipPollingIfUnfocused: true,
-  });
+  const { isFetching: isFetchingTrackers, refetch: refetchTrackers } = useGetTrackersQuery(
+    undefined,
+    {
+      pollingInterval: 20_000,
+      skipPollingIfUnfocused: true,
+    },
+  );
   const { isFetching: isFetchingNotifications, refetch: refetchNotifications } =
     useGetNotificationsQuery(undefined, { pollingInterval: 30_000, skipPollingIfUnfocused: true });
   const { currentData: user, error: queryError } = useGetUserQuery(undefined, {
@@ -132,17 +131,17 @@ export default function MainPage() {
     };
   });
 
-  const showTracker = useCallback(
-    (tracker: number | null) => {
-      if (tracker !== null) {
-        mainMap?.easeTo({
-          // @ts-expect-error there are always 2 coordinates here
-          center: trackers?.entities[tracker].last_log?.point.coordinates,
+  const showItem = useCallback(
+    (item: Team | OrganizationMember) => {
+      if (item.last_position_point && mainMap) {
+        mainMap.easeTo({
+          // @ts-ignore
+          center: item.last_position_point.coordinates,
           zoom: 14,
         });
       }
     },
-    [mainMap, trackers],
+    [mainMap],
   );
 
   // Create fuse objects for search
@@ -203,23 +202,23 @@ export default function MainPage() {
         if (teamResults.length === 0 && memberResults.length === 0) {
           return;
         } else if (teamResults.length === 0) {
-          showTracker(memberResults[0].item.tracker);
+          showItem(memberResults[0].item);
           dispatch(trackersActions.selectMember(memberResults[0].item.id));
         } else if (memberResults.length === 0) {
-          showTracker(teamResults[0].item.tracker);
+          showItem(teamResults[0].item);
           dispatch(trackersActions.selectTeam(teamResults[0].item.id));
         } else {
           if (teamResults[0].score! > memberResults[0].score!) {
-            showTracker(teamResults[0].item.tracker);
+            showItem(teamResults[0].item);
             dispatch(trackersActions.selectTeam(teamResults[0].item.id));
           } else {
-            showTracker(memberResults[0].item.tracker);
+            showItem(memberResults[0].item);
             dispatch(trackersActions.selectMember(memberResults[0].item.id));
           }
         }
       }
     },
-    [teamFuse, memberFuse, showTracker, dispatch],
+    [teamFuse, memberFuse, showItem, dispatch],
   );
 
   const onChangeKeyword = useCallback((keyword: string) => {
@@ -396,9 +395,9 @@ export default function MainPage() {
           )}
           <Paper css={contentList} sx={{ visibility: listOpen ? 'visible' : 'hidden' }} square>
             {showNotifications ? (
-              <NotificationList onTrackerClick={showTracker} />
+              <NotificationList onItemClick={showItem} />
             ) : (
-              <TrackerList members={filteredMembers} teams={filteredTeams} onClick={showTracker} />
+              <TrackerList members={filteredMembers} teams={filteredTeams} onItemClick={showItem} />
             )}
           </Paper>
         </div>

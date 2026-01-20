@@ -15,19 +15,14 @@ def get_all_tracks() -> str:
 SELECT ST_AsGeoJSON(ST_Collect(f.line))
 FROM (
     SELECT
-        ST_MakeLine(trackers_trackerlog.point ORDER BY trackers_trackerlog.gps_datetime) as line
-    FROM trackers_trackerlog
-    INNER JOIN trackers_tracker
-    ON (trackers_trackerlog.tracker_id = trackers_tracker.id)
-    INNER JOIN people_team
-    ON (trackers_tracker.id = people_team.id)
+        ST_MakeLine(trackers_position.point ORDER BY trackers_position.timestamp) as line
+    FROM trackers_position
     WHERE (
-        (%s IS NULL OR ST_DistanceSphere(trackers_trackerlog.point, %s::geometry) < %s)
-        AND ST_DistanceSphere(trackers_trackerlog.point, %s::geometry) > %s
-        AND NOT trackers_trackerlog.team_is_safe
-        AND trackers_trackerlog.speed < 15
+        trackers_position.team_id IS NOT NULL
+        AND (%s IS NULL OR ST_DistanceSphere(trackers_position.point, %s::geometry) < %s)
+        AND ST_DistanceSphere(trackers_position.point, %s::geometry) > %s
     )
-    group by trackers_trackerlog.tracker_id
+    GROUP BY trackers_position.team_id
 ) as f;
             """,
             [

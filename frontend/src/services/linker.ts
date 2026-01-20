@@ -15,12 +15,12 @@ import type {
   MapNote,
   Notification,
   OrganizationMember,
+  Position,
   Stats,
   Team,
   TeamNote,
   Tocht,
   Tracker,
-  TrackerLog,
   User,
   Weide,
   Zijweg,
@@ -53,7 +53,15 @@ export const linkerApi = createApi({
   refetchOnFocus: true,
   refetchOnReconnect: true,
   refetchOnMountOrArgChange: 30,
-  tagTypes: ['Team', 'MapNote', 'Tracker', 'TrackerLogs', 'Notifications'],
+  tagTypes: [
+    'Team',
+    'OrganizationMember',
+    'MapNote',
+    'Tracker',
+    'TrackerLogs',
+    'Positions',
+    'Notifications',
+  ],
   endpoints: (build) => ({
     getTrackers: build.query<EntityState<Tracker, number>, void>({
       query: () => '/trackers/',
@@ -77,6 +85,7 @@ export const linkerApi = createApi({
           response,
         );
       },
+      providesTags: ['OrganizationMember'],
     }),
     getTochten: build.query<EntityState<Tocht, number>, void>({
       query: () => '/tochten/',
@@ -117,14 +126,30 @@ export const linkerApi = createApi({
         return weidesAdapter.addMany(weidesAdapter.getInitialState(), response);
       },
     }),
-    getTrackerLogs: build.query<TrackerLog[], number>({
-      query: (id) => `/trackers/${id}/logs/`,
-      providesTags: (_result, _error, arg) => [{ type: 'TrackerLogs', id: arg }],
+    getTeamPositions: build.query<Position[], number>({
+      query: (id) => `/teams/${id}/positions/`,
+      providesTags: (_result, _error, arg) => [{ type: 'Positions', id: `team-${arg}` }],
     }),
-    getTrackerTrack: build.query<LineString, number>({
-      query: (id) => `/trackers/${id}/track/`,
-      providesTags: (_result, _error, arg) => [{ type: 'TrackerLogs', id: arg }],
+    getTeamTrack: build.query<LineString, number>({
+      query: (id) => `/teams/${id}/track/`,
+      providesTags: (_result, _error, arg) => [{ type: 'Positions', id: `team-${arg}` }],
     }),
+    getOrganizationMemberPositions: build.query<Position[], number>({
+      query: (id) => `/organization-members/${id}/positions/`,
+      providesTags: (_result, _error, arg) => [{ type: 'Positions', id: `org-member-${arg}` }],
+    }),
+    getOrganizationMemberTrack: build.query<LineString, number>({
+      query: (id) => `/organization-members/${id}/track/`,
+      providesTags: (_result, _error, arg) => [{ type: 'Positions', id: `org-member-${arg}` }],
+    }),
+    // getTrackerLogs: build.query<TrackerLog[], number>({
+    //   query: (id) => `/trackers/${id}/logs/`,
+    //   providesTags: (_result, _error, arg) => [{ type: 'TrackerLogs', id: arg }],
+    // }),
+    // getTrackerTrack: build.query<LineString, number>({
+    //   query: (id) => `/trackers/${id}/track/`,
+    //   providesTags: (_result, _error, arg) => [{ type: 'TrackerLogs', id: arg }],
+    // }),
     getBasis: build.query<Point, void>({
       query: () => '/basis/',
       transformResponse(response: Basis[]) {
@@ -217,18 +242,25 @@ export const linkerApi = createApi({
       }),
       invalidatesTags: ['MapNote'],
     }),
-    createTrackerLog: build.mutation<
-      TrackerLog,
-      Pick<TrackerLog, 'point' | 'tracker' | 'gps_datetime'>
+    createPosition: build.mutation<
+      Position,
+      Pick<Position, 'point' | 'timestamp' | 'organization_member' | 'team'>
     >({
       query: (trackerLog) => ({
-        url: '/tracker-logs/',
+        url: '/positions/',
         method: 'POST',
         body: trackerLog,
       }),
       invalidatesTags: (_result, _error, arg) => [
-        'Tracker',
-        { type: 'TrackerLogs', id: arg.tracker },
+        ...(arg.team !== null
+          ? (['Team', { type: 'Positions', id: `team-${arg.team}` }] as const)
+          : []),
+        ...(arg.organization_member !== null
+          ? ([
+              'OrganizationMember',
+              { type: 'Positions', id: `org-member-${arg.organization_member}` },
+            ] as const)
+          : []),
       ],
     }),
     deleteTeamNote: build.mutation<void, number>({
@@ -298,8 +330,12 @@ export const {
   useGetCheckpointLogsQuery,
   useGetMapNotesQuery,
   useGetZijwegenQuery,
-  useGetTrackerLogsQuery,
-  useGetTrackerTrackQuery,
+  useGetTeamPositionsQuery,
+  useGetTeamTrackQuery,
+  useGetOrganizationMemberPositionsQuery,
+  useGetOrganizationMemberTrackQuery,
+  // useGetTrackerLogsQuery,
+  // useGetTrackerTrackQuery,
   useGetBasisQuery,
   useGetWeidesQuery,
   useGetStatsQuery,
@@ -311,7 +347,7 @@ export const {
   useLogoutUserMutation,
   useCreateTeamNoteMutation,
   useCreateMapNoteMutation,
-  useCreateTrackerLogMutation,
+  useCreatePositionMutation,
   useDeleteTeamNoteMutation,
   useDeleteMapNoteMutation,
   useUpdateMapNoteMutation,

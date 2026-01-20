@@ -8,14 +8,12 @@ import requests
 from dateutil.parser import isoparse
 from django.conf import settings
 from django.contrib.gis.geos import Point
-from django.db.models import OuterRef, Subquery
 from django.utils.timezone import now
 
 from linker.config.models import Setting
 from linker.people.models import Team
 from linker.trackers.constants import SETTING_GEODYNAMICS_API_HISTORY_SECONDS, TrackerLogSource
-from linker.trackers.models import Tracker, TrackerLog
-
+from linker.trackers.models import Position, Tracker, TrackerLog
 logger = getLogger(__name__)
 
 
@@ -28,12 +26,6 @@ def try_parse_date(date_str: str | None) -> datetime | None:
         return None
 
 
-def post_import_actions() -> None:
-    subquery = TrackerLog.objects.filter(tracker=OuterRef('pk')).order_by('-gps_datetime')
-    trackers_updated = Tracker.objects.update(last_log_id=Subquery(subquery.values('id')[:1]))
-    logger.info(f'Updated last log of {trackers_updated} trackers')
-
-
 def import_geodynamics_minisite_data(data: dict[str, Any], fetch_datetime: datetime | None = None) -> None:
     if fetch_datetime is None:
         fetch_datetime = now()
@@ -41,7 +33,11 @@ def import_geodynamics_minisite_data(data: dict[str, Any], fetch_datetime: datet
     # tocht_centroid = Tocht.centroid()
 
     new_tracker_logs = []
-    trackers = {tracker.tracker_id: tracker for tracker in Tracker.objects.all()}
+    new_positions = []
+
+    trackers = {
+        tracker.tracker_id: tracker for tracker in Tracker.objects.prefetch_related('team', 'organizationmember').all()
+    }
     safe_trackers = set(Team.objects.exclude(safe_weide='').values_list('tracker__tracker_id', flat=True))
 
     for tracker_data in data['Data']:
@@ -89,11 +85,22 @@ def import_geodynamics_minisite_data(data: dict[str, Any], fetch_datetime: datet
                 has_power=tracker_data.get('HasPower'),
             )
         )
+        if hasattr(tracker, 'team') or hasattr(tracker, 'organizationmember'):
+            new_positions.append(
+                Position(
+                    team=getattr(tracker, 'team', None),
+                    organization_member=getattr(tracker, 'organizationmember', None),
+                    timestamp=gps_datetime,
+                    point=point,
+                    source=TrackerLogSource.MINISITE_API,
+                )
+            )
 
-    result = TrackerLog.objects.bulk_create(new_tracker_logs, ignore_conflicts=True)
-    logger.info(f'Created {len(result)} tracker logs')
+    tracker_logs = TrackerLog.objects.bulk_create(new_tracker_logs, ignore_conflicts=True)
+    logger.info(f'Created {len(tracker_logs)} tracker logs')
 
-    post_import_actions()
+    positions = Position.objects.bulk_create(new_positions, ignore_conflicts=True)
+    logger.info(f'Created {len(positions)} positions')
 
 
 def fetch_geodynamics_minisite_data() -> None:
@@ -112,7 +119,10 @@ def fetch_geodynamics_minisite_data() -> None:
 
 def import_geodynamics_api_data(data: list[dict[str, Any]]) -> None:
     new_tracker_logs = []
-    trackers = {tracker.tracker_id: tracker for tracker in Tracker.objects.all()}
+    new_positions = []
+    trackers = {
+        tracker.tracker_id: tracker for tracker in Tracker.objects.prefetch_related('team', 'organizationmember').all()
+    }
 
     for item in data:
         tracker_id = item['ResourceId']
@@ -141,11 +151,22 @@ def import_geodynamics_api_data(data: list[dict[str, Any]]) -> None:
                     satellites=position.get('Satellites'),
                 )
             )
+            if hasattr(tracker, 'team') or hasattr(tracker, 'organizationmember'):
+                new_positions.append(
+                    Position(
+                        team=getattr(tracker, 'team', None),
+                        organization_member=getattr(tracker, 'organizationmember', None),
+                        timestamp=gps_datetime,
+                        point=point,
+                        source=TrackerLogSource.GEODYNAMICS_API,
+                    )
+                )
 
     result = TrackerLog.objects.bulk_create(new_tracker_logs, ignore_conflicts=True)
     logger.info(f'Created {len(result)} tracker logs')
 
-    post_import_actions()
+    positions = Position.objects.bulk_create(new_positions, ignore_conflicts=True)
+    logger.info(f'Created {len(positions)} positions')
 
 
 def fetch_geodynamics_api_data() -> None:

@@ -1,15 +1,23 @@
 from json import loads
+from logging import getLogger
 from typing import Any
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Permission
+from django.contrib.gis.measure import D
 from django.db.models import Prefetch
 from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.utils.timezone import now
 from django.views import View
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import BaseSerializer, Serializer
+
+from linker.map.models import Tocht
+from linker.tracing.constants import GEBIED_MAX_DISTANCE
+from linker.trackers.permissions import CanViewPositions
 
 from .models import ContactPerson, LoginToken, OrganizationMember, Team, TeamNote
 from .serializers import (
@@ -21,12 +29,36 @@ from .serializers import (
     TeamWithNumberSerializer,
 )
 
+logger = getLogger(__name__)
+
+
+def positions_response(queryset) -> HttpResponse:
+    tocht_centroid = Tocht.centroid()
+    queryset = queryset.filter(point__distance_lt=(tocht_centroid, D(m=GEBIED_MAX_DISTANCE)))
+    queryset = queryset.order_by('timestamp')
+
+    response = '['
+    for item in queryset.values('id', 'timestamp', 'point', 'source', 'team_id', 'organization_member_id'):
+        team_id = item['team_id'] if item['team_id'] else 'null'
+        organization_member_id = item['organization_member_id'] if item['organization_member_id'] else 'null'
+        response += (
+            f'{{"id":{item["id"]},"timestamp":"{item["timestamp"].isoformat()}",'
+            f'"point":{item["point"].json},"source":"{item["source"].value}",'
+            f'"team_id":{team_id}, "organization_member_id":{organization_member_id}}},'
+        )
+    if response[-1] == ',':
+        response = response[:-1]
+    response = response + ']'
+
+    return HttpResponse(response, content_type='application/json')
+
 
 class TeamViewSet(viewsets.ModelViewSet[Team]):
     def get_serializer_class(self) -> type[Serializer[Team]]:
         if self.request.user.has_perm('people.view_team_details') and self.request.user.has_perm(
             'people.view_team_number'
         ):
+            logger.info('YEAH BOI')
             return TeamSerializer
         elif self.request.user.has_perm('people.view_team_number'):
             return TeamWithNumberSerializer
@@ -49,6 +81,8 @@ class TeamViewSet(viewsets.ModelViewSet[Team]):
                 Prefetch('contact_persons', queryset=contact_person_inner_queryset),
             )
             .select_related('safe_weide_updated_by')
+            .with_last_location()
+            .with_last_position_timestamp()
             .order_by('number')
         )
 
@@ -63,10 +97,33 @@ class TeamViewSet(viewsets.ModelViewSet[Team]):
         else:
             serializer.save()
 
+    @action(detail=True, methods=['get'], permission_classes=(IsAuthenticated, CanViewPositions))
+    def track(self, request: HttpRequest, pk: int | None = None) -> HttpResponse:
+        return HttpResponse(self.get_object().get_track_geojson(), content_type='application/geo+json')
+
+    @action(detail=True, methods=['get'], permission_classes=(IsAuthenticated, CanViewPositions))
+    def positions(self, request: HttpRequest, pk: int | None = None) -> HttpResponse:
+        return positions_response(self.get_object().positions)
+
 
 class OrganizationMemberViewSet(viewsets.ReadOnlyModelViewSet[OrganizationMember]):
     queryset = OrganizationMember.objects.order_by('member_type', 'name')
     serializer_class = OrganizationMemberSerializer
+
+    def get_queryset(self):
+        return (
+            OrganizationMember.objects.order_by('member_type', 'name')
+            .with_last_location()
+            .with_last_position_timestamp()
+        )
+
+    @action(detail=True, methods=['get'], permission_classes=(IsAuthenticated, CanViewPositions))
+    def track(self, request: HttpRequest, pk: int | None = None) -> HttpResponse:
+        return HttpResponse(self.get_object().get_track_geojson(), content_type='application/geo+json')
+
+    @action(detail=True, methods=['get'], permission_classes=(IsAuthenticated, CanViewPositions))
+    def positions(self, request: HttpRequest, pk: int | None = None) -> HttpResponse:
+        return positions_response(self.get_object().positions)
 
 
 class TeamNoteViewSet(viewsets.ModelViewSet[TeamNote]):

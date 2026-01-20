@@ -10,8 +10,8 @@ class CanViewHeatmap(permissions.BasePermission):
         return request.user.has_perm('trackers.view_heatmap')
 
 
-class CanViewTrackerLogs(permissions.BasePermission):
+class CanViewPositions(permissions.BasePermission):
     def has_permission(self, request: HttpRequest, view: View) -> bool:
         if not request.user:
             return False
-        return request.user.has_perm('trackers.view_trackerlog')
+        return request.user.has_perm('trackers.view_position')

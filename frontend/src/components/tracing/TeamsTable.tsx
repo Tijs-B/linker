@@ -14,15 +14,7 @@ import { green, red } from '@mui/material/colors';
 
 import type { EntityState } from '@reduxjs/toolkit';
 
-import type {
-  Fiche,
-  ForbiddenArea,
-  Stats,
-  Team,
-  Tocht,
-  Tracker,
-  Weide,
-} from '../../services/types.ts';
+import type { Fiche, ForbiddenArea, Stats, Team, Tocht, Weide } from '../../services/types.ts';
 import { getPositionDescription } from '../../utils/data.ts';
 import { secondsToHoursMinutes } from '../../utils/time.ts';
 import PersonAvatar from '../PersonAvatar.jsx';
@@ -50,7 +42,6 @@ interface TeamRowProps {
   weides: EntityState<Weide, number>;
   forbiddenAreas: EntityState<ForbiddenArea, number>;
   stats: Stats;
-  trackers: EntityState<Tracker, number>;
   showFull: boolean;
 }
 
@@ -62,13 +53,10 @@ const TeamRow = function ({
   weides,
   forbiddenAreas,
   stats,
-  trackers,
   showFull,
 }: TeamRowProps) {
   const team = teams.entities[id];
-  const tracker = team.tracker === null ? null : trackers.entities[team.tracker];
-  const description =
-    tracker && getPositionDescription(tracker, fiches, tochten, weides, forbiddenAreas);
+  const description = team && getPositionDescription(team, fiches, tochten, weides, forbiddenAreas);
   const teamStats = stats.teams[id];
   const tochtDev = showFull ? teamStats.avgFullTochtDeviation : teamStats.avgPartialTochtDeviation;
   const ficheDev = teamStats.avgFicheDeviation;
@@ -99,7 +87,6 @@ interface TeamsTableProps {
   weides: EntityState<Weide, number>;
   forbiddenAreas: EntityState<ForbiddenArea, number>;
   stats: Stats;
-  trackers: EntityState<Tracker, number>;
   showFull: boolean;
 }
 
@@ -110,7 +97,6 @@ export default function TeamTable({
   weides,
   forbiddenAreas,
   stats,
-  trackers,
   showFull,
 }: TeamsTableProps) {
   return (
@@ -134,7 +120,6 @@ export default function TeamTable({
               stats={stats}
               tochten={tochten}
               fiches={fiches}
-              trackers={trackers}
               weides={weides}
               forbiddenAreas={forbiddenAreas}
               showFull={showFull}

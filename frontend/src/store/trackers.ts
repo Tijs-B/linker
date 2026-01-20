@@ -1,20 +1,24 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
+import type { Point } from 'geojson';
 
-import type { TrackerLog } from '../services/types.ts';
+interface HistoryItem {
+  point: Point;
+  timestamp: string;
+}
 
 interface TrackerState {
   selectedId: number | null;
   selectedItemType: 'team' | 'member' | null;
   showHistory: boolean;
-  historyLog: TrackerLog | null;
+  historyItem: HistoryItem | null;
 }
 
 const initialState: TrackerState = {
   selectedId: null,
   selectedItemType: null,
   showHistory: false,
-  historyLog: null,
+  historyItem: null,
 };
 
 const { reducer, actions } = createSlice({
@@ -36,11 +40,11 @@ const { reducer, actions } = createSlice({
     setShowHistory: (state, action: PayloadAction<boolean>) => {
       state.showHistory = action.payload;
       if (!action.payload) {
-        state.historyLog = null;
+        state.historyItem = null;
       }
     },
-    setHistoryLog: (state, action: PayloadAction<TrackerLog | null>) => {
-      state.historyLog = action.payload;
+    setHistoryItem: (state, action: PayloadAction<HistoryItem | null>) => {
+      state.historyItem = action.payload;
     },
   },
 });

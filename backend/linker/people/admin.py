@@ -48,10 +48,18 @@ class ContactPersonAdmin(admin.ModelAdmin[ContactPerson]):
     list_filter = ('is_favorite', 'team')
 
     def get_urls(self) -> list:
-        return [path('download-vcf/', self.admin_site.admin_view(self.download_vcf), name='people_contactperson_download_vcf')] + super().get_urls()
+        return [
+            path(
+                'download-vcf/', self.admin_site.admin_view(self.download_vcf), name='people_contactperson_download_vcf'
+            )
+        ] + super().get_urls()
 
     def download_vcf(self, request: HttpRequest) -> HttpResponse:
-        return HttpResponse(generate_vcf(), content_type='text/vcard', headers={'Content-Disposition': 'attachment; filename="contacts.vcf"'})
+        return HttpResponse(
+            generate_vcf(),
+            content_type='text/vcard',
+            headers={'Content-Disposition': 'attachment; filename="contacts.vcf"'},
+        )
 
     @admin.display(description='team')
     def team_url(self, obj: ContactPerson) -> str:

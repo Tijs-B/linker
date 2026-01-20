@@ -8,7 +8,7 @@ from linker.map.models import Fiche
 from linker.people.models import Team
 from linker.tracing.constants import FICHE_MAX_DISTANCE
 from linker.tracing.models import CheckpointLog
-from linker.trackers.models import TrackerLog
+from linker.trackers.models import Position
 
 logger = getLogger(__name__)
 
@@ -21,25 +21,26 @@ def trace_team(team: Team) -> None:
         ).values('pk')[:1]
     )
 
-    logs = TrackerLog.objects.filter(tracker__team=team, team_is_safe=False)
+    # TODO: filter "is_safe" out of these positions
+    positions = Position.objects.filter(team=team)
     try:
         last_checkpoint = team.checkpointlogs.latest('left')
     except CheckpointLog.DoesNotExist:
         pass
     else:
-        logs = logs.filter(gps_datetime__gte=last_checkpoint.arrived)
+        positions = positions.filter(timestamp__gte=last_checkpoint.arrived)
 
-    logs = logs.annotate(closest_fiche=closest_fiche).order_by('gps_datetime')
+    positions = positions.annotate(closest_fiche=closest_fiche).order_by('timestamp')
 
-    if not logs.exists():
+    if not positions.exists():
         return
 
-    logs_values = list(logs.values('gps_datetime', 'closest_fiche'))
-    current_fiche = logs_values[0]['closest_fiche']
-    current_arrived = logs_values[0]['gps_datetime']
-    current_left = logs_values[0]['gps_datetime']
-    for log in logs_values:
-        if log['closest_fiche'] != current_fiche:
+    positions_values = list(positions.values('timestamp', 'closest_fiche'))
+    current_fiche = positions_values[0]['closest_fiche']
+    current_arrived = positions_values[0]['timestamp']
+    current_left = positions_values[0]['timestamp']
+    for position in positions_values:
+        if position['closest_fiche'] != current_fiche:
             if current_fiche is not None:
                 matching = (
                     CheckpointLog.objects.filter(team=team, fiche_id=current_fiche, arrived__lte=current_left)
@@ -59,11 +60,12 @@ def trace_team(team: Team) -> None:
                         fiche_id=current_fiche,
                         team=team,
                     )
-            current_arrived = log['gps_datetime']
-            current_left = log['gps_datetime']
-            current_fiche = log['closest_fiche']
+            current_arrived = position['timestamp']
+            current_left = position['timestamp']
+            current_fiche = position['closest_fiche']
         else:
-            current_left = log['gps_datetime']
+            current_left = position['timestamp']
+
     if current_fiche is not None and (
         CheckpointLog.objects.filter(team=team, fiche_id=current_fiche)
         .filter(Q(left=None) | Q(left__gte=current_arrived))

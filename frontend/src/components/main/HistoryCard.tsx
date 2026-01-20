@@ -20,9 +20,13 @@ import { skipToken } from '@reduxjs/toolkit/query';
 import bbox from '@turf/bbox';
 import { feature, featureCollection } from '@turf/helpers';
 
-import { useGetTrackerLogsQuery } from '../../services/linker.ts';
+import {
+  useGetOrganizationMemberPositionsQuery,
+  useGetTeamPositionsQuery,
+} from '../../services/linker.ts';
 import {
   selectSelectedItem,
+  selectSelectedMember,
   selectSelectedTeam,
   trackersActions,
   useAppDispatch,
@@ -38,37 +42,49 @@ export default function HistoryCard() {
 
   const selectedItem = useAppSelector(selectSelectedItem);
   const selectedTeam = useAppSelector(selectSelectedTeam);
+  const selectedMember = useAppSelector(selectSelectedMember);
 
   const [index, setIndex] = useState(0);
   const { mainMap } = useMap();
 
   const code = selectedItem?.code;
 
-  const { currentData: logs } = useGetTrackerLogsQuery(
-    selectedItem?.tracker && showHistory ? selectedItem.tracker : skipToken,
+  const { currentData: teamPositions } = useGetTeamPositionsQuery(
+    selectedTeam && showHistory ? selectedTeam.id : skipToken,
+  );
+  const { currentData: organizationMemberPositions } = useGetOrganizationMemberPositionsQuery(
+    selectedMember && showHistory ? selectedMember.id : skipToken,
   );
 
+  const positions = teamPositions || organizationMemberPositions;
+
   useEffect(() => {
-    if (!logs || logs.length === 0 || !mainMap) {
+    if (!positions || positions.length === 0 || !mainMap) {
       return;
     }
 
-    const bounds = bbox(featureCollection(logs.map((l) => feature(l.point))));
+    const bounds = bbox(featureCollection(positions.map((l) => feature(l.point))));
     // @ts-expect-error bounds is always 4 elements long
     mainMap.fitBounds(bounds, { padding: 30 });
 
-    setIndex(logs.length - 1);
-    dispatch(trackersActions.setHistoryLog(logs[logs.length - 1]));
-  }, [logs, dispatch, mainMap]);
+    setIndex(positions.length - 1);
+    const position = positions[positions.length - 1];
+    dispatch(
+      trackersActions.setHistoryItem({
+        point: position.point,
+        timestamp: position.timestamp,
+      }),
+    );
+  }, [positions, dispatch, mainMap]);
 
   const onSliderChange = useCallback(
     (value: number) => {
       setIndex(value);
-      if (logs) {
-        dispatch(trackersActions.setHistoryLog(logs[value]));
+      if (positions) {
+        dispatch(trackersActions.setHistoryItem(positions[value]));
       }
     },
-    [dispatch, logs],
+    [dispatch, positions],
   );
 
   return (
@@ -100,13 +116,13 @@ export default function HistoryCard() {
       />
 
       <CardContent>
-        {logs ? (
-          logs.length > 0 ? (
+        {positions ? (
+          positions.length > 0 ? (
             <>
               <Box sx={{ pl: 1, pr: 1 }}>
                 <Slider
                   value={index}
-                  max={logs.length - 1}
+                  max={positions.length - 1}
                   onChange={(_, v) => onSliderChange(v)}
                 />
               </Box>
@@ -122,11 +138,11 @@ export default function HistoryCard() {
                   <ArrowBackIcon />
                 </IconButton>
                 <Typography variant="body2">
-                  {formatDateTimeLong(logs?.[index]?.gps_datetime)}
+                  {formatDateTimeLong(positions?.[index]?.timestamp)}
                 </Typography>
                 <IconButton
-                  onClick={() => onSliderChange(Math.min(logs.length - 1, index + 1))}
-                  disabled={index === logs.length - 1}
+                  onClick={() => onSliderChange(Math.min(positions.length - 1, index + 1))}
+                  disabled={index === positions.length - 1}
                 >
                   <ArrowForwardIcon />
                 </IconButton>

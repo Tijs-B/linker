@@ -7,8 +7,9 @@ import type {
   CheckpointLog,
   Fiche,
   ForbiddenArea,
+  OrganizationMember,
+  Team,
   Tocht,
-  Tracker,
   Weide,
 } from '../services/types.ts';
 
@@ -27,36 +28,35 @@ export function getLastCheckpointLog(
 }
 
 export function getPositionDescription(
-  tracker: Tracker,
+  item: Team | OrganizationMember,
   fiches: EntityState<Fiche, number>,
   tochten: EntityState<Tocht, number>,
   weides: EntityState<Weide, number>,
   forbiddenAreas: EntityState<ForbiddenArea, number>,
 ): string {
-  if (tracker.last_log === null) {
+  if (item.last_position_point === null) {
     return '-';
   }
-  if (tracker.basis !== null) {
+  if (item.basis !== null) {
     return 'Basis';
   }
-  if (tracker.weide !== null) {
-    return `Weide ${weides.entities[tracker.weide].identifier}`;
+  if (item.weide !== null) {
+    return `Weide ${weides.entities[item.weide].identifier}`;
   }
-  if (tracker.fiche !== null) {
-    return `Fiche ${fiches.entities[tracker.fiche].display_name}`;
+  if (item.fiche !== null) {
+    return `Fiche ${fiches.entities[item.fiche].display_name}`;
   }
-  if (tracker.forbidden_area !== null) {
-    const forbiddenArea = forbiddenAreas.entities[tracker.forbidden_area];
+  if (item.forbidden_area !== null) {
+    const forbiddenArea = forbiddenAreas.entities[item.forbidden_area];
     return `🚨 In verboden gebied ${forbiddenArea.description}`;
   }
-  if (tracker.tocht !== null) {
-    const tocht = tochten.entities[tracker.tocht];
+  if (item.tocht !== null) {
+    const tocht = tochten.entities[item.tocht];
     if (tocht.is_alternative) {
       return `Tocht ${tocht.identifier}`;
     }
     const closest_fiches = Object.values(fiches.entities).map((fiche) => ({
-      // @ts-expect-error I have no idea
-      distance: distance(tracker.last_log.point, fiche.point),
+      distance: distance(item.last_position_point!, fiche.point),
       ...fiche,
     }));
     closest_fiches.sort((a, b) => a.distance - b.distance);

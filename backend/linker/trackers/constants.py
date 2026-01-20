@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import StrEnum
 
 SETTING_SIMULATION_START = 'simulation_start'
 SETTING_GEODYNAMICS_API_HISTORY_SECONDS = 'geodynamics_api_history_seconds'
@@ -15,10 +15,12 @@ TRACKER_LOG_SOS_TYPES = [17006, 200]
 TRACKER_VOLTAGE_RANGE = (3.65, 4.2)
 
 
-class TrackerLogSource(Enum):
+class TrackerLogSource(StrEnum):
+    MINISITE_API = 'minisite_api'
+    GEODYNAMICS_API = 'geodynamics_api'
+
+
+class PositionSource(StrEnum):
     MINISITE_API = 'minisite_api'
     GEODYNAMICS_API = 'geodynamics_api'
     MANUAL = 'manual'
-
-    def __str__(self) -> str:
-        return self.value

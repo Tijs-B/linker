@@ -4,12 +4,11 @@ from django.http.request import HttpRequest
 from django.urls import reverse
 from django.utils.html import format_html
 
-from linker.trackers.models import Tracker, TrackerLog
+from linker.trackers.models import Position, Tracker, TrackerLog
 
 
 @admin.register(Tracker)
 class TrackerAdmin(admin.ModelAdmin[Tracker]):
-    readonly_fields = ('last_log',)
     list_display = ('tracker_id', 'tracker_name', 'used_by')
     search_fields = ('tracker_id', 'tracker_name')
     ordering = (
@@ -78,3 +77,8 @@ class TrackerLogAdmin(admin.GISModelAdmin):
     def tracker_url(self, obj: TrackerLog) -> str:
         url = reverse('admin:trackers_tracker_change', args=(obj.tracker.id,))
         return format_html('<a href={url}>{tracker}</a>', url=url, tracker=obj.tracker)
+
+
+@admin.register(Position)
+class PositionAdmin(admin.ModelAdmin):
+    pass

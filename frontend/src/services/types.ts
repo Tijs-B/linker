@@ -17,6 +17,11 @@ export enum MemberType {
 export enum TrackerLogSource {
   MINISITE_API = 'minisite_api',
   GEODYNAMICS_API = 'geodynamics_api',
+}
+
+export enum PositionSource {
+  MINISITE_API = 'minisite_api',
+  GEODYNAMICS_API = 'geodynamics_api',
   MANUAL = 'manual',
 }
 
@@ -28,24 +33,27 @@ export enum NotificationType {
   TRACKER_IN_FORBIDDEN_AREA = 'tracker_in_forbidden_area',
 }
 
-export interface TrackerLog {
+// export interface TrackerLog {
+//   id: number;
+//   gps_datetime: string;
+//   point: Point;
+//   source: TrackerLogSource;
+//   tracker: number;
+// }
+
+export interface Position {
   id: number;
-  gps_datetime: string;
+  timestamp: string;
   point: Point;
-  source: TrackerLogSource;
-  tracker: number;
+  source: PositionSource;
+  organization_member: number | null;
+  team: number | null;
 }
 
 export interface Tracker {
   id: number;
-  last_log: TrackerLog | null;
   tracker_id: string;
   tracker_name: string;
-  fiche: number | null;
-  weide: number | null;
-  tocht: number | null;
-  basis: number | null;
-  forbidden_area: number | null;
   is_online: boolean;
   battery_percentage: number | null;
 }
@@ -80,6 +88,14 @@ export interface Team {
   safe_weide_updated_at: string | null;
   safe_weide_updated_by: string | null;
   code: string;
+  fiche: number | null;
+  weide: number | null;
+  tocht: number | null;
+  basis: number | null;
+  forbidden_area: number | null;
+  last_position_point: Point | null;
+  last_position_timestamp: string | null;
+  is_online: boolean;
 }
 
 export interface OrganizationMember {
@@ -89,6 +105,14 @@ export interface OrganizationMember {
   code: string;
   phone_number: string;
   member_type: MemberType;
+  fiche: number | null;
+  weide: number | null;
+  tocht: number | null;
+  basis: number | null;
+  forbidden_area: number | null;
+  last_position_point: Point | null;
+  last_position_timestamp: string | null;
+  is_online: boolean;
 }
 
 export interface Tocht {
@@ -185,7 +209,8 @@ export interface Notification {
   id: number;
   notification_type: NotificationType;
   sent: string;
-  tracker: number;
+  tracker: number | null;
+  team: number | null;
   read: boolean;
   severity: number;
 }

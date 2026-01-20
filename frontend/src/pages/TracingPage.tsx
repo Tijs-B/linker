@@ -109,7 +109,6 @@ export default function TracingPage() {
                 weides={weides}
                 forbiddenAreas={forbiddenAreas}
                 stats={stats}
-                trackers={trackers}
                 showFull={showFull}
               />
             </Box>

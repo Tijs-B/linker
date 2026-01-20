@@ -16,5 +16,5 @@ class NotificationSerializer(EnumSupportSerializerMixin, serializers.ModelSerial
 
     class Meta:
         model = Notification
-        fields = ['id', 'notification_type', 'sent', 'tracker', 'read', 'severity']
+        fields = ['id', 'notification_type', 'sent', 'tracker', 'team', 'read', 'severity']
         read_only_fields = fields

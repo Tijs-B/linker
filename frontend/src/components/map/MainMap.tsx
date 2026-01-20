@@ -31,7 +31,7 @@ import TrackerLayer from './TrackerLayer.tsx';
 
 const BOUNDS_OPTIONS = { padding: { top: 30, left: 30, right: 30, bottom: 30 } };
 const DEFAULT_INITIAL_BOUNDS = {
-  bounds: [5.549738, 50.269447, 5.666711, 50.350870] as [number, number, number, number],
+  bounds: [5.549738, 50.269447, 5.666711, 50.35087] as [number, number, number, number],
   fitBoundsOptions: BOUNDS_OPTIONS,
 };
 

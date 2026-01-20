@@ -10,14 +10,13 @@ import '@fontsource/roboto/latin-300.css';
 import '@fontsource/roboto/latin-400.css';
 import '@fontsource/roboto/latin-500.css';
 import '@fontsource/roboto/latin-700.css';
+import { init } from '@plausible-analytics/tracker';
 import dayjs from 'dayjs';
 import 'dayjs/locale/nl-be';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { SnackbarProvider } from 'notistack';
-
-import { init } from '@plausible-analytics/tracker';
 
 import Navigation from './Navigation';
 import RegisterServiceWorker from './components/RegisterServiceWorker.tsx';
