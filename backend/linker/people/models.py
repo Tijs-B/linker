@@ -1,3 +1,5 @@
+import secrets
+
 from django.contrib.auth.models import User
 from django.db import models
 from enumfields import EnumField
@@ -64,6 +66,19 @@ class Team(models.Model):
             return self.tracker.last_log
         else:
             return None
+
+
+class LoginToken(models.Model):
+    token = models.CharField(max_length=64, unique=True, db_index=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='login_tokens')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f'LoginToken for {self.user.username}'
+
+    @staticmethod
+    def generate_token() -> str:
+        return secrets.token_urlsafe(32)
 
 
 class TeamNote(models.Model):

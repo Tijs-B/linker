@@ -11,7 +11,7 @@ from django.views import View
 from rest_framework import viewsets
 from rest_framework.serializers import BaseSerializer, Serializer
 
-from .models import ContactPerson, OrganizationMember, Team, TeamNote
+from .models import ContactPerson, LoginToken, OrganizationMember, Team, TeamNote
 from .serializers import (
     BasicTeamSerializer,
     ContactPersonSerializer,
@@ -115,6 +115,20 @@ class LogoutView(View):
     def post(self, request: HttpRequest) -> HttpResponse:
         logout(request)
         return HttpResponse(status=200)
+
+
+class TokenLoginView(View):
+    def post(self, request: HttpRequest) -> HttpResponse:
+        data = loads(request.body)
+        token_value = data.get('token')
+        if not token_value:
+            return HttpResponse(status=400)
+        try:
+            token = LoginToken.objects.select_related('user').get(token=token_value)
+        except LoginToken.DoesNotExist:
+            return HttpResponse(status=401)
+        login(request, token.user, backend='django.contrib.auth.backends.ModelBackend')
+        return JsonResponse(get_user_info(request))
 
 
 class UserView(View):

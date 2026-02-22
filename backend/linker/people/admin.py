@@ -1,9 +1,35 @@
 from django.contrib import admin
+from django.http import HttpRequest
 from django.urls import reverse
 from django.utils.html import format_html
 from enumfields.admin import EnumFieldListFilter
 
-from .models import ContactPerson, OrganizationMember, Team, TeamNote
+from .models import ContactPerson, LoginToken, OrganizationMember, Team, TeamNote
+
+
+@admin.register(LoginToken)
+class LoginTokenAdmin(admin.ModelAdmin[LoginToken]):
+    list_display = ('user', 'login_url', 'created_at')
+    readonly_fields = ('token', 'login_url', 'created_at')
+    fields = ('user', 'token', 'login_url', 'created_at')
+
+    def changelist_view(self, request: HttpRequest, extra_context: dict | None = None) -> object:
+        self.request = request
+        return super().changelist_view(request, extra_context)
+
+    def changeform_view(self, request: HttpRequest, *args: object, **kwargs: object) -> object:
+        self.request = request
+        return super().changeform_view(request, *args, **kwargs)
+
+    def save_model(self, request: HttpRequest, obj: LoginToken, form: object, change: bool) -> None:
+        if not obj.pk:
+            obj.token = LoginToken.generate_token()
+        super().save_model(request, obj, form, change)
+
+    @admin.display(description='Login URL')
+    def login_url(self, obj: LoginToken) -> str:
+        url = self.request.build_absolute_uri(f'/login?token={obj.token}')
+        return format_html('<a href="{url}">{url}</a>', url=url)
 
 
 @admin.register(OrganizationMember)

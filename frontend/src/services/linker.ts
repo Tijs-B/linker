@@ -166,6 +166,25 @@ export const linkerApi = createApi({
         }
       },
     }),
+    loginWithToken: build.mutation<User, string>({
+      query: (token) => ({
+        url: `/token-login/`,
+        method: 'POST',
+        body: { token },
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data: updatedUser } = await queryFulfilled;
+          dispatch(
+            linkerApi.util.updateQueryData('getUser', undefined, (draft) => {
+              Object.assign(draft, updatedUser);
+            }),
+          );
+        } catch {
+          /* empty */
+        }
+      },
+    }),
     logoutUser: build.mutation<void, void>({
       query: () => ({
         url: '/logout/',
@@ -288,6 +307,7 @@ export const {
   useGetUserQuery,
   useGetNotificationsQuery,
   useLoginUserMutation,
+  useLoginWithTokenMutation,
   useLogoutUserMutation,
   useCreateTeamNoteMutation,
   useCreateMapNoteMutation,

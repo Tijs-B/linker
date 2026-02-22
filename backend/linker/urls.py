@@ -21,6 +21,7 @@ from linker.people.views import (
     OrganizationMemberViewSet,
     TeamNoteViewSet,
     TeamViewSet,
+    TokenLoginView,
     UserView,
 )
 from linker.tracing.views import CheckpointLogViewSet, NotificationViewSet, StatsView
@@ -52,6 +53,7 @@ urlpatterns = [
     path('api/stats/', StatsView.as_view()),
     path('api/heatmap/', HeatmapView.as_view()),
     path('api/login/', csrf_exempt(LoginView.as_view())),
+    path('api/token-login/', csrf_exempt(TokenLoginView.as_view())),
     path('api/logout/', LogoutView.as_view()),
     path('api/user/', UserView.as_view()),
     path('admin/', admin.site.urls),
