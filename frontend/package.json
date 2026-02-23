@@ -47,7 +47,7 @@
     "@vite-pwa/assets-generator": "^1.0.0",
     "@vitejs/plugin-react": "^5.0.1",
     "babel-plugin-react-compiler": "^1.0.0",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.27.0",
     "eslint": "^9.22.0",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-compiler": "^19.1.0-rc.2",
