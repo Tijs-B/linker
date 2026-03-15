@@ -25,6 +25,7 @@ dependencies = [
     "watchdog>=3.0.0",
     "django-stubs>=5.2.7",
     "django-stubs-ext>=5.2.7",
+    "django-polymorphic>=4.11.2",
 ]
 
 [dependency-groups]

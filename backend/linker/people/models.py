@@ -3,9 +3,14 @@ import secrets
 from django.contrib.auth.models import User
 from django.db import models
 from enumfields import EnumField
+from polymorphic.models import PolymorphicModel
 
 from linker.people.constants import Direction, MemberType
-from linker.trackers.models import Tracker, TrackerLog
+from linker.trackers.models import Tracker
+
+
+class TrackedThing(PolymorphicModel):
+    tracker = models.OneToOneField(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
 
 
 class ContactPerson(models.Model):
@@ -20,8 +25,7 @@ class ContactPerson(models.Model):
         return f'{self.team.direction.value}{self.team.number:02d} {self.name}'
 
 
-class OrganizationMember(models.Model):
-    tracker = models.OneToOneField(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
+class OrganizationMember(TrackedThing):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=5, help_text='De letters die op de kaart verschijnen')
     phone_number = models.CharField(max_length=13, blank=True)
@@ -30,20 +34,12 @@ class OrganizationMember(models.Model):
     def __str__(self) -> str:
         return f'{self.member_type.value.title()} - {self.name}'
 
-    @property
-    def last_log(self) -> TrackerLog | None:
-        if self.tracker:
-            return self.tracker.last_log
-        else:
-            return None
 
-
-class Team(models.Model):
+class Team(TrackedThing):
     direction = EnumField(Direction)
     number = models.PositiveIntegerField(unique=True)
     name = models.CharField(max_length=100)
     chiro = models.CharField(max_length=100)
-    tracker = models.OneToOneField(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
 
     safe_weide = models.CharField(max_length=64, blank=True)
     safe_weide_updated_at = models.DateTimeField(blank=True, null=True)
@@ -59,13 +55,6 @@ class Team(models.Model):
 
     def __str__(self) -> str:
         return f'{self.direction.value}{self.number:02d} {self.name}'
-
-    @property
-    def last_log(self) -> TrackerLog | None:
-        if self.tracker:
-            return self.tracker.last_log
-        else:
-            return None
 
 
 class LoginToken(models.Model):

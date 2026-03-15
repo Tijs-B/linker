@@ -7,7 +7,7 @@ from enumfields import EnumField
 from linker.config.models import Switch
 from linker.map.models import Basis, Tocht
 from linker.tracing.constants import GEBIED_MAX_DISTANCE, SKIP_BASIS_DISTANCE
-from linker.trackers.constants import SWITCH_EXCLUDE_BASIS_FROM_TRACK, TrackerLogSource
+from linker.trackers.constants import SWITCH_EXCLUDE_BASIS_FROM_TRACK, PositionSource, TrackerLogSource
 
 
 class Tracker(models.Model):
@@ -85,3 +85,11 @@ class TrackerLog(models.Model):
 
     def __str__(self) -> str:
         return f'{self.tracker} {self.gps_datetime}'
+
+
+class Position(models.Model):
+    tracking = models.ForeignKey('people.TrackedThing', on_delete=models.CASCADE, related_name='positions')
+
+    timestamp = models.DateTimeField()
+    point = models.PointField()
+    source = EnumField(PositionSource, max_length=30)
