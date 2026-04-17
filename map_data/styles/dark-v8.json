@@ -4,7 +4,8 @@
   "sources": {
     "openmaptiles": {
       "type": "vector",
-      "url": "/tiles/openmaptiles,outdoor"
+      "url": "/tiles/openmaptiles,outdoor",
+      "encoding": "mlt"
     }
   },
   "sprite": "https://openmaptiles.github.io/dark-matter-gl-style/sprite",

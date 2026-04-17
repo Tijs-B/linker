@@ -76,7 +76,7 @@ services:
     image: ghcr.io/maplibre/martin
     volumes:
       - ./map_data:/map_data:ro
-    command: '--config /map_data/martin.yaml'
+    command: '--config /map_data/martin.yaml --webui enable-for-all'
     ports:
       - '8064:8064'
 

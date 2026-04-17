@@ -4,7 +4,8 @@
   "sources": {
     "openmaptiles": {
       "type": "vector",
-      "url": "/tiles/openmaptiles,outdoor"
+      "url": "/tiles/openmaptiles,outdoor",
+      "encoding": "mlt"
     }
   },
   "sprite": "https://maputnik.github.io/osm-liberty/sprites/osm-liberty",
