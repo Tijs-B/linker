@@ -113,7 +113,7 @@ const NotificationRow = ({
             primary={title}
             secondary={formatDateTimeShorter(item.sent)}
             slotProps={{
-              primary: { noWrap: true, fontWeight: item.read ? 'regular' : 'bold' },
+              primary: { noWrap: true, sx: { fontWeight: item.read ? 'regular' : 'bold' } },
               secondary: { noWrap: true },
             }}
           />

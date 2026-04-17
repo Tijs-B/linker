@@ -113,8 +113,7 @@ export default function HistoryCard() {
               <Stack
                 direction="row"
                 spacing={2}
-                alignItems="center"
-                sx={{ justifyContent: 'center' }}
+                sx={{ alignItems: 'center', justifyContent: 'center' }}
               >
                 <IconButton
                   onClick={() => onSliderChange(Math.max(0, index - 1))}
