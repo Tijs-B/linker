@@ -18,6 +18,10 @@ services:
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
       - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY}
+      - GEODYNAMICS_MINISITE_URL=${GEODYNAMICS_MINISITE_URL}
+      - GEODYNAMICS_API_BASE_URL=${GEODYNAMICS_API_BASE_URL}
+      - GEODYNAMICS_API_AUTH=${GEODYNAMICS_API_AUTH}
     networks:
       - linker_net
 
@@ -38,6 +42,10 @@ services:
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
       - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY}
+      - GEODYNAMICS_MINISITE_URL=${GEODYNAMICS_MINISITE_URL}
+      - GEODYNAMICS_API_BASE_URL=${GEODYNAMICS_API_BASE_URL}
+      - GEODYNAMICS_API_AUTH=${GEODYNAMICS_API_AUTH}
     networks:
       - linker_net
 
@@ -58,6 +66,10 @@ services:
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
       - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY}
+      - GEODYNAMICS_MINISITE_URL=${GEODYNAMICS_MINISITE_URL}
+      - GEODYNAMICS_API_BASE_URL=${GEODYNAMICS_API_BASE_URL}
+      - GEODYNAMICS_API_AUTH=${GEODYNAMICS_API_AUTH}
     networks:
       - linker_net
 
