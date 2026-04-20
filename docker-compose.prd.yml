@@ -12,8 +12,8 @@ services:
     volumes:
       - ./simulation-data:/simulation-data:ro
     environment:
-      - ALLOWED_HOSTS=link2.tijsb.be
-      - CSRF_TRUSTED_ORIGINS=https://link2.tijsb.be
+      - ALLOWED_HOSTS=${DOMAIN}
+      - CSRF_TRUSTED_ORIGINS=https://${DOMAIN}
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
@@ -32,8 +32,8 @@ services:
     volumes:
       - ./simulation-data:/simulation-data:ro
     environment:
-      - ALLOWED_HOSTS=link2.tijsb.be
-      - CSRF_TRUSTED_ORIGINS=https://link2.tijsb.be
+      - ALLOWED_HOSTS=${DOMAIN}
+      - CSRF_TRUSTED_ORIGINS=https://${DOMAIN}
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
@@ -52,8 +52,8 @@ services:
     volumes:
       - ./simulation-data:/simulation-data:ro
     environment:
-      - ALLOWED_HOSTS=link2.tijsb.be
-      - CSRF_TRUSTED_ORIGINS=https://link2.tijsb.be
+      - ALLOWED_HOSTS=${DOMAIN}
+      - CSRF_TRUSTED_ORIGINS=https://${DOMAIN}
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
@@ -89,6 +89,8 @@ services:
     build:
       context: .
       target: custom-nginx
+      args:
+        - VITE_DOMAIN=${DOMAIN}
     networks:
       - linker_net
       - caddy
@@ -96,7 +98,7 @@ services:
       - linker
       - tiles
     labels:
-      caddy: link2.tijsb.be
+      caddy: ${DOMAIN}
       caddy.reverse_proxy: "{{upstreams 80}}"
 
 volumes:

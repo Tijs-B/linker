@@ -10,6 +10,8 @@ const ReactCompilerConfig = {
 
 export default defineConfig(({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
+  const domain = process.env.VITE_DOMAIN ?? 'link.tijsb.be';
+  const escapedDomain = domain.replace(/\./g, '\\.');
   return {
     resolve: {
       conditions: ['mui-modern', 'module', 'browser', 'development|production'],
@@ -33,12 +35,13 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
           runtimeCaching: [
             {
-              urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/api\/user/,
+              urlPattern: new RegExp(`^https://${escapedDomain}/api/user`),
               handler: 'NetworkOnly',
             },
             {
-              urlPattern:
-                /^https:\/\/link\d?(?:-test)?.tijsb.be\/api\/(?:tochten|fiches|weides|basis|zijwegen|forbidden-areas)/,
+              urlPattern: new RegExp(
+                `^https://${escapedDomain}/api/(?:tochten|fiches|weides|basis|zijwegen|forbidden-areas)`,
+              ),
               handler: 'StaleWhileRevalidate',
               options: {
                 expiration: { maxAgeSeconds: 4 * 60 * 60 },
@@ -46,7 +49,7 @@ export default defineConfig(({ mode }) => {
               },
             },
             {
-              urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/api\//,
+              urlPattern: new RegExp(`^https://${escapedDomain}/api/`),
               handler: 'NetworkFirst',
               options: {
                 expiration: { maxAgeSeconds: 2 * 60 * 60 },
@@ -54,7 +57,7 @@ export default defineConfig(({ mode }) => {
               },
             },
             {
-              urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/tiles\/openmaptiles,outdoor\//,
+              urlPattern: new RegExp(`^https://${escapedDomain}/tiles/openmaptiles,outdoor/`),
               handler: 'CacheFirst',
               options: {
                 cacheableResponse: {
@@ -63,7 +66,7 @@ export default defineConfig(({ mode }) => {
               },
             },
             {
-              urlPattern: /^https:\/\/link\d?(?:-test)?.tijsb.be\/tiles\/font\//,
+              urlPattern: new RegExp(`^https://${escapedDomain}/tiles/font/`),
               handler: 'CacheFirst',
             },
             {

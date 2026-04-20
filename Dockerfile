@@ -3,6 +3,9 @@
 ################
 FROM node:22-bookworm-slim AS frontend
 
+ARG VITE_DOMAIN
+ENV VITE_DOMAIN=$VITE_DOMAIN
+
 WORKDIR /app
 
 COPY frontend/package.json frontend/package-lock.json ./

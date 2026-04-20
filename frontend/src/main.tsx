@@ -26,7 +26,7 @@ import { store } from './store';
 import AppThemeProvider from './theme/AppThemeProvider.tsx';
 
 init({
-  domain: 'link.tijsb.be',
+  domain: import.meta.env.VITE_DOMAIN,
   endpoint: 'https://pls.tijsb.be/api/event',
 });
 
