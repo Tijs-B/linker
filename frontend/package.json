@@ -15,6 +15,7 @@
     "@fontsource/roboto": "^5.0.3",
     "@mui/icons-material": "^9.0.0",
     "@mui/material": "^9.0.0",
+    "@plausible-analytics/tracker": "^0.4.4",
     "@reduxjs/toolkit": "^2.2.1",
     "@turf/bbox": "^7.2.0",
     "@turf/centroid": "^7.2.0",

@@ -17,11 +17,18 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { SnackbarProvider } from 'notistack';
 
+import { init } from '@plausible-analytics/tracker';
+
 import Navigation from './Navigation';
 import RegisterServiceWorker from './components/RegisterServiceWorker.tsx';
 import { notifications } from './config';
 import { store } from './store';
 import AppThemeProvider from './theme/AppThemeProvider.tsx';
+
+init({
+  domain: 'link.tijsb.be',
+  endpoint: 'https://pls.tijsb.be/api/event',
+});
 
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
