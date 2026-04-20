@@ -1,10 +1,11 @@
 from django.contrib import admin
-from django.http import HttpRequest
-from django.urls import reverse
+from django.http import HttpRequest, HttpResponse
+from django.urls import path, reverse
 from django.utils.html import format_html
 from enumfields.admin import EnumFieldListFilter
 
 from .models import ContactPerson, LoginToken, OrganizationMember, Team, TeamNote
+from .utils import generate_vcf
 
 
 @admin.register(LoginToken)
@@ -45,6 +46,12 @@ class ContactPersonAdmin(admin.ModelAdmin[ContactPerson]):
     ordering = ('team__number', '-is_favorite', 'name')
     search_fields = ('name',)
     list_filter = ('is_favorite', 'team')
+
+    def get_urls(self) -> list:
+        return [path('download-vcf/', self.admin_site.admin_view(self.download_vcf), name='people_contactperson_download_vcf')] + super().get_urls()
+
+    def download_vcf(self, request: HttpRequest) -> HttpResponse:
+        return HttpResponse(generate_vcf(), content_type='text/vcard', headers={'Content-Disposition': 'attachment; filename="contacts.vcf"'})
 
     @admin.display(description='team')
     def team_url(self, obj: ContactPerson) -> str:
