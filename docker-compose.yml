@@ -53,7 +53,7 @@ services:
       - postgis-data:/var/lib/postgresql
 
   redis:
-    image: redis:6
+    image: redis:8-alpine
     ports:
       - "8063:6379"
 

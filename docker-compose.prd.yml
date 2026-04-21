@@ -85,7 +85,7 @@ services:
       - linker_net
 
   redis:
-    image: redis:6
+    image: redis:8-alpine
     networks:
       - linker_net
 
@@ -93,7 +93,7 @@ services:
     image: ghcr.io/maplibre/martin
     volumes:
       - ./map_data:/map_data:ro
-    command: '--config /map_data/martin.yaml'
+    command: "--config /map_data/martin.yaml"
     networks:
       - linker_net
 
