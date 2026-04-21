@@ -14,7 +14,7 @@ services:
     environment:
       - ALLOWED_HOSTS=${DOMAIN},linker
       - CSRF_TRUSTED_ORIGINS=https://${DOMAIN}
-      - DATABASE_URL=postgis://root:pass@postgis:5432/linker
+      - DATABASE_URL=prometheus-postgis://root:pass@postgis:5432/linker
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
       - DEBUG=False
@@ -38,7 +38,7 @@ services:
     environment:
       - ALLOWED_HOSTS=${DOMAIN}
       - CSRF_TRUSTED_ORIGINS=https://${DOMAIN}
-      - DATABASE_URL=postgis://root:pass@postgis:5432/linker
+      - DATABASE_URL=prometheus-postgis://root:pass@postgis:5432/linker
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
       - DEBUG=False
@@ -62,7 +62,7 @@ services:
     environment:
       - ALLOWED_HOSTS=${DOMAIN}
       - CSRF_TRUSTED_ORIGINS=https://${DOMAIN}
-      - DATABASE_URL=postgis://root:pass@postgis:5432/linker
+      - DATABASE_URL=prometheus-postgis://root:pass@postgis:5432/linker
       - CACHE_URL=redis://redis:6379
       - SIMULATION_PATH=/simulation-data
       - DEBUG=False
