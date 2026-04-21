@@ -57,6 +57,7 @@ urlpatterns = [
     path('api/logout/', LogoutView.as_view()),
     path('api/user/', UserView.as_view()),
     path('admin/', admin.site.urls),
+    path('', include('django_prometheus.urls')),
 ]
 
 if settings.DEBUG:
