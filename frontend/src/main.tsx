@@ -25,10 +25,12 @@ import { notifications } from './config';
 import { store } from './store';
 import AppThemeProvider from './theme/AppThemeProvider.tsx';
 
-init({
-  domain: import.meta.env.VITE_DOMAIN,
-  endpoint: 'https://pls.tijsb.be/api/event',
-});
+if (import.meta.env.VITE_DOMAIN) {
+  init({
+    domain: import.meta.env.VITE_DOMAIN,
+    endpoint: 'https://pls.tijsb.be/api/event',
+  });
+}
 
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
