@@ -233,8 +233,9 @@ def import_groepen_en_deelnemers(filename: Path) -> None:
         if phone is not None:
             phone = phone.replace(' ', '')
             phone = re.sub(r'^(?:\+?32|0032|0)?4', '+324', phone)
+            phone = re.sub(r'^(?:0031|\+31|0)6', '+316', phone)
 
-        if phone is not None and not re.match(r'\+324\d{8}', phone):
+        if phone is not None and not re.match(r'\+324\d{8}$|\+31\d{9}$', phone):
             print(f'Warning: phone number not correct: {phone} from {name}. Skipping adding.')
             phone = None
 
