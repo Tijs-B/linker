@@ -9,3 +9,5 @@ celerybeat-schedule
 .DS_Store
 db_dump
 *.dump
+__pycache__/
+.env

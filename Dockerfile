@@ -1,10 +1,12 @@
+ARG DOMAIN
+
 ################
 ### FRONTEND ###
 ################
 FROM node:22-bookworm-slim AS frontend
 
-ARG VITE_DOMAIN
-ENV VITE_DOMAIN=$VITE_DOMAIN
+ARG DOMAIN
+ENV VITE_DOMAIN=$DOMAIN
 
 WORKDIR /app
 

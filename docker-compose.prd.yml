@@ -102,7 +102,7 @@ services:
       context: .
       target: custom-nginx
       args:
-        - VITE_DOMAIN=${DOMAIN}
+        - DOMAIN=${DOMAIN}
     networks:
       - linker_net
       - caddy
