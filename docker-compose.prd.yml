@@ -12,7 +12,7 @@ services:
     volumes:
       - ./simulation-data:/simulation-data:ro
     environment:
-      - ALLOWED_HOSTS=${DOMAIN}
+      - ALLOWED_HOSTS=${DOMAIN},linker
       - CSRF_TRUSTED_ORIGINS=https://${DOMAIN}
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker
       - CACHE_URL=redis://redis:6379
@@ -113,8 +113,32 @@ services:
       caddy: ${DOMAIN}
       caddy.reverse_proxy: "{{upstreams 80}}"
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "${TAILSCALE_IP}:9090:9090"
+    volumes:
+      - ./deployment/prometheus:/etc/prometheus:ro
+    networks:
+      - linker_net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "${TAILSCALE_IP}:3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    networks:
+      - linker_net
+
 volumes:
   postgis-data:
+  grafana-storage:
 
 networks:
   caddy:
