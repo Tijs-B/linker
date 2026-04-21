@@ -72,7 +72,11 @@
         ["add_trackerlog", "trackers", "trackerlog"],
         ["change_trackerlog", "trackers", "trackerlog"],
         ["delete_trackerlog", "trackers", "trackerlog"],
-        ["view_trackerlog", "trackers", "trackerlog"]
+        ["view_trackerlog", "trackers", "trackerlog"],
+        ["add_logintoken", "people", "logintoken"],
+        ["change_logintoken", "people", "logintoken"],
+        ["delete_logintoken", "people", "logintoken"],
+        ["view_logintoken", "people", "logintoken"]
       ]
     }
   },
