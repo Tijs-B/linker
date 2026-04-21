@@ -150,23 +150,23 @@ def import_geoserver(base_url: str) -> None:
     _import_geojson_zijwegen(zijwegen.json())
 
 
-def import_featureserv(base_url: str) -> None:
+def import_featureserv(base_url: str, year: str) -> None:
     params = {'limit': 10_000}
     stripped = base_url.rstrip('/')
 
-    tochten = get(stripped + '/collections/public.tochten_2025/items.json', params=params)
+    tochten = get(stripped + f'/collections/public.tochten_{year}/items.json', params=params)
     _import_geojson_tochten(tochten.json())
 
-    weides = get(stripped + '/collections/public.weides_2025/items.json', params=params)
+    weides = get(stripped + f'/collections/public.weides_{year}/items.json', params=params)
     _import_geojson_weides(weides.json())
 
-    fiches = get(stripped + '/collections/public.fiches_2025/items.json', params=params)
+    fiches = get(stripped + f'/collections/public.fiches_{year}/items.json', params=params)
     _import_geojson_fiches(fiches.json())
 
-    zijwegen = get(stripped + '/collections/public.zijwegen_2025/items.json', params=params)
+    zijwegen = get(stripped + f'/collections/public.zijwegen_{year}/items.json', params=params)
     _import_geojson_zijwegen(zijwegen.json())
 
-    basis = get(stripped + '/collections/public.basis_2025/items.json', params=params)
+    basis = get(stripped + f'/collections/public.basis_{year}/items.json', params=params)
     _import_geojson_basis(basis.json())
 
 
