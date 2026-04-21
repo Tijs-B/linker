@@ -6,7 +6,7 @@ import psycopg
 import sys
 import time
 
-connection_url = os.environ['DATABASE_URL'].replace('postgis://', 'postgresql://')
+connection_url = os.environ['DATABASE_URL'].replace('prometheus-postgis://', 'postgresql://')
 connection_dict = psycopg.conninfo.conninfo_to_dict(connection_url)
 
 suggest_unrecoverable_after = 30
