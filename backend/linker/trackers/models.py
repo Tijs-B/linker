@@ -8,6 +8,7 @@ from .constants import PositionSource, TrackerLogSource
 class Tracker(models.Model):
     tracker_id = models.CharField(max_length=50, db_index=True, unique=True)
     tracker_name = models.CharField(max_length=50, blank=True, null=True)
+    tracker_barcode = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         permissions = [
