@@ -19,6 +19,9 @@ services:
       - SIMULATION_PATH=/simulation-data
       - DEBUG=True
       - SECRET_KEY=secret
+      - GEODYNAMICS_MINISITE_URL=${GEODYNAMICS_MINISITE_URL}
+      - GEODYNAMICS_API_BASE_URL=${GEODYNAMICS_API_BASE_URL}
+      - GEODYNAMICS_API_AUTH=${GEODYNAMICS_API_AUTH}
     ports:
       - "8060:8060"
 
@@ -40,6 +43,9 @@ services:
       - SIMULATION_PATH=/simulation-data
       - DEBUG=True
       - SECRET_KEY=secret
+      - GEODYNAMICS_MINISITE_URL=${GEODYNAMICS_MINISITE_URL}
+      - GEODYNAMICS_API_BASE_URL=${GEODYNAMICS_API_BASE_URL}
+      - GEODYNAMICS_API_AUTH=${GEODYNAMICS_API_AUTH}
 
   postgis:
     image: kartoza/postgis:17-3.5
