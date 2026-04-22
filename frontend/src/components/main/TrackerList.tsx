@@ -3,8 +3,7 @@ import { List } from 'react-window';
 import { type RowComponentProps } from 'react-window';
 
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
-import LinkOffIcon from '@mui/icons-material/LinkOff';
-import { Badge, Chip, ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
+import WifiOffIcon from '@mui/icons-material/WifiOff';import { Badge, Chip, ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 
 import {
   useGetBasisQuery,
@@ -61,7 +60,7 @@ const TrackerRow = ({ items, index, style, onItemClick }: RowComponentProps<Trac
     if (item.isOnline) {
       return null;
     }
-    return <LinkOffIcon fontSize="small" sx={{ mr: 1 }} />;
+    return <WifiOffIcon fontSize="small" sx={{ mr: 1 }} />;
   }, [items, index]);
 
   return (
