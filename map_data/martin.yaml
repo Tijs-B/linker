@@ -1,6 +1,6 @@
 listen_addresses: 0.0.0.0:8064
 
-preferred_encoding: gzip
+preferred_encoding: brotli
 
 mbtiles:
   sources:

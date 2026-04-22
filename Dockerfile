@@ -10,12 +10,16 @@ ENV VITE_DOMAIN=$DOMAIN
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install --no-install-recommends -y brotli && rm -rf /var/lib/apt/lists/*
+
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
 COPY frontend .
 
-RUN npm run build
+RUN npm run build \
+    && find /app/dist -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" -o -name "*.json" -o -name "*.svg" -o -name "*.woff2" \) \
+       -exec brotli --best --keep {} \;
 
 ###############
 ### BACKEND ###
@@ -63,7 +67,7 @@ RUN SECRET_KEY=12345 python manage.py collectstatic --noinput
 #############
 ### NGINX ###
 #############
-FROM nginx AS custom-nginx
+FROM fholzer/nginx-brotli AS custom-nginx
 
 RUN rm /etc/nginx/conf.d/default.conf
 COPY deployment/nginx.conf /etc/nginx/conf.d
