@@ -76,7 +76,7 @@ class TrackerViewSet(viewsets.ReadOnlyModelViewSet[Tracker]):
         track = tracker.get_track_geojson()
         return HttpResponse(track, content_type='application/geo+json')
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], permission_classes=(IsAuthenticated, CanViewTrackerLogs))
     def logs(self, request: HttpRequest, pk: int | None = None) -> HttpResponse:
         tocht_centroid = Tocht.centroid()
         tracker = self.get_object()
