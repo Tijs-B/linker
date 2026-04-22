@@ -33,24 +33,25 @@ def trace_teams() -> None:
 
 @shared_task
 def tracker_offline_notifications() -> None:
-    # Find offline trackers
+    # Find offline trackers (no recent log)
     cutoff = now() - timedelta(minutes=TRACKER_OFFLINE_MINUTES)
+    has_recent_log = Exists(TrackerLog.objects.filter(tracker=OuterRef('pk'), gps_datetime__gte=cutoff))
     offline_trackers = Tracker.objects.filter(
+        ~has_recent_log,
         team__isnull=False,
         team__in=Team.objects.with_last_safety_location().filter(
             Q(last_safety_location='') | Q(last_safety_location__isnull=True)
         ),
-    ).filter(Q(last_log__isnull=True) | Q(last_log__gps_datetime__lte=cutoff))
+    )
 
     # Add notifications for offline trackers
     for tracker in offline_trackers:
         Notification.objects.get_or_create(notification_type=NotificationType.TRACKER_OFFLINE, tracker=tracker)
 
     # Delete notifications for online trackers
-    Notification.objects.filter(
-        notification_type=NotificationType.TRACKER_OFFLINE,
-        tracker__last_log__isnull=False,
-        tracker__last_log__gps_datetime__gte=cutoff,
+    tracker_has_recent_log = Exists(TrackerLog.objects.filter(tracker=OuterRef('tracker'), gps_datetime__gte=cutoff))
+    Notification.objects.filter(notification_type=NotificationType.TRACKER_OFFLINE).filter(
+        tracker_has_recent_log
     ).delete()
 
 
