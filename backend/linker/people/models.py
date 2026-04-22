@@ -115,6 +115,21 @@ class TeamQuerySet(LocationMixin, models.QuerySet):
             ),
         )
 
+    def with_last_safety_location(self):
+        return self.annotate(
+            last_safety_location=Subquery(
+                TeamSafetyLog.objects.filter(team=OuterRef('pk')).order_by('-created').values('location')[:1]
+            ),
+            last_safety_location_updated_at=Subquery(
+                TeamSafetyLog.objects.filter(team=OuterRef('pk')).order_by('-created').values('created')[:1]
+            ),
+            last_safety_location_updated_by=Subquery(
+                TeamSafetyLog.objects.filter(team=OuterRef('pk'))
+                .order_by('-created')
+                .values('created_by__username')[:1]
+            ),
+        )
+
 
 class Team(models.Model):
     direction = EnumField(Direction)
@@ -122,10 +137,6 @@ class Team(models.Model):
     name = models.CharField(max_length=100)
     chiro = models.CharField(max_length=100)
     tracker = models.OneToOneField(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
-
-    safe_weide = models.CharField(max_length=64, blank=True)
-    safe_weide_updated_at = models.DateTimeField(blank=True, null=True)
-    safe_weide_updated_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
     objects = TeamQuerySet.as_manager()
 
@@ -156,6 +167,16 @@ class Team(models.Model):
             )
             row = cursor.fetchone()
         return row[0]  # type: ignore[no-any-return]
+
+
+class TeamSafetyLog(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_safety_logs')
+    created = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
+    location = models.CharField(max_length=100, blank=True)
+
+    def __str__(self) -> str:
+        return f'{self.team}: {self.location} at {self.created}'
 
 
 class LoginToken(models.Model):

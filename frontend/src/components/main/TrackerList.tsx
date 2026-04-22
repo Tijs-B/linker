@@ -47,13 +47,13 @@ const TrackerRow = ({ items, index, style, onItemClick }: RowComponentProps<Trac
 
   const safeChip = useMemo(() => {
     const item = items[index];
-    if (!('safe_weide' in item) || !item.safe_weide) {
+    if (!('last_safety_location' in item) || !item.last_safety_location) {
       return null;
     }
-    if (item.safe_weide.trim().toLowerCase() === 'bus') {
+    if (item.last_safety_location.trim().toLowerCase() === 'bus') {
       return <Chip color="warning" variant="outlined" icon={<DirectionsBusIcon />} label="Bus" />;
     }
-    return <Chip color="primary" variant="filled" label={`Safe op ${item.safe_weide}`} />;
+    return <Chip color="primary" variant="filled" label={`Safe op ${item.last_safety_location}`} />;
   }, [items, index]);
 
   const offlineIcon = useMemo(() => {

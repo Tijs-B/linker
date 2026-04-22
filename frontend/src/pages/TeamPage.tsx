@@ -165,12 +165,13 @@ export default function TeamPage() {
                         <TableCell>Safe?</TableCell>
                         <TableCell>
                           <SafeSelector team={team} />{' '}
-                          {team.safe_weide_updated_at && team.safe_weide_updated_by && (
-                            <>
-                              ({formatFromNow(team.safe_weide_updated_at)} door{' '}
-                              {team.safe_weide_updated_by})
-                            </>
-                          )}
+                          {team.last_safety_location_updated_at &&
+                            team.last_safety_location_updated_by && (
+                              <>
+                                ({formatFromNow(team.last_safety_location_updated_at)} door{' '}
+                                {team.last_safety_location_updated_by})
+                              </>
+                            )}
                         </TableCell>
                       </TableRow>
                     </TableBody>

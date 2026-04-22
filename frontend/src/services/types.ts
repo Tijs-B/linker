@@ -84,9 +84,9 @@ export interface Team {
   tracker: number | null;
   contact_persons: ContactPerson[];
   team_notes: TeamNote[];
-  safe_weide: string;
-  safe_weide_updated_at: string | null;
-  safe_weide_updated_by: string | null;
+  last_safety_location: string;
+  last_safety_location_updated_at: string | null;
+  last_safety_location_updated_by: string | null;
   code: string;
   fiche: number | null;
   weide: number | null;

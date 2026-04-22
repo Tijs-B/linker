@@ -35,9 +35,9 @@ def trace_teams() -> None:
 def tracker_offline_notifications() -> None:
     # Find offline trackers
     cutoff = now() - timedelta(minutes=TRACKER_OFFLINE_MINUTES)
-    offline_trackers = Tracker.objects.filter(team__isnull=False, team__safe_weide='').filter(
-        Q(last_log__isnull=True) | Q(last_log__gps_datetime__lte=cutoff)
-    )
+    offline_trackers = Tracker.objects.filter(
+        team__isnull=False, team__in=Team.objects.with_last_safety_location().filter(Q(last_safety_location='') | Q(last_safety_location__isnull=True))
+    ).filter(Q(last_log__isnull=True) | Q(last_log__gps_datetime__lte=cutoff))
 
     # Add notifications for offline trackers
     for tracker in offline_trackers:
@@ -87,7 +87,7 @@ def tracker_far_away_notifications() -> None:
         ~Exists(Tocht.objects.filter(route__distance_lte=(OuterRef('point'), D(m=TRACKER_FAR_AWAY_METERS)))),
         timestamp__gte=now() - timedelta(minutes=10),
         team__isnull=False,
-        team__safe_weide='',
+        team__in=Team.objects.with_last_safety_location().filter(Q(last_safety_location='') | Q(last_safety_location__isnull=True)),
     ).values_list('team_id', flat=True)
 
     for team_id in teams_far_away:
@@ -117,7 +117,7 @@ def tracker_forbidden_area_notifications() -> None:
         Position.objects.filter(
             in_forbidden_area_route_not_allowed | (in_forbidden_area_route_allowed & ~close_to_route),
             team__isnull=False,
-            team__safe_weide='',
+            team__in=Team.objects.with_last_safety_location().filter(Q(last_safety_location='') | Q(last_safety_location__isnull=True)),
         )
         .values_list('team_id', flat=True)
         .distinct()

@@ -172,9 +172,12 @@ export default function MainPage() {
       return teams.ids
         .map((id) => teams.entities[id])
         .filter(
-          (team) => showSafe || !team.safe_weide || team.safe_weide.trim().toLowerCase() === 'bus',
+          (team) =>
+            showSafe ||
+            !team.last_safety_location ||
+            team.last_safety_location.trim().toLowerCase() === 'bus',
         )
-        .filter((team) => showBus || team.safe_weide.trim().toLowerCase() !== 'bus')
+        .filter((team) => showBus || team.last_safety_location.trim().toLowerCase() !== 'bus')
         .filter((team) => showRed || team.direction !== Direction.RED)
         .filter((team) => showBlue || team.direction !== Direction.BLUE);
     } else {

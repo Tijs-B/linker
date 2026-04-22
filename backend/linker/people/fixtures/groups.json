@@ -58,6 +58,8 @@
         ["change_teamnote", "people", "teamnote"],
         ["delete_teamnote", "people", "teamnote"],
         ["view_teamnote", "people", "teamnote"],
+        ["add_teamsafetylog", "people", "teamsafetylog"],
+        ["view_teamsafetylog", "people", "teamsafetylog"],
         ["add_checkpointlog", "tracing", "checkpointlog"],
         ["change_checkpointlog", "tracing", "checkpointlog"],
         ["delete_checkpointlog", "tracing", "checkpointlog"],

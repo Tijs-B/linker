@@ -26,7 +26,6 @@ class TrackerLog(models.Model):
     gps_datetime = models.DateTimeField(db_index=True)
     point = models.PointField()
 
-    team_is_safe = models.BooleanField(default=False)
     source = EnumField(TrackerLogSource, max_length=30)
 
     # The below fields are less important.

@@ -11,9 +11,9 @@ from django.contrib.gis.geos import Point
 from django.utils.timezone import now
 
 from linker.config.models import Setting
-from linker.people.models import Team
 from linker.trackers.constants import SETTING_GEODYNAMICS_API_HISTORY_SECONDS, TrackerLogSource
 from linker.trackers.models import Position, Tracker, TrackerLog
+
 logger = getLogger(__name__)
 
 
@@ -38,7 +38,6 @@ def import_geodynamics_minisite_data(data: dict[str, Any], fetch_datetime: datet
     trackers = {
         tracker.tracker_id: tracker for tracker in Tracker.objects.prefetch_related('team', 'organizationmember').all()
     }
-    safe_trackers = set(Team.objects.exclude(safe_weide='').values_list('tracker__tracker_id', flat=True))
 
     for tracker_data in data['Data']:
         tracker_id = tracker_data['Id']
@@ -72,7 +71,6 @@ def import_geodynamics_minisite_data(data: dict[str, Any], fetch_datetime: datet
                 gps_datetime=gps_datetime,
                 source=TrackerLogSource.MINISITE_API,
                 fetch_datetime=fetch_datetime,
-                team_is_safe=tracker_id in safe_trackers,
                 local_datetime=try_parse_date(last_location.get('LocalDateTime')),
                 last_sync_date=try_parse_date(tracker_data.get('LastSyncDate')),
                 satellites=last_location.get('Satellites'),

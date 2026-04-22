@@ -4,7 +4,7 @@ from django.urls import path, reverse
 from django.utils.html import format_html
 from enumfields.admin import EnumFieldListFilter
 
-from .models import ContactPerson, LoginToken, OrganizationMember, Team, TeamNote
+from .models import ContactPerson, LoginToken, OrganizationMember, Team, TeamNote, TeamSafetyLog
 from .utils import generate_vcf
 
 
@@ -77,12 +77,16 @@ class TeamNoteInline(admin.TabularInline[TeamNote, Team]):
     extra = 0
 
 
+class TeamSafetyLogInline(admin.StackedInline):
+    model = TeamSafetyLog
+    extra = 0
+
+
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin[Team]):
-    inlines = [ContactPersonInline, TeamNoteInline]
+    inlines = [ContactPersonInline, TeamNoteInline, TeamSafetyLogInline]
     ordering = ('number',)
-    list_display = ('__str__', 'chiro', 'safe_weide')
-    list_filter = ('safe_weide',)
+    list_display = ('__str__', 'chiro', 'last_safety_location')
     search_fields = ('name', 'number', 'chiro')
     fields = (
         'direction',
@@ -90,14 +94,20 @@ class TeamAdmin(admin.ModelAdmin[Team]):
         'name',
         'chiro',
         'tracker',
-        'safe_weide',
-        'safe_weide_updated_at',
+        'last_safety_location',
         'checkpoints',
     )
-    readonly_fields = ('checkpoints', 'safe_weide_updated_at')
+    readonly_fields = ('checkpoints', 'last_safety_location')
 
     @admin.display()
     def checkpoints(self, obj: Team) -> str:
         url = f'{reverse("admin:tracing_checkpointlog_changelist")}?team={obj.pk}'
         nb_checkpoints = obj.checkpointlogs.count()
-        return format_html(f'<a href={url}>{nb_checkpoints} checkpoints</a>')
+        return format_html('<a href="{}">{} checkpoints</a>', url, nb_checkpoints)
+
+    @admin.display()
+    def last_safety_location(self, obj: Team) -> str:
+        latest_log = obj.team_safety_logs.order_by('-created').first()
+        if latest_log:
+            return latest_log.location or '-'
+        return '-'

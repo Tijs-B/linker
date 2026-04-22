@@ -54,6 +54,13 @@ class BasicTeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, s
     name = serializers.SerializerMethodField('return_empty')
     chiro = serializers.SerializerMethodField('return_empty')
     code = serializers.SerializerMethodField('return_empty')
+    last_safety_location = serializers.CharField(required=False, default=None, allow_null=True, allow_blank=True)
+    last_safety_location_updated_at = serializers.DateTimeField(
+        read_only=True, required=False, default=None, allow_null=True
+    )
+    last_safety_location_updated_by = serializers.CharField(
+        read_only=True, required=False, default=None, allow_null=True
+    )
 
     def return_empty(self, obj: Team) -> str:
         return ''
@@ -69,9 +76,9 @@ class BasicTeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, s
             'tracker',
             'contact_persons',
             'team_notes',
-            'safe_weide',
-            'safe_weide_updated_at',
-            'safe_weide_updated_by',
+            'last_safety_location',
+            'last_safety_location_updated_at',
+            'last_safety_location_updated_by',
             'code',
             'fiche',
             'weide',
@@ -87,6 +94,13 @@ class TeamWithNumberSerializer(LocationSerializerMixin, EnumSupportSerializerMix
     name = serializers.SerializerMethodField('return_empty')
     chiro = serializers.SerializerMethodField('return_empty')
     code = serializers.SerializerMethodField('get_code')
+    last_safety_location = serializers.CharField(required=False, default=None, allow_null=True, allow_blank=True)
+    last_safety_location_updated_at = serializers.DateTimeField(
+        read_only=True, required=False, default=None, allow_null=True
+    )
+    last_safety_location_updated_by = serializers.CharField(
+        read_only=True, required=False, default=None, allow_null=True
+    )
 
     def return_empty(self, obj: Team) -> str:
         return ''
@@ -105,9 +119,9 @@ class TeamWithNumberSerializer(LocationSerializerMixin, EnumSupportSerializerMix
             'tracker',
             'contact_persons',
             'team_notes',
-            'safe_weide',
-            'safe_weide_updated_at',
-            'safe_weide_updated_by',
+            'last_safety_location',
+            'last_safety_location_updated_at',
+            'last_safety_location_updated_by',
             'code',
             'fiche',
             'weide',
@@ -123,7 +137,13 @@ class TeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, serial
     contact_persons = ContactPersonSerializer(many=True)
     team_notes = TeamNoteSerializer(many=True)
     code = serializers.SerializerMethodField('get_code')
-    safe_weide_updated_by: serializers.StringRelatedField[Team] = serializers.StringRelatedField(read_only=True)
+    last_safety_location = serializers.CharField(required=False, default=None, allow_null=True, allow_blank=True)
+    last_safety_location_updated_at = serializers.DateTimeField(
+        read_only=True, required=False, default=None, allow_null=True
+    )
+    last_safety_location_updated_by = serializers.CharField(
+        read_only=True, required=False, default=None, allow_null=True
+    )
 
     def get_code(self, obj: Team) -> str:
         return f'{obj.number:02d}'
@@ -139,9 +159,9 @@ class TeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, serial
             'tracker',
             'contact_persons',
             'team_notes',
-            'safe_weide',
-            'safe_weide_updated_at',
-            'safe_weide_updated_by',
+            'last_safety_location',
+            'last_safety_location_updated_at',
+            'last_safety_location_updated_by',
             'code',
             'fiche',
             'weide',
@@ -151,4 +171,4 @@ class TeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, serial
             'last_position_point',
             'last_position_timestamp',
         ]
-        read_only_fields = ['safe_weide_updated_at']
+        read_only_fields = ['last_safety_location_updated_at', 'last_safety_location_updated_by']

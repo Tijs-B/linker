@@ -18,7 +18,7 @@ export default function SafeSelector({ team }: SafeSelectorProps) {
   const onChange = useCallback(
     (_e: SyntheticEvent, value: string | null) => {
       const safeWeide = !value || value === 'Unsafe' ? '' : value;
-      updateTeam({ id: team.id, safe_weide: safeWeide });
+      updateTeam({ id: team.id, last_safety_location: safeWeide });
     },
     [team, updateTeam],
   );
@@ -32,7 +32,7 @@ export default function SafeSelector({ team }: SafeSelectorProps) {
   }, [weides]);
 
   if (!weides || !user || !user.permissions.includes('change_team')) {
-    return team.safe_weide || 'Unsafe';
+    return team.last_safety_location || 'Unsafe';
   }
 
   return (
@@ -40,7 +40,7 @@ export default function SafeSelector({ team }: SafeSelectorProps) {
       <Autocomplete
         freeSolo
         options={options}
-        value={team.safe_weide || 'Unsafe'}
+        value={team.last_safety_location || 'Unsafe'}
         onChange={onChange}
         renderInput={(params) => <TextField {...params} hiddenLabel size="small" />}
         selectOnFocus

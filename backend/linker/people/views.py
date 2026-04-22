@@ -5,10 +5,9 @@ from typing import Any
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Permission
 from django.contrib.gis.measure import D
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.utils.timezone import now
 from django.views import View
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -80,22 +79,22 @@ class TeamViewSet(viewsets.ModelViewSet[Team]):
                 Prefetch('team_notes', queryset=team_note_inner_queryset),
                 Prefetch('contact_persons', queryset=contact_person_inner_queryset),
             )
-            .select_related('safe_weide_updated_by')
+            .with_last_safety_location()
             .with_last_location()
             .with_last_position_timestamp()
             .order_by('number')
         )
 
         if not self.request.user.has_perm('people.view_all_teams'):
-            queryset = queryset.filter(safe_weide='')
+            queryset = queryset.filter(Q(last_safety_location='') | Q(last_safety_location__isnull=True))
 
         return queryset
 
     def perform_update(self, serializer: BaseSerializer[Team]) -> None:
-        if serializer.validated_data.get('safe_weide'):
-            serializer.save(safe_weide_updated_at=now(), safe_weide_updated_by=self.request.user)
-        else:
-            serializer.save()
+        location = serializer.validated_data.pop('last_safety_location', None)
+        team = serializer.save()
+        if location is not None:
+            team.team_safety_logs.create(created_by=self.request.user, location=location)
 
     @action(detail=True, methods=['get'], permission_classes=(IsAuthenticated, CanViewPositions))
     def track(self, request: HttpRequest, pk: int | None = None) -> HttpResponse:
