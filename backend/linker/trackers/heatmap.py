@@ -21,6 +21,13 @@ FROM (
         trackers_position.team_id IS NOT NULL
         AND (%s IS NULL OR ST_DistanceSphere(trackers_position.point, %s::geometry) < %s)
         AND ST_DistanceSphere(trackers_position.point, %s::geometry) > %s
+        AND COALESCE((
+            SELECT location FROM people_teamsafetylog
+            WHERE team_id = trackers_position.team_id
+            AND created <= trackers_position.timestamp
+            ORDER BY created DESC
+            LIMIT 1
+        ), '') = ''
     )
     GROUP BY trackers_position.team_id
 ) as f;

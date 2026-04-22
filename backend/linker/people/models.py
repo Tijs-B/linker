@@ -162,8 +162,15 @@ class Team(models.Model):
                 WHERE (
                     trackers_position.team_id = %s
                     AND (%s IS NULL OR ST_DistanceSphere(trackers_position.point, %s::geometry) < %s)
+                    AND COALESCE((
+                        SELECT location FROM people_teamsafetylog
+                        WHERE team_id = %s
+                        AND created <= trackers_position.timestamp
+                        ORDER BY created DESC
+                        LIMIT 1
+                    ), '') = ''
                 )""",
-                [self.id, tocht_centroid_ewkb, tocht_centroid_ewkb, GEBIED_MAX_DISTANCE],
+                [self.id, tocht_centroid_ewkb, tocht_centroid_ewkb, GEBIED_MAX_DISTANCE, self.id],
             )
             row = cursor.fetchone()
         return row[0]  # type: ignore[no-any-return]
@@ -174,6 +181,9 @@ class TeamSafetyLog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     location = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        indexes = [models.Index(fields=['team', '-created'])]
 
     def __str__(self) -> str:
         return f'{self.team}: {self.location} at {self.created}'

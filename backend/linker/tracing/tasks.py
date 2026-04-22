@@ -3,12 +3,12 @@ from logging import getLogger
 
 from celery import shared_task
 from django.contrib.gis.measure import D
-from django.db.models import Exists, OuterRef, Q
+from django.db.models import Exists, OuterRef, Q, Subquery
 from django.utils.timezone import now
 
 from linker.config.models import Switch
 from linker.map.models import ForbiddenArea, Tocht
-from linker.people.models import Team
+from linker.people.models import Team, TeamSafetyLog
 from linker.tracing.constants import (
     SWITCH_TRACE_TEAMS,
     TRACKER_FAR_AWAY_METERS,
@@ -36,7 +36,10 @@ def tracker_offline_notifications() -> None:
     # Find offline trackers
     cutoff = now() - timedelta(minutes=TRACKER_OFFLINE_MINUTES)
     offline_trackers = Tracker.objects.filter(
-        team__isnull=False, team__in=Team.objects.with_last_safety_location().filter(Q(last_safety_location='') | Q(last_safety_location__isnull=True))
+        team__isnull=False,
+        team__in=Team.objects.with_last_safety_location().filter(
+            Q(last_safety_location='') | Q(last_safety_location__isnull=True)
+        ),
     ).filter(Q(last_log__isnull=True) | Q(last_log__gps_datetime__lte=cutoff))
 
     # Add notifications for offline trackers
@@ -83,12 +86,24 @@ def tracker_battery_notifications() -> None:
 
 @shared_task
 def tracker_far_away_notifications() -> None:
-    teams_far_away = Position.objects.filter(
-        ~Exists(Tocht.objects.filter(route__distance_lte=(OuterRef('point'), D(m=TRACKER_FAR_AWAY_METERS)))),
-        timestamp__gte=now() - timedelta(minutes=10),
-        team__isnull=False,
-        team__in=Team.objects.with_last_safety_location().filter(Q(last_safety_location='') | Q(last_safety_location__isnull=True)),
-    ).values_list('team_id', flat=True)
+    safety_location_subquery = Subquery(
+        TeamSafetyLog.objects.filter(
+            team=OuterRef('team'),
+            created__lte=OuterRef('timestamp'),
+        )
+        .order_by('-created')
+        .values('location')[:1]
+    )
+    teams_far_away = (
+        Position.objects.annotate(team_safe_at_time=safety_location_subquery)
+        .filter(
+            ~Exists(Tocht.objects.filter(route__distance_lte=(OuterRef('point'), D(m=TRACKER_FAR_AWAY_METERS)))),
+            Q(team_safe_at_time='') | Q(team_safe_at_time__isnull=True),
+            timestamp__gte=now() - timedelta(minutes=10),
+            team__isnull=False,
+        )
+        .values_list('team_id', flat=True)
+    )
 
     for team_id in teams_far_away:
         Notification.objects.get_or_create(notification_type=NotificationType.TRACKER_FAR_AWAY, team_id=team_id)
@@ -113,11 +128,20 @@ def tracker_forbidden_area_notifications() -> None:
         )
     )
 
+    safety_location_subquery = Subquery(
+        TeamSafetyLog.objects.filter(
+            team=OuterRef('team'),
+            created__lte=OuterRef('timestamp'),
+        )
+        .order_by('-created')
+        .values('location')[:1]
+    )
     team_ids = set(
-        Position.objects.filter(
+        Position.objects.annotate(team_safe_at_time=safety_location_subquery)
+        .filter(
             in_forbidden_area_route_not_allowed | (in_forbidden_area_route_allowed & ~close_to_route),
+            Q(team_safe_at_time='') | Q(team_safe_at_time__isnull=True),
             team__isnull=False,
-            team__in=Team.objects.with_last_safety_location().filter(Q(last_safety_location='') | Q(last_safety_location__isnull=True)),
         )
         .values_list('team_id', flat=True)
         .distinct()

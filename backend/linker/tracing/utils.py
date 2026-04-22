@@ -5,7 +5,7 @@ from django.contrib.gis.measure import D
 from django.db.models import OuterRef, Q, Subquery
 
 from linker.map.models import Fiche
-from linker.people.models import Team
+from linker.people.models import Team, TeamSafetyLog
 from linker.tracing.constants import FICHE_MAX_DISTANCE
 from linker.tracing.models import CheckpointLog
 from linker.trackers.models import Position
@@ -21,8 +21,20 @@ def trace_team(team: Team) -> None:
         ).values('pk')[:1]
     )
 
-    # TODO: filter "is_safe" out of these positions
-    positions = Position.objects.filter(team=team)
+    positions = (
+        Position.objects.filter(team=team)
+        .annotate(
+            team_safe_at_time=Subquery(
+                TeamSafetyLog.objects.filter(
+                    team=team,
+                    created__lte=OuterRef('timestamp'),
+                )
+                .order_by('-created')
+                .values('location')[:1]
+            )
+        )
+        .filter(Q(team_safe_at_time='') | Q(team_safe_at_time__isnull=True))
+    )
     try:
         last_checkpoint = team.checkpointlogs.latest('left')
     except CheckpointLog.DoesNotExist:
