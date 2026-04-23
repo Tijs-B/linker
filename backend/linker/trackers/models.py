@@ -67,7 +67,11 @@ class Position(models.Model):
                     | Q(team__isnull=True, organization_member__isnull=False)
                 ),
                 name='position_exactly_one_owner',
-            )
+            ),
+            models.UniqueConstraint(
+                fields=['timestamp', 'source', 'team', 'organization_member'],
+                name='position_unique_timestamp_source_owner',
+            ),
         ]
         indexes = [
             models.Index(fields=['team', 'timestamp']),
