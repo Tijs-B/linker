@@ -1,5 +1,4 @@
 from json import loads
-from logging import getLogger
 from typing import Any
 
 from django.contrib.auth import authenticate, login, logout
@@ -28,8 +27,6 @@ from .serializers import (
     TeamWithNumberSerializer,
 )
 
-logger = getLogger(__name__)
-
 
 def positions_response(queryset) -> HttpResponse:
     tocht_centroid = Tocht.centroid()
@@ -57,7 +54,6 @@ class TeamViewSet(viewsets.ModelViewSet[Team]):
         if self.request.user.has_perm('people.view_team_details') and self.request.user.has_perm(
             'people.view_team_number'
         ):
-            logger.info('YEAH BOI')
             return TeamSerializer
         elif self.request.user.has_perm('people.view_team_number'):
             return TeamWithNumberSerializer
