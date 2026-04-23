@@ -87,6 +87,7 @@ class BasicTeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, s
             'forbidden_area',
             'last_position_point',
             'last_position_timestamp',
+            'is_online',
         ]
 
 
@@ -130,6 +131,7 @@ class TeamWithNumberSerializer(LocationSerializerMixin, EnumSupportSerializerMix
             'forbidden_area',
             'last_position_point',
             'last_position_timestamp',
+            'is_online',
         ]
 
 
@@ -170,5 +172,6 @@ class TeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, serial
             'forbidden_area',
             'last_position_point',
             'last_position_timestamp',
+            'is_online',
         ]
         read_only_fields = ['last_safety_location_updated_at', 'last_safety_location_updated_by']
