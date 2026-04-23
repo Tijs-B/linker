@@ -54,10 +54,11 @@ const NotificationRow = ({
 
   const onClick = useCallback(() => {
     const item = items[index];
-    if (!item.team || !item.member) {
+    const teamOrMember = item.team || item.member;
+    if (!teamOrMember) {
       return;
     }
-    onItemClick(item.team || item.member);
+    onItemClick(teamOrMember);
   }, [items, index]);
 
   const onMarkThisAsRead = useCallback(() => {
