@@ -5,7 +5,7 @@ services:
     build:
       context: .
       target: backend
-    command: gunicorn linker.wsgi -w 4 --bind 0.0.0.0:8000 --chdir=/app
+    command: gunicorn linker.wsgi -w 9 --bind 0.0.0.0:8000 --chdir=/app
     depends_on:
       - postgis
       - redis
@@ -29,7 +29,7 @@ services:
     build:
       context: .
       target: backend
-    command: celery -A linker worker -l INFO --concurrency=4
+    command: celery -A linker worker -l INFO --concurrency=8
     depends_on:
       - postgis
       - redis
@@ -79,6 +79,8 @@ services:
       - POSTGRES_DB=linker
       - POSTGRES_USER=root
       - POSTGRES_PASS=pass
+      - MAINTENANCE_WORK_MEM=256MB
+      - EXTRA_CONF=shared_buffers = 2GB\nwork_mem = 32MB\neffective_cache_size = 6GB\nrandom_page_cost = 1.1\neffective_io_concurrency = 200\ncheckpoint_completion_target = 0.9\nwal_buffers = 16MB\nmax_parallel_workers_per_gather = 2
     volumes:
       - postgis-data:/var/lib/postgresql
     networks:
