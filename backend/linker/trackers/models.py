@@ -71,6 +71,7 @@ class Position(models.Model):
             models.UniqueConstraint(
                 fields=['timestamp', 'source', 'team', 'organization_member'],
                 name='position_unique_timestamp_source_owner',
+                nulls_distinct=False,
             ),
         ]
         indexes = [
