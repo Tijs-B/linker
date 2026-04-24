@@ -12,6 +12,7 @@ export enum MemberType {
   HANDIGE_HARRY = 'Handige Harry',
   WEIDE = 'Weide',
   BUS = 'Bus',
+  BASISBITCH = 'Basisbitch',
 }
 
 export enum TrackerLogSource {
