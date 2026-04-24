@@ -1,4 +1,4 @@
-import { blue, brown, green, indigo, lightGreen, orange, purple, red, pink } from '@mui/material/colors';
+import { blue, brown, green, indigo, lightGreen, orange, purple, red } from '@mui/material/colors';
 
 import type { OrganizationMember, Team } from '../services/types.ts';
 import { Direction } from '../services/types.ts';
@@ -22,7 +22,7 @@ export function memberColor(member: OrganizationMember): string | null {
     case 'Bus':
       return brown[500];
     case 'Basisbitch':
-      return pink[500];
+      return '#ff6ec7';
     default:
       console.error(`Unexpected organization member type ${member.member_type}`);
       return null;
