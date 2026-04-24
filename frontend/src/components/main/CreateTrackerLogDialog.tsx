@@ -18,7 +18,6 @@ import {
   selectSelectedItem,
   selectSelectedMember,
   selectSelectedTeam,
-  selectSelectedTracker,
   useAppSelector,
 } from '../../store';
 
@@ -31,7 +30,6 @@ export default function CreateTrackerLogDialog({
   position,
   onComplete,
 }: CreateTrackerLogDialogProps) {
-  const selectedTracker = useAppSelector(selectSelectedTracker);
   const selectedItem = useAppSelector(selectSelectedItem);
   const selectedTeam = useAppSelector(selectSelectedTeam);
   const selectedMember = useAppSelector(selectSelectedMember);
@@ -73,7 +71,7 @@ export default function CreateTrackerLogDialog({
     });
   }, [position, selectedTeam, selectedMember, onComplete, createPosition, dateTime]);
 
-  if (selectedTracker === null || selectedItem === null) {
+  if (selectedItem === null) {
     return null;
   }
 
@@ -82,8 +80,7 @@ export default function CreateTrackerLogDialog({
       <DialogTitle>Manuele tracker-update</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Je staat op het punt tracker <code>{selectedTracker.tracker_name}</code>, gebruikt door{' '}
-          {selectedItem.name}, te verplaatsen.
+          Je staat op het punt om {selectedItem.name} te verplaatsen.
         </DialogContentText>
         <TextField
           autoFocus
