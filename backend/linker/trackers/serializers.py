@@ -39,7 +39,7 @@ class TrackerSerializer(serializers.ModelSerializer[Tracker]):
     battery_percentage = serializers.SerializerMethodField()
 
     def get_battery_percentage(self, obj: Tracker) -> int | None:
-        if getattr(obj, 'avg_voltage') is None:
+        if getattr(obj, 'avg_voltage', None) is None:
             return None
         v_min, v_max = TRACKER_VOLTAGE_RANGE
         value = round(100 * (obj.avg_voltage - v_min) / (v_max - v_min))
