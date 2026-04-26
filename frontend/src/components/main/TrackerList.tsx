@@ -54,10 +54,10 @@ const TrackerRow = ({ items, index, style, onItemClick, weideSlotweide }: RowCom
       return <Chip color="warning" variant="outlined" icon={<DirectionsBusIcon />} label="Bus" />;
     }
     const slotweide = weideSlotweide.get(item.last_safety_location.trim());
-    if (slotweide !== undefined) {
-      return <Chip color={slotweide ? 'primary' : 'warning'} variant="filled" label={`Safe op ${item.last_safety_location}`} />;
+    if (slotweide === true) {
+      return <Chip color="primary" variant="filled" label={`Safe op ${item.last_safety_location}`} />;
     }
-    return <Chip color="primary" variant="filled" label={`Safe op ${item.last_safety_location}`} />;
+    return <Chip color="warning" variant="filled" label={`Maybe op ${item.last_safety_location}`} />;
   }, [items, index, weideSlotweide]);
 
   const offlineIcon = useMemo(() => {
