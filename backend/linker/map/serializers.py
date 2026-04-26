@@ -22,7 +22,7 @@ class FicheSerializer(serializers.ModelSerializer[Fiche]):
 class WeideSerializer(serializers.ModelSerializer[Weide]):
     class Meta:
         model = Weide
-        fields = ['id', 'identifier', 'name', 'polygon', 'tocht']
+        fields = ['id', 'identifier', 'name', 'polygon', 'tocht', 'slotweide']
         read_only_fields = fields
 
 

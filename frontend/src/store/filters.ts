@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit';
 
 interface FilterState {
   showMembers: boolean;
-  showSafe: boolean;
+  showMaybe: boolean;
+  showSlotweide: boolean;
   showBus: boolean;
   showRed: boolean;
   showBlue: boolean;
@@ -10,7 +11,8 @@ interface FilterState {
 
 const initialState: FilterState = {
   showMembers: true,
-  showSafe: true,
+  showMaybe: true,
+  showSlotweide: true,
   showBus: true,
   showRed: true,
   showBlue: true,
@@ -23,8 +25,11 @@ const { reducer, actions } = createSlice({
     toggleShowMembers: (state) => {
       state.showMembers = !state.showMembers;
     },
-    toggleShowSafe: (state) => {
-      state.showSafe = !state.showSafe;
+    toggleShowMaybe: (state) => {
+      state.showMaybe = !state.showMaybe;
+    },
+    toggleShowSlotweide: (state) => {
+      state.showSlotweide = !state.showSlotweide;
     },
     toggleShowBus: (state) => {
       state.showBus = !state.showBus;

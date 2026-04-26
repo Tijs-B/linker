@@ -49,7 +49,8 @@ export default function MainToolbar({
 }: MainToolbarProps) {
   const theme = useTheme();
 
-  const showSafe = useAppSelector((state) => state.filter.showSafe);
+  const showMaybe = useAppSelector((state) => state.filter.showMaybe);
+  const showSlotweide = useAppSelector((state) => state.filter.showSlotweide);
   const showBus = useAppSelector((state) => state.filter.showBus);
   const showMembers = useAppSelector((state) => state.filter.showMembers);
   const showRed = useAppSelector((state) => state.filter.showRed);
@@ -109,9 +110,13 @@ export default function MainToolbar({
         open={Boolean(menuAnchorEl)}
         onClose={() => setMenuAnchorEl(null)}
       >
-        <MenuItem onClick={() => dispatch(filterActions.toggleShowSafe())}>
-          <ListItemIcon>{showSafe && <CheckIcon />}</ListItemIcon>
-          Toon safe teams
+        <MenuItem onClick={() => dispatch(filterActions.toggleShowMaybe())}>
+          <ListItemIcon>{showMaybe && <CheckIcon />}</ListItemIcon>
+          Toon maybe teams
+        </MenuItem>
+        <MenuItem onClick={() => dispatch(filterActions.toggleShowSlotweide())}>
+          <ListItemIcon>{showSlotweide && <CheckIcon />}</ListItemIcon>
+          Toon slotweide teams
         </MenuItem>
         <MenuItem onClick={() => dispatch(filterActions.toggleShowBus())}>
           <ListItemIcon>{showBus && <CheckIcon />}</ListItemIcon>

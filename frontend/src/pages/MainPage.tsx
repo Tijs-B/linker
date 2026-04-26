@@ -25,6 +25,7 @@ import {
   useGetTeamsQuery,
   useGetTrackersQuery,
   useGetUserQuery,
+  useGetWeidesQuery,
 } from '../services/linker';
 import type { OrganizationMember, Team } from '../services/types.ts';
 import { Direction } from '../services/types.ts';
@@ -49,7 +50,8 @@ export default function MainPage() {
   const dispatch = useAppDispatch();
   const selectedId = useAppSelector((state) => state.trackers.selectedId);
   const showHistory = useAppSelector((state) => state.trackers.showHistory);
-  const showSafe = useAppSelector((state) => state.filter.showSafe);
+  const showMaybe = useAppSelector((state) => state.filter.showMaybe);
+  const showSlotweide = useAppSelector((state) => state.filter.showSlotweide);
   const showBus = useAppSelector((state) => state.filter.showBus);
   const showMembers = useAppSelector((state) => state.filter.showMembers);
   const showRed = useAppSelector((state) => state.filter.showRed);
@@ -84,6 +86,7 @@ export default function MainPage() {
     pollingInterval: 5_000,
     skipPollingIfUnfocused: true,
   });
+  const { data: weides } = useGetWeidesQuery();
 
   // Check query error for network errors
   useEffect(() => {
@@ -165,25 +168,30 @@ export default function MainPage() {
     }
   }, [organizationMembers]);
 
+  const weideSlotweide = useMemo(
+    () => new Map(weides ? Object.values(weides.entities).map((w) => [w.name, w.slotweide]) : []),
+    [weides],
+  );
+
   const filteredTeams: Team[] = useMemo(() => {
     if (teamFuse && keyword) {
       return teamFuse.search(keyword).map((item) => item.item);
     } else if (teams) {
       return teams.ids
         .map((id) => teams.entities[id])
-        .filter(
-          (team) =>
-            showSafe ||
-            !team.last_safety_location ||
-            team.last_safety_location.trim().toLowerCase() === 'bus',
-        )
-        .filter((team) => showBus || team.last_safety_location.trim().toLowerCase() !== 'bus')
+        .filter((team) => {
+          const loc = team.last_safety_location?.trim();
+          if (!loc) return true;
+          if (loc.toLowerCase() === 'bus') return showBus && showMaybe;
+          const isSlotweide = weideSlotweide.get(loc) === true;
+          return isSlotweide ? showSlotweide : showMaybe;
+        })
         .filter((team) => showRed || team.direction !== Direction.RED)
         .filter((team) => showBlue || team.direction !== Direction.BLUE);
     } else {
       return [];
     }
-  }, [teamFuse, keyword, teams, showSafe, showBus, showRed, showBlue]);
+  }, [teamFuse, keyword, teams, weideSlotweide, showMaybe, showSlotweide, showBus, showRed, showBlue]);
 
   const filteredMembers = useMemo(() => {
     if (!showMembers) {

@@ -96,7 +96,8 @@ export const selectSelectedTracker = createSelector(
 export const selectFilterActive = createSelector([(state: RootState) => state.filter], (filter) => {
   return (
     !filter.showMembers ||
-    !filter.showSafe ||
+    !filter.showMaybe ||
+    !filter.showSlotweide ||
     !filter.showBus ||
     !filter.showRed ||
     !filter.showBlue

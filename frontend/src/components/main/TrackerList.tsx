@@ -28,9 +28,10 @@ type TrackerRowDataItem = (OrganizationMember | Team) & {
 interface TrackerRowProps {
   items: TrackerRowDataItem[];
   onItemClick: (item: Team | OrganizationMember) => void;
+  weideSlotweide: Map<string, boolean>;
 }
 
-const TrackerRow = ({ items, index, style, onItemClick }: RowComponentProps<TrackerRowProps>) => {
+const TrackerRow = ({ items, index, style, onItemClick, weideSlotweide }: RowComponentProps<TrackerRowProps>) => {
   const item = items[index];
   const dispatch = useAppDispatch();
 
@@ -52,8 +53,12 @@ const TrackerRow = ({ items, index, style, onItemClick }: RowComponentProps<Trac
     if (item.last_safety_location.trim().toLowerCase() === 'bus') {
       return <Chip color="warning" variant="outlined" icon={<DirectionsBusIcon />} label="Bus" />;
     }
+    const slotweide = weideSlotweide.get(item.last_safety_location.trim());
+    if (slotweide !== undefined) {
+      return <Chip color={slotweide ? 'primary' : 'warning'} variant="filled" label={`Safe op ${item.last_safety_location}`} />;
+    }
     return <Chip color="primary" variant="filled" label={`Safe op ${item.last_safety_location}`} />;
-  }, [items, index]);
+  }, [items, index, weideSlotweide]);
 
   const offlineIcon = useMemo(() => {
     const item = items[index];
@@ -143,12 +148,17 @@ export default function TrackerList({ members, teams, onItemClick }: TrackerList
     });
   }, [user, teams, members, fiches, tochten, weides, basis, forbiddenAreas, trackers]);
 
+  const weideSlotweide = useMemo(
+    () => new Map(weides ? Object.values(weides.entities).map((w) => [w.name, w.slotweide]) : []),
+    [weides],
+  );
+
   return (
     <List
       rowCount={items.length}
       rowComponent={TrackerRow}
       rowHeight={60}
-      rowProps={{ items, onItemClick }}
+      rowProps={{ items, onItemClick, weideSlotweide }}
     />
   );
 }

@@ -32,6 +32,7 @@ class Weide(models.Model):
     name = models.CharField(max_length=20)
     tocht = models.OneToOneField(Tocht, null=True, blank=True, on_delete=models.SET_NULL)
     polygon = models.PolygonField()
+    slotweide = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f'Weide {self.identifier}'

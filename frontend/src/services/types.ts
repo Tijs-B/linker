@@ -138,6 +138,7 @@ export interface Weide {
   name: string;
   tocht: number | null;
   polygon: Polygon;
+  slotweide: boolean;
 }
 
 export interface Zijweg {
