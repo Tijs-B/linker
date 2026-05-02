@@ -20,6 +20,7 @@ import StatsTable from '../components/tracing/StatsTable.jsx';
 import TeamsTable from '../components/tracing/TeamsTable.jsx';
 import TochtenTable from '../components/tracing/TochtenTable.jsx';
 import TrackersTable from '../components/tracing/TrackersTable.tsx';
+import WeideGraph from '../components/tracing/WeideGraph.tsx';
 import {
   useGetCheckpointLogsQuery,
   useGetFichesQuery,
@@ -82,6 +83,7 @@ export default function TracingPage() {
         />
         <Tabs value={currentTab} onChange={onTabChange}>
           <Tab value="tochten" label="tochten" />
+          <Tab value="weides" label="weides" />
           <Tab value="teams" label="teams" />
           <Tab value="trackers" label="trackers" />
           <Tab value="fiches" label="den hele excel" />
@@ -90,6 +92,12 @@ export default function TracingPage() {
           <Box>
             <h2>Tochten</h2>
             <TochtenTable stats={stats} tochten={tochten} fiches={fiches} showFull={showFull} />
+          </Box>
+        )}
+        {currentTab === 'weides' && tochten && weides && stats && (
+          <Box>
+            <h2>Weides</h2>
+            <WeideGraph tochten={tochten} weides={weides} stats={stats} showFull={showFull} />
           </Box>
         )}
         {currentTab === 'teams' &&
