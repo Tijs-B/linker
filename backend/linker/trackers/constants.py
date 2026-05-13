@@ -24,3 +24,4 @@ class PositionSource(StrEnum):
     MINISITE_API = 'minisite_api'
     GEODYNAMICS_API = 'geodynamics_api'
     MANUAL = 'manual'
+    PHONE_GPS = 'phone_gps'

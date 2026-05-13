@@ -94,6 +94,7 @@ class TeamAdmin(admin.ModelAdmin[Team]):
         'name',
         'chiro',
         'tracker',
+        'tracker_token',
         'last_safety_location',
         'checkpoints',
     )

@@ -10,6 +10,8 @@ from linker.people.models import OrganizationMember, Team
 from .constants import TRACKER_VOLTAGE_RANGE, PositionSource
 from .models import Position, Tracker
 
+PHONE_GPS_TIMESTAMP_TOLERANCE_MINUTES = 5
+
 
 class PositionSerializer(serializers.ModelSerializer[Position]):
     id = serializers.IntegerField(read_only=True)
@@ -32,6 +34,33 @@ class PositionSerializer(serializers.ModelSerializer[Position]):
     class Meta:
         model = Position
         fields = ['id', 'timestamp', 'point', 'source', 'organization_member', 'team']
+
+
+class PhoneGpsPositionSerializer(serializers.Serializer[Position]):
+    token = serializers.CharField(write_only=True)
+    timestamp = serializers.DateTimeField()
+    point = GeometryField(precision=6)
+
+    def validate_timestamp(self, value: Any) -> Any:
+        delta = abs((now() - value).total_seconds())
+        if delta > PHONE_GPS_TIMESTAMP_TOLERANCE_MINUTES * 60:
+            raise serializers.ValidationError('Timestamp must be within 5 minutes of now.')
+        return value
+
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        try:
+            data['team'] = Team.objects.get(tracker_token=data['token'])
+        except Team.DoesNotExist:
+            raise serializers.ValidationError({'token': 'Invalid token.'})
+        return data
+
+    def create(self, validated_data: dict[str, Any]) -> Position:
+        return Position.objects.create(
+            team=validated_data['team'],
+            timestamp=validated_data['timestamp'],
+            point=validated_data['point'],
+            source=PositionSource.PHONE_GPS,
+        )
 
 
 class TrackerSerializer(serializers.ModelSerializer[Tracker]):

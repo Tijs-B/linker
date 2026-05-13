@@ -6,10 +6,11 @@ from django.db.models.expressions import ExpressionWrapper, RawSQL
 from django.db.models.functions import Now
 from django.db.models.query import QuerySet
 from django.http import HttpResponse
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.mixins import CreateModelMixin
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 from rest_framework.views import APIView
 
@@ -17,7 +18,7 @@ from linker.trackers.constants import TRACKER_OFFLINE_MINUTES, PositionSource
 from linker.trackers.heatmap import get_all_tracks
 from linker.trackers.models import Position, Tracker, TrackerLog
 from linker.trackers.permissions import CanViewHeatmap, CanViewPositions
-from linker.trackers.serializers import PositionSerializer, TrackerSerializer
+from linker.trackers.serializers import PhoneGpsPositionSerializer, PositionSerializer, TrackerSerializer
 
 
 class TrackerViewSet(viewsets.ReadOnlyModelViewSet[Tracker]):
@@ -59,6 +60,17 @@ class PositionViewSet(CreateModelMixin, viewsets.GenericViewSet[Position]):
 
     def perform_create(self, serializer: BaseSerializer[Position]) -> None:
         serializer.save(source=PositionSource.MANUAL)
+
+
+class PhoneGpsPositionView(APIView):
+    permission_classes = (AllowAny,)
+    authentication_classes = ()
+
+    def post(self, request: Request) -> Response:
+        serializer = PhoneGpsPositionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class HeatmapView(APIView):

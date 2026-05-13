@@ -1,4 +1,4 @@
-import secrets
+from secrets import token_urlsafe
 
 from django.contrib.auth.models import User
 from django.contrib.gis.measure import D
@@ -137,6 +137,7 @@ class Team(models.Model):
     name = models.CharField(max_length=100)
     chiro = models.CharField(max_length=100)
     tracker = models.OneToOneField(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
+    tracker_token = models.CharField(max_length=64, unique=True, default=lambda: token_urlsafe(32))
 
     objects = TeamQuerySet.as_manager()
 
@@ -199,7 +200,7 @@ class LoginToken(models.Model):
 
     @staticmethod
     def generate_token() -> str:
-        return secrets.token_urlsafe(32)
+        return token_urlsafe(32)
 
 
 class TeamNote(models.Model):

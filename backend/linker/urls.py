@@ -25,7 +25,7 @@ from linker.people.views import (
     UserView,
 )
 from linker.tracing.views import CheckpointLogViewSet, NotificationViewSet, StatsView
-from linker.trackers.views import HeatmapView, PositionViewSet, TrackerViewSet
+from linker.trackers.views import HeatmapView, PhoneGpsPositionView, PositionViewSet, TrackerViewSet
 
 router = routers.DefaultRouter()
 router.register('teams', TeamViewSet, basename='team')
@@ -52,6 +52,7 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/stats/', StatsView.as_view()),
     path('api/heatmap/', HeatmapView.as_view()),
+    path('api/phone-gps/', PhoneGpsPositionView.as_view()),
     path('api/login/', csrf_exempt(LoginView.as_view())),
     path('api/token-login/', csrf_exempt(TokenLoginView.as_view())),
     path('api/logout/', LogoutView.as_view()),

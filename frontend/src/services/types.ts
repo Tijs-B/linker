@@ -51,6 +51,12 @@ export interface Position {
   team: number | null;
 }
 
+export interface CreatePhoneGpsPosition {
+  token: string;
+  timestamp: string;
+  point: Point;
+}
+
 export interface Tracker {
   id: number;
   tracker_id: string;
@@ -97,6 +103,7 @@ export interface Team {
   last_position_point: Point | null;
   last_position_timestamp: string | null;
   is_online: boolean;
+  tracker_url: string | null;
 }
 
 export interface OrganizationMember {
