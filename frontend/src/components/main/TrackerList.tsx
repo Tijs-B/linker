@@ -3,7 +3,8 @@ import { List } from 'react-window';
 import { type RowComponentProps } from 'react-window';
 
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
-import WifiOffIcon from '@mui/icons-material/WifiOff';import { Badge, Chip, ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
+import WifiOffIcon from '@mui/icons-material/WifiOff';
+import { Badge, Chip, ListItem, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 
 import {
   useGetBasisQuery,
@@ -31,7 +32,13 @@ interface TrackerRowProps {
   weideSlotweide: Map<string, boolean>;
 }
 
-const TrackerRow = ({ items, index, style, onItemClick, weideSlotweide }: RowComponentProps<TrackerRowProps>) => {
+const TrackerRow = ({
+  items,
+  index,
+  style,
+  onItemClick,
+  weideSlotweide,
+}: RowComponentProps<TrackerRowProps>) => {
   const item = items[index];
   const dispatch = useAppDispatch();
 
@@ -55,9 +62,13 @@ const TrackerRow = ({ items, index, style, onItemClick, weideSlotweide }: RowCom
     }
     const slotweide = weideSlotweide.get(item.last_safety_location.trim());
     if (slotweide === true) {
-      return <Chip color="primary" variant="filled" label={`Safe op ${item.last_safety_location}`} />;
+      return (
+        <Chip color="primary" variant="filled" label={`Safe op ${item.last_safety_location}`} />
+      );
     }
-    return <Chip color="warning" variant="filled" label={`Maybe op ${item.last_safety_location}`} />;
+    return (
+      <Chip color="warning" variant="filled" label={`Maybe op ${item.last_safety_location}`} />
+    );
   }, [items, index, weideSlotweide]);
 
   const offlineIcon = useMemo(() => {

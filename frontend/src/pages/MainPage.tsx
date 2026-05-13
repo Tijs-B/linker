@@ -191,7 +191,17 @@ export default function MainPage() {
     } else {
       return [];
     }
-  }, [teamFuse, keyword, teams, weideSlotweide, showMaybe, showSlotweide, showBus, showRed, showBlue]);
+  }, [
+    teamFuse,
+    keyword,
+    teams,
+    weideSlotweide,
+    showMaybe,
+    showSlotweide,
+    showBus,
+    showRed,
+    showBlue,
+  ]);
 
   const filteredMembers = useMemo(() => {
     if (!showMembers) {

@@ -5,13 +5,7 @@ import { Layer, Source, useMap } from 'react-map-gl/maplibre';
 import { feature, featureCollection } from '@turf/helpers';
 
 import type { OrganizationMember, Team } from '../../services/types.ts';
-import {
-  selectSelectedItem,
-  selectSelectedTracker,
-  trackersActions,
-  useAppDispatch,
-  useAppSelector,
-} from '../../store';
+import { selectSelectedItem, trackersActions, useAppDispatch, useAppSelector } from '../../store';
 import { itemColor } from '../../theme/colors.ts';
 
 interface TrackerLayerProps {
@@ -29,7 +23,6 @@ export default function TrackerLayer({
 }: TrackerLayerProps) {
   const dispatch = useAppDispatch();
   const selectedItem = useAppSelector(selectSelectedItem);
-  const selectedTracker = useAppSelector(selectSelectedTracker);
   const showHistory = useAppSelector((state) => state.trackers.showHistory);
 
   const historyItem = useAppSelector((state) => state.trackers.historyItem);
@@ -95,7 +88,7 @@ export default function TrackerLayer({
     } else {
       return featureCollection([]);
     }
-  }, [selectedTracker, showHistory]);
+  }, [selectedItem, showHistory]);
 
   return (
     <>
