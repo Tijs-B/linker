@@ -24,7 +24,7 @@ RUN npm run build \
 ###############
 ### BACKEND ###
 ###############
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS backend
+FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim AS backend
 
 # Install the project into `/app`
 WORKDIR /app
