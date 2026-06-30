@@ -11,6 +11,7 @@ services:
       - redis
     volumes:
       - ./simulation-data:/simulation-data:ro
+      - heatmap-data:/heatmap
     environment:
       - ALLOWED_HOSTS=${DOMAIN}
       - CSRF_TRUSTED_ORIGINS=https://${DOMAIN}
@@ -35,6 +36,7 @@ services:
       - redis
     volumes:
       - ./simulation-data:/simulation-data:ro
+      - heatmap-data:/heatmap
     environment:
       - ALLOWED_HOSTS=${DOMAIN}
       - CSRF_TRUSTED_ORIGINS=https://${DOMAIN}
@@ -117,6 +119,7 @@ services:
 
 volumes:
   postgis-data:
+  heatmap-data:
 
 networks:
   caddy:

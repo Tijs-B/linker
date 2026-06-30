@@ -77,9 +77,7 @@ class OrganizationMemberQuerySet(LocationMixin, models.QuerySet):
     def with_last_position_source(self):
         return self.annotate(
             last_position_source=Subquery(
-                Position.objects.filter(organization_member=OuterRef('pk'))
-                .order_by('-timestamp')
-                .values('source')[:1]
+                Position.objects.filter(organization_member=OuterRef('pk')).order_by('-timestamp').values('source')[:1]
             )
         )
 

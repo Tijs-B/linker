@@ -21,6 +21,24 @@ RUN npm run build \
     && find /app/dist -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" -o -name "*.json" -o -name "*.svg" -o -name "*.woff2" \) \
        -exec brotli --best --keep {} \;
 
+###################
+### TIPPECANOE ####
+###################
+FROM debian:bookworm-slim AS tippecanoe
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    build-essential \
+    libsqlite3-dev \
+    zlib1g-dev \
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN git clone --depth 1 --branch 2.79.0 https://github.com/felt/tippecanoe.git /tippecanoe \
+    && cd /tippecanoe \
+    && make -j"$(nproc)" \
+    && make install PREFIX=/usr/local
+
 ###############
 ### BACKEND ###
 ###############
@@ -29,12 +47,17 @@ FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim AS backend
 # Install the project into `/app`
 WORKDIR /app
 
-# Install geodjango dependencies
+# Install geodjango dependencies + tippecanoe runtime deps
 RUN apt-get update && apt-get install --no-install-recommends -y \
     binutils \
     libproj-dev \
     gdal-bin \
+    libsqlite3-0 \
+    zlib1g \
     && rm -rf /var/lib/apt/lists/*
+
+COPY --from=tippecanoe /usr/local/bin/tippecanoe /usr/local/bin/tippecanoe
+COPY --from=tippecanoe /usr/local/bin/tile-join /usr/local/bin/tile-join
 
 # Enable bytecode compilation
 ENV UV_COMPILE_BYTECODE=1

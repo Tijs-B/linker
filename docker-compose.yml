@@ -11,6 +11,7 @@ services:
       - ./simulation-data:/simulation-data:ro
       - ./backend:/app
       - ./media:/media
+      - heatmap-data:/heatmap
       - /app/.venv
     environment:
       - ALLOWED_HOSTS=*
@@ -36,6 +37,7 @@ services:
     volumes:
       - ./simulation-data:/simulation-data:ro
       - ./backend:/app
+      - heatmap-data:/heatmap
     environment:
       - ALLOWED_HOSTS=*
       - DATABASE_URL=postgis://root:pass@postgis:5432/linker
@@ -88,3 +90,4 @@ services:
 
 volumes:
   postgis-data:
+  heatmap-data:

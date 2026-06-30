@@ -120,10 +120,18 @@ export default function BackgroundLayers({
       </Source>
 
       {showHeatmap && (
-        <Source type="geojson" data="/api/heatmap/">
+        // maxzoom must match HEATMAP_MAXZOOM in backend/linker/trackers/heatmap.py so
+        // maplibre overzooms (reuses the deepest tile) instead of requesting tiles
+        // beyond what tippecanoe generated
+        <Source
+          type="vector"
+          tiles={[`${window.location.origin}/api/heatmap/tiles/{z}/{x}/{y}.pbf`]}
+          maxzoom={16}
+        >
           <Layer
             id="heatmap"
             type="line"
+            source-layer="heatmap"
             layout={{ visibility: showHeatmap ? 'visible' : 'none' }}
             paint={{
               'line-color': '#e8380c',

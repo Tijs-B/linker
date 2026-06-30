@@ -1,6 +1,8 @@
+import sqlite3
 from datetime import timedelta
+from pathlib import Path
 
-from django.core.cache import cache
+from django.conf import settings
 from django.db.models import BooleanField, Exists, FloatField, OuterRef
 from django.db.models.expressions import ExpressionWrapper, RawSQL
 from django.db.models.functions import Now
@@ -16,7 +18,6 @@ from rest_framework.views import APIView
 
 from linker.people.models import OrganizationMember, Team
 from linker.trackers.constants import TRACKER_OFFLINE_MINUTES, PositionSource
-from linker.trackers.heatmap import get_all_tracks
 from linker.trackers.models import Position, Tracker, TrackerLog
 from linker.trackers.permissions import CanViewHeatmap, CanViewPositions
 from linker.trackers.serializers import PhoneGpsPositionSerializer, PositionSerializer, TrackerSerializer
@@ -90,11 +91,28 @@ class PhoneGpsPositionView(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-class HeatmapView(APIView):
+class HeatmapTileView(APIView):
     permission_classes = (IsAuthenticated, CanViewHeatmap, CanViewPositions)
 
-    def get(self, request: Request) -> HttpResponse:
-        if not (result := cache.get('heatmap-cache')):
-            result = get_all_tracks()
-            cache.set('heatmap-cache', result, timeout=60)
-        return HttpResponse(result, content_type='application/geo+json')
+    def get(self, request: Request, z: int, x: int, y: int) -> HttpResponse:
+        mbtiles_path = Path(settings.HEATMAP_MBTILES_PATH)
+        if not mbtiles_path.exists():
+            return HttpResponse(status=204)
+
+        tms_row = (2**z - 1) - y
+        connection = sqlite3.connect(f'file:{mbtiles_path}?mode=ro', uri=True)
+        try:
+            cursor = connection.execute(
+                'SELECT tile_data FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ?',
+                (z, x, tms_row),
+            )
+            row = cursor.fetchone()
+        finally:
+            connection.close()
+
+        if row is None:
+            return HttpResponse(status=204)
+
+        response = HttpResponse(row[0], content_type='application/x-protobuf')
+        response['Content-Encoding'] = 'gzip'
+        return response

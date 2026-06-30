@@ -9,6 +9,7 @@ from linker.config.models import Switch
 
 from .constants import SWITCH_FETCH_TRACKERS_API, SWITCH_FETCH_TRACKERS_MINISITE
 from .geodynamics import fetch_geodynamics_api_data, fetch_geodynamics_minisite_data
+from .heatmap import generate_heatmap_mbtiles
 
 logger = getLogger(__name__)
 
@@ -26,3 +27,11 @@ def download_tracker_data_minisite() -> None:
 def download_tracker_data_api() -> None:
     if Switch.switch_is_active(SWITCH_FETCH_TRACKERS_API):
         fetch_geodynamics_api_data()
+
+
+@shared_task
+def regenerate_heatmap_tiles() -> None:
+    with Lock(
+        redis=Redis.from_url(settings.CELERY_BROKER_URL), name='regenerate-heatmap-tiles', blocking=False, timeout=110
+    ):
+        generate_heatmap_mbtiles()
