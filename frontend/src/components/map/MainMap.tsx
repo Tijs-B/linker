@@ -59,10 +59,11 @@ export default function MainMap({
   const [cursor, setCursor] = useState('inherit');
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showSatellite, setShowSatellite] = useState(false);
-  const [iconsAdded, setIconsAdded] = useState(false);
   const [showZijwegen, setShowZijwegen] = useState(false);
 
   const mapRef = useRef<MapRef>(null);
+  const mapLoadedRef = useRef(false);
+  const iconsAddedRef = useRef(false);
   const { data: tochten } = useGetTochtenQuery();
   const { data: teams } = useGetTeamsQuery();
   const { data: members } = useGetOrganizationMembersQuery();
@@ -78,22 +79,25 @@ export default function MainMap({
       : '/tiles/style/outdoor-v8';
 
   const addIcons = useCallback(() => {
-    if (teams && members) {
-      const allItems = [...Object.values(teams.entities), ...Object.values(members.entities)];
-      generateAllIcons(allItems, (name, image) => {
-        if (mapRef.current && !mapRef.current.hasImage(name)) {
-          mapRef.current.addImage(name, image);
-        }
-      });
-    }
-  }, [mapRef, teams, members]);
+    if (!teams || !members || !mapLoadedRef.current || iconsAddedRef.current) return;
+    iconsAddedRef.current = true;
+    const allItems = [...Object.values(teams.entities), ...Object.values(members.entities)];
+    generateAllIcons(allItems, (name, image) => {
+      if (mapRef.current && !mapRef.current.hasImage(name)) {
+        mapRef.current.addImage(name, image);
+      }
+    });
+  }, [teams, members]);
+
+  const onMapLoad = useCallback(() => {
+    mapLoadedRef.current = true;
+    iconsAddedRef.current = false;
+    addIcons();
+  }, [addIcons]);
 
   useEffect(() => {
-    if (teams && members && mapRef && mapRef.current && !iconsAdded) {
-      setIconsAdded(true);
-      addIcons();
-    }
-  }, [iconsAdded, members, teams, mapRef, addIcons]);
+    addIcons();
+  }, [addIcons]);
 
   const onMouseEnter = useCallback(() => {
     if (!creatingMarker) {
@@ -109,23 +113,20 @@ export default function MainMap({
   const onToggleHeatmap = useCallback(() => {
     if (showHeatmap) {
       setShowHeatmap(false);
-      addIcons();
     } else {
       setShowHeatmap(true);
       setShowSatellite(false);
     }
-  }, [showHeatmap, addIcons]);
+  }, [showHeatmap]);
 
   const onToggleSatellite = useCallback(() => {
     if (showSatellite) {
       setShowSatellite(false);
-      addIcons();
     } else {
       setShowSatellite(true);
       setShowHeatmap(false);
-      addIcons();
     }
-  }, [showSatellite, addIcons]);
+  }, [showSatellite]);
 
   const onResetBounds = useCallback(() => {
     if (mapRef.current && tochten) {
@@ -169,7 +170,7 @@ export default function MainMap({
         // maxPitch={85}
         // terrain={{source: 'relief', exaggeration: 2}}
         // fog={{range: [2,12], color: 'white', 'horizon-blend': 0.1}}
-        onLoad={addIcons}
+        onLoad={onMapLoad}
         attributionControl={false}
         reuseMaps
       >
