@@ -21,6 +21,7 @@ class LocationSerializerMixin(metaclass=serializers.SerializerMetaclass):
     forbidden_area = serializers.IntegerField(read_only=True, required=False, default=None, allow_null=True)
     last_position_point = GeometryField(read_only=True, required=False, default=None, allow_null=True)
     last_position_timestamp = serializers.DateTimeField(read_only=True, required=False, default=None, allow_null=True)
+    last_position_source = serializers.CharField(read_only=True, required=False, default=None, allow_null=True)
     is_online = serializers.SerializerMethodField()
 
     def get_is_online(self, obj: Team | OrganizationMember) -> bool:
@@ -101,6 +102,7 @@ class BasicTeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, s
             'forbidden_area',
             'last_position_point',
             'last_position_timestamp',
+            'last_position_source',
             'is_online',
             'tracker_url',
         ]
@@ -153,6 +155,7 @@ class TeamWithNumberSerializer(LocationSerializerMixin, EnumSupportSerializerMix
             'forbidden_area',
             'last_position_point',
             'last_position_timestamp',
+            'last_position_source',
             'is_online',
             'tracker_url',
         ]
@@ -202,6 +205,7 @@ class TeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, serial
             'forbidden_area',
             'last_position_point',
             'last_position_timestamp',
+            'last_position_source',
             'is_online',
             'tracker_url',
         ]

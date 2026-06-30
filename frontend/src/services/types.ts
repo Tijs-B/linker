@@ -102,6 +102,7 @@ export interface Team {
   forbidden_area: number | null;
   last_position_point: Point | null;
   last_position_timestamp: string | null;
+  last_position_source: string | null;
   is_online: boolean;
   tracker_url: string | null;
 }
@@ -120,6 +121,7 @@ export interface OrganizationMember {
   forbidden_area: number | null;
   last_position_point: Point | null;
   last_position_timestamp: string | null;
+  last_position_source: string | null;
   is_online: boolean;
   tracker_url: string | null;
 }

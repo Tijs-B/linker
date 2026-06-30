@@ -78,6 +78,7 @@ class TeamViewSet(viewsets.ModelViewSet[Team]):
             .with_last_safety_location()
             .with_last_location()
             .with_last_position_timestamp()
+            .with_last_position_source()
             .order_by('number')
         )
 
@@ -110,6 +111,7 @@ class OrganizationMemberViewSet(viewsets.ReadOnlyModelViewSet[OrganizationMember
             OrganizationMember.objects.order_by('member_type', 'name')
             .with_last_location()
             .with_last_position_timestamp()
+            .with_last_position_source()
         )
 
     @action(detail=True, methods=['get'], permission_classes=(IsAuthenticated, CanViewPositions))

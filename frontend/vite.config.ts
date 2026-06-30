@@ -1,8 +1,10 @@
+import { readFileSync } from 'node:fs';
 import { resolve } from 'path';
 
 import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { optimize } from 'svgo';
 
 import manifest from './manifest.json';
 
@@ -25,6 +27,17 @@ export default defineConfig(({ mode }) => {
           plugins: [['babel-plugin-react-compiler', ReactCompilerConfig]],
         },
       }),
+      {
+        name: 'svgo-raw',
+        load(id) {
+          if (!id.endsWith('.svg?raw')) return;
+          const src = readFileSync(id.slice(0, -4), 'utf8');
+          const result = optimize(src, {
+            plugins: [{ name: 'preset-default', params: { overrides: { cleanupIds: false } } }],
+          });
+          return `export default ${JSON.stringify(result.data)}`;
+        },
+      },
       {
         name: 'tracker-dev-rewrite',
         configureServer(server) {

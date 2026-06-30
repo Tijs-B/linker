@@ -74,6 +74,15 @@ class OrganizationMemberQuerySet(LocationMixin, models.QuerySet):
             )
         )
 
+    def with_last_position_source(self):
+        return self.annotate(
+            last_position_source=Subquery(
+                Position.objects.filter(organization_member=OuterRef('pk'))
+                .order_by('-timestamp')
+                .values('source')[:1]
+            )
+        )
+
 
 class OrganizationMember(models.Model):
     tracker = models.OneToOneField(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
@@ -118,6 +127,13 @@ class TeamQuerySet(LocationMixin, models.QuerySet):
             last_position_timestamp=Subquery(
                 Position.objects.filter(team=OuterRef('pk')).order_by('-timestamp').values('timestamp')[:1]
             ),
+        )
+
+    def with_last_position_source(self):
+        return self.annotate(
+            last_position_source=Subquery(
+                Position.objects.filter(team=OuterRef('pk')).order_by('-timestamp').values('source')[:1]
+            )
         )
 
     def with_last_safety_location(self):

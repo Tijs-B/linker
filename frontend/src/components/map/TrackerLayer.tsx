@@ -64,8 +64,14 @@ export default function TrackerLayer({
         continue;
       }
 
+      const iconPrefix =
+        item.last_position_source === 'phone_gps'
+          ? 'phone'
+          : item.last_position_source === 'manual'
+            ? 'hand'
+            : 'tracker';
       const props = {
-        image: `tracker-${item.code}-${itemColor(item)}`,
+        image: `${iconPrefix}-${item.code}-${itemColor(item)}`,
         sortKey: selectedItem === item ? 100 : 100 - currentPoint.coordinates[1],
         action:
           'member_type' in item
@@ -76,7 +82,13 @@ export default function TrackerLayer({
       features.push(feature(currentPoint, props));
 
       if (!item.is_online) {
-        offlineFeatures.push(feature(currentPoint));
+        const offlineOutlineImage =
+          item.last_position_source === 'phone_gps'
+            ? 'phone-offline-outline'
+            : item.last_position_source === 'manual'
+              ? 'hand-offline-outline'
+              : 'tracker-offline-outline';
+        offlineFeatures.push(feature(currentPoint, { outlineImage: offlineOutlineImage }));
       }
     }
     return [featureCollection(features), featureCollection(offlineFeatures)];
@@ -84,7 +96,13 @@ export default function TrackerLayer({
 
   const selectedData = useMemo(() => {
     if (!showHistory && selectedItem?.last_position_point) {
-      return featureCollection([feature(selectedItem.last_position_point)]);
+      const outlineImage =
+        selectedItem.last_position_source === 'phone_gps'
+          ? 'phone-outline'
+          : selectedItem.last_position_source === 'manual'
+            ? 'hand-outline'
+            : 'tracker-outline';
+      return featureCollection([feature(selectedItem.last_position_point, { outlineImage })]);
     } else {
       return featureCollection([]);
     }
@@ -100,7 +118,7 @@ export default function TrackerLayer({
           layout={{
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
-            'icon-image': 'tracker-outline',
+            'icon-image': ['get', 'outlineImage'],
             'icon-offset': [0, -16.5 * 2],
             'icon-size': 0.5,
             visibility: visible ? 'visible' : 'none',
@@ -131,7 +149,7 @@ export default function TrackerLayer({
           layout={{
             'icon-allow-overlap': true,
             'icon-ignore-placement': true,
-            'icon-image': 'tracker-offline-outline',
+            'icon-image': ['get', 'outlineImage'],
             'icon-offset': [0, -16.5 * 2],
             'icon-size': 0.5,
             visibility: visible && !showHistory ? 'visible' : 'none',

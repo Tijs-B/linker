@@ -56,8 +56,12 @@
     "eslint-plugin-react-refresh": "^0.4.7",
     "globals": "^16.0.0",
     "prettier": "^3.2.5",
+    "svgo": "^4.0.1",
     "typescript": "^5.4.2",
     "typescript-eslint": "^8.26.1",
     "vite-plugin-pwa": "^1.0.0"
+  },
+  "allowScripts": {
+    "svgo@4.0.1": true
   }
 }
