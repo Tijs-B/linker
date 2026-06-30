@@ -1,4 +1,5 @@
 from datetime import timedelta
+from urllib.parse import urlencode
 
 from django.utils.timezone import now
 from enumfields.drf import EnumSupportSerializerMixin
@@ -37,6 +38,14 @@ class ContactPersonSerializer(serializers.ModelSerializer[ContactPerson]):
 class OrganizationMemberSerializer(
     LocationSerializerMixin, EnumSupportSerializerMixin, serializers.ModelSerializer[OrganizationMember]
 ):  # type: ignore[misc]
+    tracker_url = serializers.SerializerMethodField()
+
+    def get_tracker_url(self, obj: OrganizationMember) -> str | None:
+        if not obj.tracker_token:
+            return None
+        request = self.context['request']
+        return request.build_absolute_uri(f'/tracker?{urlencode({"token": obj.tracker_token})}')
+
     class Meta:
         model = OrganizationMember
         fields = '__all__'
@@ -62,8 +71,13 @@ class BasicTeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, s
         read_only=True, required=False, default=None, allow_null=True
     )
 
+    tracker_url = serializers.SerializerMethodField()
+
     def return_empty(self, obj: Team) -> str:
         return ''
+
+    def get_tracker_url(self, obj: Team) -> None:
+        return None
 
     class Meta:
         model = Team
@@ -88,6 +102,7 @@ class BasicTeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, s
             'last_position_point',
             'last_position_timestamp',
             'is_online',
+            'tracker_url',
         ]
 
 
@@ -102,12 +117,19 @@ class TeamWithNumberSerializer(LocationSerializerMixin, EnumSupportSerializerMix
     last_safety_location_updated_by = serializers.CharField(
         read_only=True, required=False, default=None, allow_null=True
     )
+    tracker_url = serializers.SerializerMethodField()
 
     def return_empty(self, obj: Team) -> str:
         return ''
 
     def get_code(self, obj: Team) -> str:
         return f'{obj.number:02d}'
+
+    def get_tracker_url(self, obj: Team) -> str | None:
+        if not obj.tracker_token:
+            return None
+        request = self.context['request']
+        return request.build_absolute_uri(f'/tracker?{urlencode({"token": obj.tracker_token})}')
 
     class Meta:
         model = Team
@@ -132,6 +154,7 @@ class TeamWithNumberSerializer(LocationSerializerMixin, EnumSupportSerializerMix
             'last_position_point',
             'last_position_timestamp',
             'is_online',
+            'tracker_url',
         ]
 
 
@@ -146,9 +169,16 @@ class TeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, serial
     last_safety_location_updated_by = serializers.CharField(
         read_only=True, required=False, default=None, allow_null=True
     )
+    tracker_url = serializers.SerializerMethodField()
 
     def get_code(self, obj: Team) -> str:
         return f'{obj.number:02d}'
+
+    def get_tracker_url(self, obj: Team) -> str | None:
+        if not obj.tracker_token:
+            return None
+        request = self.context['request']
+        return request.build_absolute_uri(f'/tracker?{urlencode({"token": obj.tracker_token})}')
 
     class Meta:
         model = Team
@@ -173,5 +203,6 @@ class TeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, serial
             'last_position_point',
             'last_position_timestamp',
             'is_online',
+            'tracker_url',
         ]
         read_only_fields = ['last_safety_location_updated_at', 'last_safety_location_updated_by']

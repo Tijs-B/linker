@@ -38,6 +38,7 @@ class OrganizationMemberAdmin(admin.ModelAdmin[OrganizationMember]):
     list_display = ('__str__', 'code')
     search_fields = ('name',)
     list_filter = (('member_type', EnumFieldListFilter),)
+    readonly_fields = ('tracker_token',)
 
 
 @admin.register(ContactPerson)
@@ -94,6 +95,7 @@ class TeamAdmin(admin.ModelAdmin[Team]):
         'name',
         'chiro',
         'tracker',
+        'tracker_token',
         'last_safety_location',
         'checkpoints',
     )

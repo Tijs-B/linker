@@ -2,11 +2,13 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 import CallIcon from '@mui/icons-material/Call';
+import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import DirectionsIcon from '@mui/icons-material/Directions';
 import EditLocationAltIcon from '@mui/icons-material/EditLocationAlt';
 import HistoryIcon from '@mui/icons-material/History';
 import InfoIcon from '@mui/icons-material/Info';
+import ShareLocationIcon from '@mui/icons-material/ShareLocation';
 import StarIcon from '@mui/icons-material/Star';
 import {
   Badge,
@@ -151,6 +153,25 @@ function TeamCallButton({ team }: { team: Team }) {
   );
 }
 
+function CopyTrackerUrlButton({ url }: { url: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleClick = useCallback(() => {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [url]);
+
+  return (
+    <Tooltip title={copied ? 'Gekopieerd!' : 'Kopieer tracker URL'} open={copied || undefined}>
+      <IconButton onClick={handleClick} color={copied ? 'success' : 'default'}>
+        {copied ? <CheckIcon /> : <ShareLocationIcon />}
+      </IconButton>
+    </Tooltip>
+  );
+}
+
 interface StatusCardProps {
   onStartTrackerLogCreation: () => void;
   isCreatingTrackerLog: boolean;
@@ -248,6 +269,10 @@ export default function StatusCard({
               <EditLocationAltIcon />
             </IconButton>
           </Tooltip>
+        )}
+
+        {canAddTrackerLog && selectedItem?.tracker_url && (
+          <CopyTrackerUrlButton url={selectedItem.tracker_url} />
         )}
 
         {selectedMember && (

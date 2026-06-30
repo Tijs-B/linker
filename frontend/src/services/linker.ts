@@ -9,6 +9,7 @@ import type {
   Basis,
   CheckpointLog,
   ContactPerson,
+  CreatePhoneGpsPosition,
   Fiche,
   ForbiddenArea,
   LoginUser,
@@ -263,6 +264,16 @@ export const linkerApi = createApi({
           : []),
       ],
     }),
+    getPhoneGpsInfo: build.query<{ label: string }, string>({
+      query: (token) => `/phone-gps/?token=${encodeURIComponent(token)}`,
+    }),
+    createPhoneGpsPosition: build.mutation<void, CreatePhoneGpsPosition>({
+      query: (position) => ({
+        url: '/phone-gps/',
+        method: 'POST',
+        body: position,
+      }),
+    }),
     deleteTeamNote: build.mutation<void, number>({
       query: (noteId) => ({
         url: `/team-notes/${noteId}/`,
@@ -348,6 +359,8 @@ export const {
   useCreateTeamNoteMutation,
   useCreateMapNoteMutation,
   useCreatePositionMutation,
+  useGetPhoneGpsInfoQuery,
+  useCreatePhoneGpsPositionMutation,
   useDeleteTeamNoteMutation,
   useDeleteMapNoteMutation,
   useUpdateMapNoteMutation,

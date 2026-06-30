@@ -1,4 +1,4 @@
-import secrets
+from secrets import token_urlsafe
 
 from django.contrib.auth.models import User
 from django.contrib.gis.measure import D
@@ -10,6 +10,10 @@ from linker.map.models import Basis, Fiche, ForbiddenArea, Tocht, Weide
 from linker.people.constants import Direction, MemberType
 from linker.tracing.constants import FICHE_MAX_DISTANCE, GEBIED_MAX_DISTANCE, TOCHT_MAX_DISTANCE, WEIDE_MAX_DISTANCE
 from linker.trackers.models import Position, Tracker
+
+
+def _default_tracker_token():
+    return token_urlsafe(32)
 
 
 class LocationMixin:
@@ -77,6 +81,7 @@ class OrganizationMember(models.Model):
     code = models.CharField(max_length=5, help_text='De letters die op de kaart verschijnen')
     phone_number = models.CharField(max_length=13, blank=True)
     member_type = EnumField(MemberType, max_length=13)
+    tracker_token = models.CharField(max_length=64, unique=True, default=_default_tracker_token)
 
     objects = OrganizationMemberQuerySet.as_manager()
 
@@ -137,6 +142,7 @@ class Team(models.Model):
     name = models.CharField(max_length=100)
     chiro = models.CharField(max_length=100)
     tracker = models.OneToOneField(Tracker, on_delete=models.SET_NULL, blank=True, null=True)
+    tracker_token = models.CharField(max_length=64, unique=True, default=_default_tracker_token)
 
     objects = TeamQuerySet.as_manager()
 
@@ -199,7 +205,7 @@ class LoginToken(models.Model):
 
     @staticmethod
     def generate_token() -> str:
-        return secrets.token_urlsafe(32)
+        return token_urlsafe(32)
 
 
 class TeamNote(models.Model):
