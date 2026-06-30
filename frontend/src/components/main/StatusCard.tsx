@@ -155,6 +155,7 @@ function TeamCallButton({ team }: { team: Team }) {
 
 function CopyTrackerUrlButton({ url }: { url: string }) {
   const [copied, setCopied] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   const handleClick = useCallback(() => {
     navigator.clipboard.writeText(url).then(() => {
@@ -164,7 +165,12 @@ function CopyTrackerUrlButton({ url }: { url: string }) {
   }, [url]);
 
   return (
-    <Tooltip title={copied ? 'Gekopieerd!' : 'Kopieer tracker URL'} open={copied || undefined}>
+    <Tooltip
+      title={copied ? 'Gekopieerd!' : 'Kopieer tracker URL'}
+      open={copied || hovered}
+      onOpen={() => setHovered(true)}
+      onClose={() => setHovered(false)}
+    >
       <IconButton onClick={handleClick} color={copied ? 'success' : 'default'}>
         {copied ? <CheckIcon /> : <ShareLocationIcon />}
       </IconButton>
@@ -209,9 +215,8 @@ export default function StatusCard({
           />
         }
         title={(selectedTeam || selectedMember)?.name}
-        titleTypographyProps={{ noWrap: true }}
         subheader={selectedTeam?.chiro || ''}
-        subheaderTypographyProps={{ noWrap: true }}
+        slotProps={{ title: { noWrap: true }, subheader: { noWrap: true } }}
         action={
           <IconButton size="small" onClick={() => dispatch(trackersActions.deselect())}>
             <CloseIcon />

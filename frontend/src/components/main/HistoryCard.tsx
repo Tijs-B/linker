@@ -101,7 +101,7 @@ export default function HistoryCard() {
           </Avatar>
         }
         title={selectedItem?.name}
-        titleTypographyProps={{ noWrap: true }}
+        slotProps={{ title: { noWrap: true } }}
         subheader={selectedTeam?.chiro || ''}
         action={
           <IconButton
