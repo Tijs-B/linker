@@ -1,5 +1,5 @@
 import mlcontour from 'maplibre-contour';
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 
 const demSource = new mlcontour.DemSource({
   url: 'https://s3.amazonaws.com/elevation-tiles-prod/v2/terrarium/{z}/{x}/{y}.png',

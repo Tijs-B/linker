@@ -101,6 +101,9 @@ export default defineConfig(({ mode }) => {
         },
       }),
     ],
+    optimizeDeps: {
+      exclude: ['maplibre-gl'],
+    },
     build: {
       rollupOptions: {
         input: {

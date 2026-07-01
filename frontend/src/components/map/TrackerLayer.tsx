@@ -82,10 +82,11 @@ export default function TrackerLayer({
       const props = {
         image: `${iconPrefix}-${item.code}-${itemColor(item)}`,
         sortKey: selectedItem === item ? 100 : 100 - currentPoint.coordinates[1],
-        action:
+        action: JSON.stringify(
           'member_type' in item
             ? trackersActions.selectMember(item.id)
             : trackersActions.selectTeam(item.id),
+        ),
       };
 
       features.push(feature(currentPoint, props));
