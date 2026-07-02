@@ -5,6 +5,7 @@ import { Layer, Source, useMap } from 'react-map-gl/maplibre';
 import { feature, featureCollection } from '@turf/helpers';
 
 import type { OrganizationMember, Team } from '../../services/types.ts';
+import { PositionSource } from '../../services/types.ts';
 import { selectSelectedItem, trackersActions, useAppDispatch, useAppSelector } from '../../store';
 import { itemColor } from '../../theme/colors.ts';
 
@@ -65,9 +66,9 @@ export default function TrackerLayer({
       }
 
       const iconPrefix =
-        item.last_position_source === 'phone_gps'
+        item.last_position_source === PositionSource.PHONE_GPS
           ? 'phone'
-          : item.last_position_source === 'manual'
+          : item.last_position_source === PositionSource.MANUAL
             ? 'hand'
             : 'tracker';
       const props = {
@@ -83,9 +84,9 @@ export default function TrackerLayer({
 
       if (!item.is_online) {
         const offlineOutlineImage =
-          item.last_position_source === 'phone_gps'
+          item.last_position_source === PositionSource.PHONE_GPS
             ? 'phone-offline-outline'
-            : item.last_position_source === 'manual'
+            : item.last_position_source === PositionSource.MANUAL
               ? 'hand-offline-outline'
               : 'tracker-offline-outline';
         offlineFeatures.push(feature(currentPoint, { outlineImage: offlineOutlineImage }));
@@ -97,9 +98,9 @@ export default function TrackerLayer({
   const selectedData = useMemo(() => {
     if (!showHistory && selectedItem?.last_position_point) {
       const outlineImage =
-        selectedItem.last_position_source === 'phone_gps'
+        selectedItem.last_position_source === PositionSource.PHONE_GPS
           ? 'phone-outline'
-          : selectedItem.last_position_source === 'manual'
+          : selectedItem.last_position_source === PositionSource.MANUAL
             ? 'hand-outline'
             : 'tracker-outline';
       return featureCollection([feature(selectedItem.last_position_point, { outlineImage })]);

@@ -54,15 +54,7 @@ export const linkerApi = createApi({
   refetchOnFocus: true,
   refetchOnReconnect: true,
   refetchOnMountOrArgChange: 30,
-  tagTypes: [
-    'Team',
-    'OrganizationMember',
-    'MapNote',
-    'Tracker',
-    'TrackerLogs',
-    'Positions',
-    'Notifications',
-  ],
+  tagTypes: ['Team', 'OrganizationMember', 'MapNote', 'Tracker', 'Positions', 'Notifications'],
   endpoints: (build) => ({
     getTrackers: build.query<EntityState<Tracker, number>, void>({
       query: () => '/trackers/',
@@ -143,14 +135,6 @@ export const linkerApi = createApi({
       query: (id) => `/organization-members/${id}/track/`,
       providesTags: (_result, _error, arg) => [{ type: 'Positions', id: `org-member-${arg}` }],
     }),
-    // getTrackerLogs: build.query<TrackerLog[], number>({
-    //   query: (id) => `/trackers/${id}/logs/`,
-    //   providesTags: (_result, _error, arg) => [{ type: 'TrackerLogs', id: arg }],
-    // }),
-    // getTrackerTrack: build.query<LineString, number>({
-    //   query: (id) => `/trackers/${id}/track/`,
-    //   providesTags: (_result, _error, arg) => [{ type: 'TrackerLogs', id: arg }],
-    // }),
     getBasis: build.query<Point, void>({
       query: () => '/basis/',
       transformResponse(response: Basis[]) {
@@ -345,8 +329,6 @@ export const {
   useGetTeamTrackQuery,
   useGetOrganizationMemberPositionsQuery,
   useGetOrganizationMemberTrackQuery,
-  // useGetTrackerLogsQuery,
-  // useGetTrackerTrackQuery,
   useGetBasisQuery,
   useGetWeidesQuery,
   useGetStatsQuery,

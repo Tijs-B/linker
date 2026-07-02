@@ -15,15 +15,11 @@ export enum MemberType {
   BASISBITCH = 'Basisbitch',
 }
 
-export enum TrackerLogSource {
-  MINISITE_API = 'minisite_api',
-  GEODYNAMICS_API = 'geodynamics_api',
-}
-
 export enum PositionSource {
   MINISITE_API = 'minisite_api',
   GEODYNAMICS_API = 'geodynamics_api',
   MANUAL = 'manual',
+  PHONE_GPS = 'phone_gps',
 }
 
 export enum NotificationType {
@@ -33,14 +29,6 @@ export enum NotificationType {
   TRACKER_LOW_BATTERY = 'tracker_low_battery',
   TRACKER_IN_FORBIDDEN_AREA = 'tracker_in_forbidden_area',
 }
-
-// export interface TrackerLog {
-//   id: number;
-//   gps_datetime: string;
-//   point: Point;
-//   source: TrackerLogSource;
-//   tracker: number;
-// }
 
 export interface Position {
   id: number;
@@ -102,7 +90,7 @@ export interface Team {
   forbidden_area: number | null;
   last_position_point: Point | null;
   last_position_timestamp: string | null;
-  last_position_source: string | null;
+  last_position_source: PositionSource | null;
   is_online: boolean;
   tracker_url: string | null;
 }
@@ -121,7 +109,7 @@ export interface OrganizationMember {
   forbidden_area: number | null;
   last_position_point: Point | null;
   last_position_timestamp: string | null;
-  last_position_source: string | null;
+  last_position_source: PositionSource | null;
   is_online: boolean;
   tracker_url: string | null;
 }

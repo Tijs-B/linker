@@ -49,7 +49,7 @@ export default function TrackersTable({ trackers, teams, members }: TrackersTabl
           {trackers.ids.map((trackerId) => {
             const tracker = trackers.entities[trackerId];
             return (
-              <TableRow>
+              <TableRow key={trackerId}>
                 <TableCell>{tracker.tracker_name}</TableCell>
                 <TableCell>
                   {tracker.is_online ? (
