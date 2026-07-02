@@ -21,6 +21,7 @@ import {
 } from '../../services/linker.ts';
 import type { OrganizationMember, Team } from '../../services/types.ts';
 import { trackersActions, useAppDispatch } from '../../store';
+import { itemColor } from '../../theme/colors.ts';
 import { generateAllIcons } from '../../utils/icons.ts';
 import BackgroundLayers from './BackgroundLayers.tsx';
 import CustomOverlay from './CustomOverlay.tsx';
@@ -63,7 +64,7 @@ export default function MainMap({
 
   const mapRef = useRef<MapRef>(null);
   const mapLoadedRef = useRef(false);
-  const iconsAddedRef = useRef(false);
+  const iconsSignatureRef = useRef<string | null>(null);
   const { data: tochten } = useGetTochtenQuery();
   const { data: teams } = useGetTeamsQuery();
   const { data: members } = useGetOrganizationMembersQuery();
@@ -79,9 +80,16 @@ export default function MainMap({
       : '/tiles/style/outdoor-v8';
 
   const addIcons = useCallback(() => {
-    if (!teams || !members || !mapLoadedRef.current || iconsAddedRef.current) return;
-    iconsAddedRef.current = true;
+    if (!teams || !members || !mapLoadedRef.current) return;
     const allItems = [...Object.values(teams.entities), ...Object.values(members.entities)];
+    // Only regenerate when the set of code/color combos actually changed, so newly
+    // added or updated teams/members get their icons instead of an invisible marker.
+    const signature = allItems
+      .map((item) => `${itemColor(item)}-${item.code}`)
+      .sort()
+      .join('|');
+    if (signature === iconsSignatureRef.current) return;
+    iconsSignatureRef.current = signature;
     generateAllIcons(allItems, (name, image) => {
       if (mapRef.current && !mapRef.current.hasImage(name)) {
         mapRef.current.addImage(name, image);
@@ -91,7 +99,7 @@ export default function MainMap({
 
   const onMapLoad = useCallback(() => {
     mapLoadedRef.current = true;
-    iconsAddedRef.current = false;
+    iconsSignatureRef.current = null;
     addIcons();
   }, [addIcons]);
 
@@ -198,7 +206,7 @@ export default function MainMap({
             <IconButton onClick={onToggleHeatmap}>
               <WhatshotIcon
                 color="primary"
-                sx={{ color: showHeatmap ? '' : '#000', marginTop: '2px' }}
+                sx={{ color: showHeatmap ? undefined : '#000', marginTop: '2px' }}
               />
             </IconButton>
           </CustomOverlay>
@@ -208,7 +216,7 @@ export default function MainMap({
           <IconButton onClick={onToggleSatellite}>
             <SatelliteIcon
               color="primary"
-              sx={{ color: showSatellite ? '' : '#000', marginTop: '2px' }}
+              sx={{ color: showSatellite ? undefined : '#000', marginTop: '2px' }}
             />
           </IconButton>
         </CustomOverlay>
@@ -224,7 +232,7 @@ export default function MainMap({
             <IconButton onClick={onToggleMapNoteCreation}>
               <FlagIcon
                 color={'primary'}
-                sx={{ color: creatingMapNote ? '' : '#000', marginTop: '2px' }}
+                sx={{ color: creatingMapNote ? undefined : '#000', marginTop: '2px' }}
               />
             </IconButton>
           </CustomOverlay>
@@ -234,7 +242,7 @@ export default function MainMap({
           <IconButton onClick={onToggleZijwegen}>
             <CallSplitIcon
               color={'primary'}
-              sx={{ color: showZijwegen ? '' : '#000', marginTop: '2px' }}
+              sx={{ color: showZijwegen ? undefined : '#000', marginTop: '2px' }}
             />
           </IconButton>
         </CustomOverlay>
