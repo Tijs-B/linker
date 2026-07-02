@@ -1,8 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
-import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import FilterIcon from '@mui/icons-material/FilterAlt';
+import LayersIcon from '@mui/icons-material/Layers';
 import MapIcon from '@mui/icons-material/Map';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -13,9 +12,6 @@ import {
   CircularProgress,
   IconButton,
   InputAdornment,
-  ListItemIcon,
-  Menu,
-  MenuItem,
   OutlinedInput,
   Toolbar,
   useTheme,
@@ -24,7 +20,8 @@ import {
 import { css } from '@emotion/react';
 
 import { useGetNotificationsQuery, useGetUserQuery } from '../../services/linker.ts';
-import { filterActions, selectFilterActive, useAppDispatch, useAppSelector } from '../../store';
+import { DEFAULT_VIEW_ID, getAvailableViews, useAppSelector } from '../../store';
+import ViewPickerDialog from './ViewPickerDialog.tsx';
 
 interface MainToolbarProps {
   keyword: string;
@@ -49,23 +46,16 @@ export default function MainToolbar({
 }: MainToolbarProps) {
   const theme = useTheme();
 
-  const showMaybe = useAppSelector((state) => state.filter.showMaybe);
-  const showSlotweide = useAppSelector((state) => state.filter.showSlotweide);
-  const showBus = useAppSelector((state) => state.filter.showBus);
-  const showMembers = useAppSelector((state) => state.filter.showMembers);
-  const showRed = useAppSelector((state) => state.filter.showRed);
-  const showBlue = useAppSelector((state) => state.filter.showBlue);
-  const filterActive = useAppSelector(selectFilterActive);
-  const dispatch = useAppDispatch();
+  const activeViewId = useAppSelector((state) => state.filter.activeViewId);
 
   const { data: user } = useGetUserQuery();
   const canViewNotifications = Boolean(user?.permissions.includes('view_notification'));
-  const canViewTeamDetails = Boolean(user?.permissions.includes('view_team_details'));
+  const availableViews = getAvailableViews(user?.permissions ?? []);
   const { data: notifications } = useGetNotificationsQuery(undefined, {
     skip: !canViewNotifications,
   });
 
-  const [menuAnchorEl, setMenuAnchorEl] = useState<Element | null>(null);
+  const [viewPickerOpen, setViewPickerOpen] = useState(false);
 
   const onSearchChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,43 +88,14 @@ export default function MainToolbar({
       <IconButton edge="start" onClick={() => setListOpen(!listOpen)}>
         {listOpen ? <MapIcon /> : <ViewListIcon />}
       </IconButton>
-      {canViewTeamDetails && (
-        <IconButton edge="start" onClick={(e) => setMenuAnchorEl(e.currentTarget)}>
-          <Badge variant="dot" invisible={!filterActive} color="primary">
-            <FilterIcon />
+      {availableViews.length > 1 && (
+        <IconButton edge="start" onClick={() => setViewPickerOpen(true)}>
+          <Badge variant="dot" invisible={activeViewId === DEFAULT_VIEW_ID} color="primary">
+            <LayersIcon />
           </Badge>
         </IconButton>
       )}
-      <Menu
-        anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
-        onClose={() => setMenuAnchorEl(null)}
-      >
-        <MenuItem onClick={() => dispatch(filterActions.toggleShowMaybe())}>
-          <ListItemIcon>{showMaybe && <CheckIcon />}</ListItemIcon>
-          Toon maybe teams
-        </MenuItem>
-        <MenuItem onClick={() => dispatch(filterActions.toggleShowSlotweide())}>
-          <ListItemIcon>{showSlotweide && <CheckIcon />}</ListItemIcon>
-          Toon slotweide teams
-        </MenuItem>
-        <MenuItem onClick={() => dispatch(filterActions.toggleShowBus())}>
-          <ListItemIcon>{showBus && <CheckIcon />}</ListItemIcon>
-          Toon teams op de bus
-        </MenuItem>
-        <MenuItem onClick={() => dispatch(filterActions.toggleShowMembers())}>
-          <ListItemIcon>{showMembers && <CheckIcon />}</ListItemIcon>
-          Toon organisatie
-        </MenuItem>
-        <MenuItem onClick={() => dispatch(filterActions.toggleShowBlue())}>
-          <ListItemIcon>{showBlue && <CheckIcon />}</ListItemIcon>
-          Toon blauwe teams
-        </MenuItem>
-        <MenuItem onClick={() => dispatch(filterActions.toggleShowRed())}>
-          <ListItemIcon>{showRed && <CheckIcon />}</ListItemIcon>
-          Toon rode teams
-        </MenuItem>
-      </Menu>
+      <ViewPickerDialog open={viewPickerOpen} onClose={() => setViewPickerOpen(false)} />
       <OutlinedInput
         placeholder="Zoeken"
         size="small"

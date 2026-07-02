@@ -7,7 +7,7 @@ import linker.trackers.constants
 from django.db import migrations, models
 
 def copy_trackerlogs_to_positions(apps, schema_editor):
-    # Pure SQL copy — avoids all ORM field conversion issues (enumfields rejects
+    # Pure SQL copy - avoids all ORM field conversion issues (enumfields rejects
     # 'manual' on read, GIS proxy rejects raw bytes on write). The DB copies the
     # geometry column directly without passing through Python.
     schema_editor.execute("""

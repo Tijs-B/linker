@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { LngLat } from 'react-map-gl/maplibre';
 import { useMap } from 'react-map-gl/maplibre';
 import { Navigate } from 'react-router-dom';
@@ -6,7 +6,6 @@ import { Navigate } from 'react-router-dom';
 import { Paper, useMediaQuery, useTheme } from '@mui/material';
 
 import { css } from '@emotion/react';
-import Fuse from 'fuse.js';
 import type { SnackbarKey } from 'notistack';
 import { useSnackbar } from 'notistack';
 
@@ -19,16 +18,15 @@ import NotificationList from '../components/main/NotificationList.tsx';
 import StatusCard from '../components/main/StatusCard';
 import TrackerList from '../components/main/TrackerList.tsx';
 import MainMap from '../components/map/MainMap';
+import { useFilteredTrackers } from '../hooks/useFilteredTrackers.ts';
 import {
   useGetNotificationsQuery,
   useGetOrganizationMembersQuery,
   useGetTeamsQuery,
   useGetTrackersQuery,
   useGetUserQuery,
-  useGetWeidesQuery,
 } from '../services/linker';
 import type { OrganizationMember, Team } from '../services/types.ts';
-import { Direction } from '../services/types.ts';
 import { trackersActions, useAppDispatch, useAppSelector } from '../store/index.ts';
 
 export default function MainPage() {
@@ -48,29 +46,18 @@ export default function MainPage() {
   const dispatch = useAppDispatch();
   const selectedId = useAppSelector((state) => state.trackers.selectedId);
   const showHistory = useAppSelector((state) => state.trackers.showHistory);
-  const showMaybe = useAppSelector((state) => state.filter.showMaybe);
-  const showSlotweide = useAppSelector((state) => state.filter.showSlotweide);
-  const showBus = useAppSelector((state) => state.filter.showBus);
-  const showMembers = useAppSelector((state) => state.filter.showMembers);
-  const showRed = useAppSelector((state) => state.filter.showRed);
-  const showBlue = useAppSelector((state) => state.filter.showBlue);
 
-  const {
-    data: teams,
-    isFetching: isFetchingTeams,
-    refetch: refetchTeams,
-  } = useGetTeamsQuery(undefined, {
+  const { isFetching: isFetchingTeams, refetch: refetchTeams } = useGetTeamsQuery(undefined, {
     pollingInterval: 10_000,
     skipPollingIfUnfocused: true,
   });
-  const {
-    data: organizationMembers,
-    isFetching: isFetchingMembers,
-    refetch: refetchMembers,
-  } = useGetOrganizationMembersQuery(undefined, {
-    pollingInterval: 10_000,
-    skipPollingIfUnfocused: true,
-  });
+  const { isFetching: isFetchingMembers, refetch: refetchMembers } = useGetOrganizationMembersQuery(
+    undefined,
+    {
+      pollingInterval: 10_000,
+      skipPollingIfUnfocused: true,
+    },
+  );
   const { isFetching: isFetchingTrackers, refetch: refetchTrackers } = useGetTrackersQuery(
     undefined,
     {
@@ -84,7 +71,8 @@ export default function MainPage() {
     pollingInterval: 5_000,
     skipPollingIfUnfocused: true,
   });
-  const { data: weides } = useGetWeidesQuery();
+
+  const { filteredTeams, filteredMembers, teamFuse, memberFuse } = useFilteredTrackers(keyword);
 
   // Toggle a persistent snackbar in sync with the user query's network error. The
   // snackbar system is the external store here, so the effect only touches it; the
@@ -152,74 +140,6 @@ export default function MainPage() {
     },
     [mainMap],
   );
-
-  // Create fuse objects for search
-  const teamFuse = useMemo(() => {
-    if (teams && teams.ids.length > 0) {
-      return new Fuse(Object.values(teams.entities), {
-        keys: ['code', 'name', 'contact_persons.name', 'chiro'],
-        threshold: 0.2,
-        includeScore: true,
-      });
-    }
-  }, [teams]);
-
-  const memberFuse = useMemo(() => {
-    if (organizationMembers && organizationMembers.ids.length > 0) {
-      return new Fuse(Object.values(organizationMembers.entities), {
-        keys: ['name', 'code'],
-        threshold: 0.2,
-        includeScore: true,
-      });
-    }
-  }, [organizationMembers]);
-
-  const weideSlotweide = useMemo(
-    () => new Map(weides ? Object.values(weides.entities).map((w) => [w.name, w.slotweide]) : []),
-    [weides],
-  );
-
-  const filteredTeams: Team[] = useMemo(() => {
-    if (teamFuse && keyword) {
-      return teamFuse.search(keyword).map((item) => item.item);
-    } else if (teams) {
-      return teams.ids
-        .map((id) => teams.entities[id])
-        .filter((team) => {
-          const loc = team.last_safety_location?.trim();
-          if (!loc) return true;
-          if (loc.toLowerCase() === 'bus') return showBus && showMaybe;
-          const isSlotweide = weideSlotweide.get(loc) === true;
-          return isSlotweide ? showSlotweide : showMaybe;
-        })
-        .filter((team) => showRed || team.direction !== Direction.RED)
-        .filter((team) => showBlue || team.direction !== Direction.BLUE);
-    } else {
-      return [];
-    }
-  }, [
-    teamFuse,
-    keyword,
-    teams,
-    weideSlotweide,
-    showMaybe,
-    showSlotweide,
-    showBus,
-    showRed,
-    showBlue,
-  ]);
-
-  const filteredMembers = useMemo(() => {
-    if (!showMembers) {
-      return [];
-    } else if (memberFuse && keyword) {
-      return memberFuse.search(keyword).map((item) => item.item);
-    } else if (organizationMembers) {
-      return organizationMembers.ids.map((id) => organizationMembers.entities[id]);
-    } else {
-      return [];
-    }
-  }, [keyword, memberFuse, organizationMembers, showMembers]);
 
   const onSearchEnter = useCallback(
     (keyword: string) => {

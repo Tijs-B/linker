@@ -10,6 +10,8 @@ import { trackersReducer as trackers } from './trackers';
 
 export { trackersActions } from './trackers';
 export { filterActions } from './filters.ts';
+export { VIEWS, DEFAULT_VIEW_ID, getViewById, getAvailableViews } from './views.ts';
+export type { View, ViewFilters } from './views.ts';
 
 export const store = configureStore({
   reducer: {
@@ -93,13 +95,12 @@ export const selectSelectedTracker = createSelector(
   },
 );
 
-export const selectFilterActive = createSelector([(state: RootState) => state.filter], (filter) => {
-  return (
-    !filter.showMembers ||
-    !filter.showMaybe ||
-    !filter.showSlotweide ||
-    !filter.showBus ||
-    !filter.showRed ||
-    !filter.showBlue
-  );
-});
+// Maps a weide name to whether it is the slotweide. Used to derive a team's
+// safety state (see utils/teamSafety).
+export const selectWeideSlotweide = createSelector(
+  [linkerApi.endpoints.getWeides.select(undefined)],
+  (weides) =>
+    new Map<string, boolean>(
+      weides.data ? Object.values(weides.data.entities).map((w) => [w.name, w.slotweide]) : [],
+    ),
+);

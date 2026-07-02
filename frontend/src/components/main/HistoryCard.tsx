@@ -306,7 +306,7 @@ function buildTimeline(
 
   // Collapse consecutive raw segments that share the same color/label into one: a long
   // stretch of same-source fixes should be a single DOM node, not one per fix pair. This
-  // matters a lot — an all-day tracked team can have thousands of fixes, and without
+  // matters a lot - an all-day tracked team can have thousands of fixes, and without
   // merging we'd mount thousands of boxes (each with its own Tooltip), which made
   // dragging the slider freeze the tab.
   const mergeConsecutive = (

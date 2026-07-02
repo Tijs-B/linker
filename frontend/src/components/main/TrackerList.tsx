@@ -16,8 +16,9 @@ import {
   useGetWeidesQuery,
 } from '../../services/linker.ts';
 import type { OrganizationMember, Team } from '../../services/types.ts';
-import { trackersActions, useAppDispatch } from '../../store';
+import { selectWeideSlotweide, trackersActions, useAppDispatch, useAppSelector } from '../../store';
 import { getPositionDescription } from '../../utils/data';
+import { getTeamSafetyState } from '../../utils/teamSafety.ts';
 import PersonAvatar from '../PersonAvatar';
 
 type TrackerRowDataItem = (OrganizationMember | Team) & {
@@ -57,18 +58,20 @@ const TrackerRow = ({
     if (!('last_safety_location' in item) || !item.last_safety_location) {
       return null;
     }
-    if (item.last_safety_location.trim().toLowerCase() === 'bus') {
-      return <Chip color="warning" variant="outlined" icon={<DirectionsBusIcon />} label="Bus" />;
+    switch (getTeamSafetyState(item, weideSlotweide)) {
+      case 'unsafe':
+        return null;
+      case 'bus':
+        return <Chip color="warning" variant="outlined" icon={<DirectionsBusIcon />} label="Bus" />;
+      case 'slotweide':
+        return (
+          <Chip color="primary" variant="filled" label={`Safe op ${item.last_safety_location}`} />
+        );
+      case 'maybe':
+        return (
+          <Chip color="warning" variant="filled" label={`Maybe op ${item.last_safety_location}`} />
+        );
     }
-    const slotweide = weideSlotweide.get(item.last_safety_location.trim());
-    if (slotweide === true) {
-      return (
-        <Chip color="primary" variant="filled" label={`Safe op ${item.last_safety_location}`} />
-      );
-    }
-    return (
-      <Chip color="warning" variant="filled" label={`Maybe op ${item.last_safety_location}`} />
-    );
   }, [items, index, weideSlotweide]);
 
   const offlineIcon = useMemo(() => {
@@ -159,10 +162,7 @@ export default function TrackerList({ members, teams, onItemClick }: TrackerList
     });
   }, [user, teams, members, fiches, tochten, weides, basis, forbiddenAreas, trackers]);
 
-  const weideSlotweide = useMemo(
-    () => new Map(weides ? Object.values(weides.entities).map((w) => [w.name, w.slotweide]) : []),
-    [weides],
-  );
+  const weideSlotweide = useAppSelector(selectWeideSlotweide);
 
   return (
     <List
