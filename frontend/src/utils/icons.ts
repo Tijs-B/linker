@@ -72,49 +72,46 @@ function generateMapNoteIcon(
   addToMap('map-note', context.getImageData(0, 0, 33 * 2, 48 * 2));
 }
 
-function generateTrackers(
-  color: string,
-  codes: string[],
-  context: CanvasRenderingContext2D,
-  addToMap: (name: string, data: ImageData) => void,
-): void {
-  const gradient = context.createRadialGradient(16.5 / 1.8, 39.1, 0, 16.5 / 1.8, 39.1, 5.25);
-  gradient.addColorStop(0, 'rgba(0, 0, 0, 0.4)');
-  gradient.addColorStop(0.95, 'rgba(0, 0, 0, 0.05)');
-  gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-  context.clearRect(0, 0, 33 * 2, 48 * 2);
-  context.fillStyle = gradient;
-  context.setTransform(3.6, 0, 0, 2, 0, 0);
-  context.fillRect(0, 0, 33, 48);
-  context.setTransform(2, 0, 0, 2, 0, 0);
-
-  context.fillStyle = color;
-  context.fill(TRACKER_PATH);
-
-  context.fillStyle = 'rgba(0, 0, 0, 0.25)';
-  context.fill(TRACKER_BORDER_PATH);
-
-  const imageWithoutCode = context.getImageData(0, 0, 33 * 2, 48 * 2);
-
-  codes.forEach((code) => {
-    context.putImageData(imageWithoutCode, 0, 0);
-    context.font = code.length == 2 ? '17px D-DIN Bold' : '14px D-DINCondensed Bold';
-    context.textAlign = 'center';
-    context.fillStyle = '#fff';
-    context.fillText(code, 16.5, 23.1);
-
-    addToMap(`tracker-${code}-${color}`, context.getImageData(0, 0, 33 * 2, 48 * 2));
-  });
+interface TrackerIconSpec {
+  prefix: string;
+  bodyPath: Path2D;
+  borderPath: Path2D;
+  textX: number;
+  textY: number;
 }
 
-function generatePhoneTrackers(
+const TRACKER_SPEC: TrackerIconSpec = {
+  prefix: 'tracker',
+  bodyPath: TRACKER_PATH,
+  borderPath: TRACKER_BORDER_PATH,
+  textX: 16.5,
+  textY: 23.1,
+};
+
+const PHONE_SPEC: TrackerIconSpec = {
+  prefix: 'phone',
+  bodyPath: PHONE_BODY_PATH,
+  borderPath: PHONE_BORDER_PATH,
+  textX: 16.5,
+  textY: 23,
+};
+
+const HAND_SPEC: TrackerIconSpec = {
+  prefix: 'hand',
+  bodyPath: HAND_BODY_PATH,
+  borderPath: HAND_BORDER_PATH,
+  textX: 17,
+  textY: 20,
+};
+
+function generateTrackerIcons(
   color: string,
   codes: string[],
+  spec: TrackerIconSpec,
   context: CanvasRenderingContext2D,
   addToMap: (name: string, data: ImageData) => void,
 ): void {
-  // Same shadow position as tracker (tip at y≈38.8, shadow center at 39.1)
+  // Shadow tip at y≈38.8, shadow center at 39.1 (shared by all tracker variants)
   const gradient = context.createRadialGradient(16.5 / 1.8, 39.1, 0, 16.5 / 1.8, 39.1, 5.25);
   gradient.addColorStop(0, 'rgba(0, 0, 0, 0.4)');
   gradient.addColorStop(0.95, 'rgba(0, 0, 0, 0.05)');
@@ -127,57 +124,21 @@ function generatePhoneTrackers(
   context.setTransform(2, 0, 0, 2, 0, 0);
 
   context.fillStyle = color;
-  context.fill(PHONE_BODY_PATH);
+  context.fill(spec.bodyPath);
 
   context.fillStyle = 'rgba(0, 0, 0, 0.25)';
-  context.fill(PHONE_BORDER_PATH);
+  context.fill(spec.borderPath);
 
   const imageWithoutCode = context.getImageData(0, 0, 33 * 2, 48 * 2);
 
   codes.forEach((code) => {
     context.putImageData(imageWithoutCode, 0, 0);
-    context.font = code.length == 2 ? '17px D-DIN Bold' : '14px D-DINCondensed Bold';
+    context.font = code.length == 2 ? '17px D-DINCondensed Bold' : '14px D-DINCondensed Bold';
     context.textAlign = 'center';
     context.fillStyle = '#fff';
-    context.fillText(code, 16.5, 23);
+    context.fillText(code, spec.textX, spec.textY);
 
-    addToMap(`phone-${code}-${color}`, context.getImageData(0, 0, 33 * 2, 48 * 2));
-  });
-}
-
-function generateHandTrackers(
-  color: string,
-  codes: string[],
-  context: CanvasRenderingContext2D,
-  addToMap: (name: string, data: ImageData) => void,
-): void {
-  const gradient = context.createRadialGradient(16.5 / 1.8, 39.1, 0, 16.5 / 1.8, 39.1, 5.25);
-  gradient.addColorStop(0, 'rgba(0, 0, 0, 0.4)');
-  gradient.addColorStop(0.95, 'rgba(0, 0, 0, 0.05)');
-  gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-  context.clearRect(0, 0, 33 * 2, 48 * 2);
-  context.fillStyle = gradient;
-  context.setTransform(3.6, 0, 0, 2, 0, 0);
-  context.fillRect(0, 0, 33, 48);
-  context.setTransform(2, 0, 0, 2, 0, 0);
-
-  context.fillStyle = color;
-  context.fill(HAND_BODY_PATH);
-
-  context.fillStyle = 'rgba(0, 0, 0, 0.25)';
-  context.fill(HAND_BORDER_PATH);
-
-  const imageWithoutCode = context.getImageData(0, 0, 33 * 2, 48 * 2);
-
-  codes.forEach((code) => {
-    context.putImageData(imageWithoutCode, 0, 0);
-    context.font = code.length == 2 ? '16px D-DIN Bold' : '14px D-DINCondensed Bold';
-    context.textAlign = 'center';
-    context.fillStyle = '#fff';
-    context.fillText(code, 17, 20);
-
-    addToMap(`hand-${code}-${color}`, context.getImageData(0, 0, 33 * 2, 48 * 2));
+    addToMap(`${spec.prefix}-${code}-${color}`, context.getImageData(0, 0, 33 * 2, 48 * 2));
   });
 }
 
@@ -232,9 +193,9 @@ export async function generateAllIcons(
 
   Object.entries(codesPerColor).forEach(([color, codes]) => {
     const uniqueCodes = [...new Set(codes)];
-    generateTrackers(color, uniqueCodes, context, addToMap);
-    generatePhoneTrackers(color, uniqueCodes, context, addToMap);
-    generateHandTrackers(color, uniqueCodes, context, addToMap);
+    generateTrackerIcons(color, uniqueCodes, TRACKER_SPEC, context, addToMap);
+    generateTrackerIcons(color, uniqueCodes, PHONE_SPEC, context, addToMap);
+    generateTrackerIcons(color, uniqueCodes, HAND_SPEC, context, addToMap);
   });
 
   generateMapNoteIcon(yellow[400], context, addToMap);

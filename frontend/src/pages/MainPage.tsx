@@ -132,7 +132,7 @@ export default function MainPage() {
     return () => {
       window.removeEventListener('keydown', handleEscape);
     };
-  });
+  }, []);
 
   const showItem = useCallback(
     (item: Team | OrganizationMember) => {

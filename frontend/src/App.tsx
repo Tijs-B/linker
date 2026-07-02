@@ -11,10 +11,8 @@ export default function App() {
   `;
 
   return (
-    <>
-      <div css={main}>
-        <Outlet />
-      </div>
-    </>
+    <div css={main}>
+      <Outlet />
+    </div>
   );
 }

@@ -30,9 +30,10 @@ export function secondsToHoursMinutes(
       result += `${Math.floor(hours)} uur `;
     }
     const minutesOfHours = Math.floor(minutes) % 60;
-    result += `${minutesOfHours} minuten `;
+    result += `${minutesOfHours} ${minutesOfHours === 1 ? 'minuut' : 'minuten'} `;
   } else {
-    result += `${Math.floor(seconds)} seconden`;
+    const wholeSeconds = Math.floor(seconds);
+    result += `${wholeSeconds} ${wholeSeconds === 1 ? 'seconde' : 'seconden'}`;
   }
 
   return result;

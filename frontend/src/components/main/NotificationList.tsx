@@ -59,12 +59,12 @@ const NotificationRow = ({
       return;
     }
     onItemClick(teamOrMember);
-  }, [items, index]);
+  }, [items, index, onItemClick]);
 
   const onMarkThisAsRead = useCallback(() => {
     const item = items[index];
     onMarkAsRead(item.id);
-  }, [items, index]);
+  }, [items, index, onMarkAsRead]);
 
   let icon;
   let title;
@@ -200,7 +200,7 @@ export default function NotificationList({ onItemClick }: NotificationListProps)
       css={css`
         max-height: 100%;
       `}
-      rowCount={notifications ? notifications.length : 0}
+      rowCount={items.length}
       rowComponent={NotificationRow}
       rowHeight={60}
       rowProps={{ items, onItemClick: onClick, onMarkAsRead: onMarkAsRead }}
