@@ -20,6 +20,7 @@ import type {
   Stats,
   Team,
   TeamNote,
+  TeamSafetyLog,
   Tocht,
   Tracker,
   User,
@@ -126,6 +127,10 @@ export const linkerApi = createApi({
     getTeamTrack: build.query<LineString, number>({
       query: (id) => `/teams/${id}/track/`,
       providesTags: (_result, _error, arg) => [{ type: 'Positions', id: `team-${arg}` }],
+    }),
+    getTeamSafetyLogs: build.query<TeamSafetyLog[], number>({
+      query: (id) => `/teams/${id}/safety-logs/`,
+      providesTags: (_result, _error, arg) => [{ type: 'Team', id: `safety-${arg}` }],
     }),
     getOrganizationMemberPositions: build.query<Position[], number>({
       query: (id) => `/organization-members/${id}/positions/`,
@@ -327,6 +332,7 @@ export const {
   useGetZijwegenQuery,
   useGetTeamPositionsQuery,
   useGetTeamTrackQuery,
+  useGetTeamSafetyLogsQuery,
   useGetOrganizationMemberPositionsQuery,
   useGetOrganizationMemberTrackQuery,
   useGetBasisQuery,

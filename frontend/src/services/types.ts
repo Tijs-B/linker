@@ -70,6 +70,13 @@ export interface TeamNote {
   author: string | null;
 }
 
+export interface TeamSafetyLog {
+  id: number;
+  created: string;
+  created_by: string | null;
+  location: string;
+}
+
 export interface Team {
   id: number;
   direction: Direction;
