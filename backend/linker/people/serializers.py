@@ -8,7 +8,7 @@ from rest_framework_gis.fields import GeometryField
 
 from linker.trackers.constants import TRACKER_OFFLINE_MINUTES
 
-from .models import ContactPerson, OrganizationMember, Team, TeamNote
+from .models import ContactPerson, OrganizationMember, Team, TeamNote, TeamSafetyLog
 
 
 class LocationSerializerMixin(metaclass=serializers.SerializerMetaclass):
@@ -58,6 +58,14 @@ class TeamNoteSerializer(serializers.ModelSerializer[TeamNote]):
     class Meta:
         model = TeamNote
         fields = '__all__'
+
+
+class TeamSafetyLogSerializer(serializers.ModelSerializer[TeamSafetyLog]):
+    created_by: serializers.StringRelatedField[TeamSafetyLog] = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = TeamSafetyLog
+        fields = ['id', 'created', 'created_by', 'location']
 
 
 class BasicTeamSerializer(LocationSerializerMixin, EnumSupportSerializerMixin, serializers.ModelSerializer[Team]):  # type: ignore[misc]

@@ -11,6 +11,7 @@ from django.views import View
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer, Serializer
 
 from linker.map.models import Tocht
@@ -23,6 +24,7 @@ from .serializers import (
     ContactPersonSerializer,
     OrganizationMemberSerializer,
     TeamNoteSerializer,
+    TeamSafetyLogSerializer,
     TeamSerializer,
     TeamWithNumberSerializer,
 )
@@ -100,6 +102,16 @@ class TeamViewSet(viewsets.ModelViewSet[Team]):
     @action(detail=True, methods=['get'], permission_classes=(IsAuthenticated, CanViewPositions))
     def positions(self, request: HttpRequest, pk: int | None = None) -> HttpResponse:
         return positions_response(self.get_object().positions)
+
+    @action(
+        detail=True,
+        methods=['get'],
+        url_path='safety-logs',
+        permission_classes=(IsAuthenticated, CanViewPositions),
+    )
+    def safety_logs(self, request: HttpRequest, pk: int | None = None) -> Response:
+        logs = self.get_object().team_safety_logs.select_related('created_by').order_by('created')
+        return Response(TeamSafetyLogSerializer(logs, many=True).data)
 
 
 class OrganizationMemberViewSet(viewsets.ReadOnlyModelViewSet[OrganizationMember]):
