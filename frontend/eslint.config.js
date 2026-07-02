@@ -11,7 +11,7 @@ export default tseslint.config(
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
-      reactHooks.configs['recommended-latest'],
+      reactHooks.configs.flat['recommended-latest'],
       reactRefresh.configs.vite,
     ],
     files: ['**/*.{ts,tsx}'],
@@ -28,7 +28,6 @@ export default tseslint.config(
       'react-compiler': reactCompiler,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react-compiler/react-compiler': 'error',
       "@typescript-eslint/consistent-type-imports": "error"

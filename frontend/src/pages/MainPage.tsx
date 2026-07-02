@@ -138,7 +138,7 @@ export default function MainPage() {
     (item: Team | OrganizationMember) => {
       if (item.last_position_point && mainMap) {
         mainMap.easeTo({
-          // @ts-ignore
+          // @ts-expect-error GeoJSON coordinates are a number[], easeTo wants a LngLat tuple
           center: item.last_position_point.coordinates,
           zoom: 14,
         });

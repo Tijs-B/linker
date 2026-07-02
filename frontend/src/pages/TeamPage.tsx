@@ -95,7 +95,7 @@ export default function TeamPage() {
       return '-';
     }
     return getPositionDescription(team, fiches, tochten, weides, forbiddenAreas);
-  }, [team, teams, fiches, tochten, weides, forbiddenAreas]);
+  }, [team, teams, fiches, tochten, weides, forbiddenAreas, teamId]);
 
   const createNote = useCallback(() => {
     if (newNoteText && teamId) {
