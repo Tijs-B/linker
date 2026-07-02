@@ -79,6 +79,7 @@ export default function HistoryCard() {
       trackersActions.setHistoryItem({
         point: position.point,
         timestamp: position.timestamp,
+        source: position.source,
       }),
     );
   }, [positions, dispatch, mainMap]);
@@ -87,7 +88,14 @@ export default function HistoryCard() {
     (value: number) => {
       setIndex(value);
       if (positions) {
-        dispatch(trackersActions.setHistoryItem(positions[value]));
+        const position = positions[value];
+        dispatch(
+          trackersActions.setHistoryItem({
+            point: position.point,
+            timestamp: position.timestamp,
+            source: position.source,
+          }),
+        );
       }
     },
     [dispatch, positions],

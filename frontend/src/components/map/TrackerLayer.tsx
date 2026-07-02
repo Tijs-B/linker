@@ -16,6 +16,16 @@ interface TrackerLayerProps {
   trackersClickable: boolean;
 }
 
+// The three icon families are named by prefix (e.g. `phone-A1-#f00`,
+// `hand-offline-outline`, `tracker-outline`), keyed off the position source.
+function iconPrefixForSource(source: PositionSource | null): string {
+  return source === PositionSource.PHONE_GPS
+    ? 'phone'
+    : source === PositionSource.MANUAL
+      ? 'hand'
+      : 'tracker';
+}
+
 export default function TrackerLayer({
   visible,
   filteredTeams,
@@ -65,12 +75,10 @@ export default function TrackerLayer({
         continue;
       }
 
-      const iconPrefix =
-        item.last_position_source === PositionSource.PHONE_GPS
-          ? 'phone'
-          : item.last_position_source === PositionSource.MANUAL
-            ? 'hand'
-            : 'tracker';
+      // In history mode the marker shows a past position, so use that position's
+      // source rather than the item's current one.
+      const source = historyItem ? historyItem.source : item.last_position_source;
+      const iconPrefix = iconPrefixForSource(source);
       const props = {
         image: `${iconPrefix}-${item.code}-${itemColor(item)}`,
         sortKey: selectedItem === item ? 100 : 100 - currentPoint.coordinates[1],
@@ -83,13 +91,9 @@ export default function TrackerLayer({
       features.push(feature(currentPoint, props));
 
       if (!item.is_online) {
-        const offlineOutlineImage =
-          item.last_position_source === PositionSource.PHONE_GPS
-            ? 'phone-offline-outline'
-            : item.last_position_source === PositionSource.MANUAL
-              ? 'hand-offline-outline'
-              : 'tracker-offline-outline';
-        offlineFeatures.push(feature(currentPoint, { outlineImage: offlineOutlineImage }));
+        offlineFeatures.push(
+          feature(currentPoint, { outlineImage: `${iconPrefix}-offline-outline` }),
+        );
       }
     }
     return [featureCollection(features), featureCollection(offlineFeatures)];
@@ -97,12 +101,7 @@ export default function TrackerLayer({
 
   const selectedData = useMemo(() => {
     if (!showHistory && selectedItem?.last_position_point) {
-      const outlineImage =
-        selectedItem.last_position_source === PositionSource.PHONE_GPS
-          ? 'phone-outline'
-          : selectedItem.last_position_source === PositionSource.MANUAL
-            ? 'hand-outline'
-            : 'tracker-outline';
+      const outlineImage = `${iconPrefixForSource(selectedItem.last_position_source)}-outline`;
       return featureCollection([feature(selectedItem.last_position_point, { outlineImage })]);
     } else {
       return featureCollection([]);

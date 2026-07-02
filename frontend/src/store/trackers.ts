@@ -2,9 +2,12 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import type { Point } from 'geojson';
 
+import type { PositionSource } from '../services/types';
+
 interface HistoryItem {
   point: Point;
   timestamp: string;
+  source: PositionSource;
 }
 
 interface TrackerState {
