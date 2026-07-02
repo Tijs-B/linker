@@ -65,12 +65,6 @@ export default function App() {
       return;
     }
 
-    if (!navigator.geolocation) {
-      setGeoError('Je browser ondersteunt geen locatie delen. Probeer een andere browser.');
-      setActive(false);
-      return;
-    }
-
     function startWatch() {
       if (watchId.current !== null) navigator.geolocation.clearWatch(watchId.current);
       if (watchdogId.current !== null) clearTimeout(watchdogId.current);
@@ -96,7 +90,6 @@ export default function App() {
       );
     }
 
-    setGeoError(null);
     startWatch();
 
     return () => {
@@ -110,6 +103,19 @@ export default function App() {
       }
     };
   }, [active, upload]);
+
+  const onToggleActive = useCallback(() => {
+    if (active) {
+      setActive(false);
+      return;
+    }
+    if (!navigator.geolocation) {
+      setGeoError('Je browser ondersteunt geen locatie delen. Probeer een andere browser.');
+      return;
+    }
+    setGeoError(null);
+    setActive(true);
+  }, [active]);
 
   if (!token) {
     return (
@@ -137,10 +143,7 @@ export default function App() {
       {info && <p className="tracker-label">{info.label}</p>}
       <p className="subtitle">Druk op de knop en de Basisbitch ziet waar je bent.</p>
 
-      <button
-        className={`btn-toggle ${active ? 'stop' : 'start'}`}
-        onClick={() => setActive((a) => !a)}
-      >
+      <button className={`btn-toggle ${active ? 'stop' : 'start'}`} onClick={onToggleActive}>
         {active ? '🛑 Stop met delen' : '📡 Deel mijn locatie'}
       </button>
 

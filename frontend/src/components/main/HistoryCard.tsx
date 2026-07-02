@@ -58,6 +58,13 @@ export default function HistoryCard() {
 
   const positions = teamPositions || organizationMemberPositions;
 
+  // Reset the slider to the most recent position whenever the position list changes.
+  const [prevPositions, setPrevPositions] = useState(positions);
+  if (positions !== prevPositions) {
+    setPrevPositions(positions);
+    setIndex(positions && positions.length > 0 ? positions.length - 1 : 0);
+  }
+
   useEffect(() => {
     if (!positions || positions.length === 0 || !mainMap) {
       return;
@@ -67,7 +74,6 @@ export default function HistoryCard() {
     // @ts-expect-error bounds is always 4 elements long
     mainMap.fitBounds(bounds, { padding: 30 });
 
-    setIndex(positions.length - 1);
     const position = positions[positions.length - 1];
     dispatch(
       trackersActions.setHistoryItem({

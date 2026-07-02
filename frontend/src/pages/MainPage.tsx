@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { LngLat } from 'react-map-gl/maplibre';
 import { useMap } from 'react-map-gl/maplibre';
 import { Navigate } from 'react-router-dom';
@@ -38,9 +38,7 @@ export default function MainPage() {
   const [keyword, setKeyword] = useState('');
   const [listOpen, setListOpen] = useState(desktop);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [networkErrorNotificationId, setNetworkErrorNotificationId] = useState<SnackbarKey | null>(
-    null,
-  );
+  const networkErrorNotificationId = useRef<SnackbarKey | null>(null);
   const [creatingMarker, setCreatingMarker] = useState<'mapNote' | 'tracker' | null>(null);
   const [mapNoteLngLat, setMapNoteLngLat] = useState<LngLat | null>(null);
   const [trackerLogLngLat, setTrackerLogLngLat] = useState<LngLat | null>(null);
@@ -88,38 +86,46 @@ export default function MainPage() {
   });
   const { data: weides } = useGetWeidesQuery();
 
-  // Check query error for network errors
+  // Toggle a persistent snackbar in sync with the user query's network error. The
+  // snackbar system is the external store here, so the effect only touches it; the
+  // active notification's id lives in a ref rather than render state.
   useEffect(() => {
-    if (queryError !== undefined && networkErrorNotificationId === null) {
-      const id = enqueueSnackbar('Geen internetverbinding', {
+    if (queryError !== undefined && networkErrorNotificationId.current === null) {
+      networkErrorNotificationId.current = enqueueSnackbar('Geen internetverbinding', {
         variant: 'warning',
         preventDuplicate: true,
         persist: true,
       });
-      setNetworkErrorNotificationId(id);
-    } else if (queryError === undefined && networkErrorNotificationId !== null) {
-      closeSnackbar(networkErrorNotificationId);
-      setNetworkErrorNotificationId(null);
+    } else if (queryError === undefined && networkErrorNotificationId.current !== null) {
+      closeSnackbar(networkErrorNotificationId.current);
+      networkErrorNotificationId.current = null;
       enqueueSnackbar('Internetverbinding hersteld', {
         variant: 'success',
         preventDuplicate: true,
       });
     }
-  }, [dispatch, enqueueSnackbar, queryError, networkErrorNotificationId, closeSnackbar]);
+  }, [enqueueSnackbar, queryError, closeSnackbar]);
 
-  // Close the list on mobile when team is selected
-  useEffect(() => {
+  // Close the list on mobile when an item is selected. Selection can originate from
+  // many places (map, list, search), so adjust during render off the selected id
+  // instead of mirroring it into an effect.
+  const [prevSelectedId, setPrevSelectedId] = useState(selectedId);
+  if (selectedId !== prevSelectedId) {
+    setPrevSelectedId(selectedId);
     if (!desktop && selectedId !== null) {
       setListOpen(false);
     }
-  }, [desktop, selectedId]);
+  }
 
-  // Close the list on desktop if the user doesn't have permissions to view team details
-  useEffect(() => {
-    if (desktop && user && !user.permissions.includes('view_team_details')) {
+  // Once the user loads, start with the list closed on desktop for users without
+  // permission to view team details.
+  const [permissionChecked, setPermissionChecked] = useState(false);
+  if (!permissionChecked && user) {
+    setPermissionChecked(true);
+    if (desktop && !user.permissions.includes('view_team_details')) {
       setListOpen(false);
     }
-  }, [user, desktop]);
+  }
 
   // Stop creating marker when escape is pressed
   useEffect(() => {
