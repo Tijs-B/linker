@@ -78,6 +78,8 @@ interface TrackerIconSpec {
   borderPath: Path2D;
   textX: number;
   textY: number;
+  twoCharFont: string;
+  threeCharFont: string;
 }
 
 const TRACKER_SPEC: TrackerIconSpec = {
@@ -86,6 +88,8 @@ const TRACKER_SPEC: TrackerIconSpec = {
   borderPath: TRACKER_BORDER_PATH,
   textX: 16.5,
   textY: 23.1,
+  twoCharFont: '17px D-DIN Bold',
+  threeCharFont: '14px D-DINCondensed Bold',
 };
 
 const PHONE_SPEC: TrackerIconSpec = {
@@ -94,6 +98,8 @@ const PHONE_SPEC: TrackerIconSpec = {
   borderPath: PHONE_BORDER_PATH,
   textX: 16.5,
   textY: 23,
+  twoCharFont: '17px D-DIN Bold',
+  threeCharFont: '14px D-DINCondensed Bold',
 };
 
 const HAND_SPEC: TrackerIconSpec = {
@@ -102,6 +108,8 @@ const HAND_SPEC: TrackerIconSpec = {
   borderPath: HAND_BORDER_PATH,
   textX: 17,
   textY: 20,
+  twoCharFont: '16px D-DINCondensed Bold',
+  threeCharFont: '14px D-DINCondensed Bold',
 };
 
 function generateTrackerIcons(
@@ -133,7 +141,7 @@ function generateTrackerIcons(
 
   codes.forEach((code) => {
     context.putImageData(imageWithoutCode, 0, 0);
-    context.font = code.length == 2 ? '17px D-DINCondensed Bold' : '14px D-DINCondensed Bold';
+    context.font = code.length == 2 ? spec.twoCharFont : spec.threeCharFont;
     context.textAlign = 'center';
     context.fillStyle = '#fff';
     context.fillText(code, spec.textX, spec.textY);
