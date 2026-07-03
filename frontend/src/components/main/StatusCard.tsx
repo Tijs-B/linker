@@ -8,7 +8,6 @@ import DirectionsIcon from '@mui/icons-material/Directions';
 import EditLocationAltIcon from '@mui/icons-material/EditLocationAlt';
 import HistoryIcon from '@mui/icons-material/History';
 import InfoIcon from '@mui/icons-material/Info';
-import ShareLocationIcon from '@mui/icons-material/ShareLocation';
 import StarIcon from '@mui/icons-material/Star';
 import {
   Badge,
@@ -55,6 +54,7 @@ import {
 } from '../../utils/time';
 import PersonAvatar from '../PersonAvatar';
 import SafeSelector from '../SafeSelector';
+import SmartphoneLocationPinIcon from '../icons/SmartphoneLocationPinIcon.tsx';
 import MainCard from './MainCard.tsx';
 
 const cell = css`
@@ -172,7 +172,7 @@ function CopyTrackerUrlButton({ url }: { url: string }) {
       onClose={() => setHovered(false)}
     >
       <IconButton onClick={handleClick} color={copied ? 'success' : 'default'}>
-        {copied ? <CheckIcon /> : <ShareLocationIcon />}
+        {copied ? <CheckIcon /> : <SmartphoneLocationPinIcon />}
       </IconButton>
     </Tooltip>
   );
