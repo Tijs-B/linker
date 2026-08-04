@@ -12,12 +12,14 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install --no-install-recommends -y brotli && rm -rf /var/lib/apt/lists/*
 
-COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci
+RUN corepack enable
+
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY frontend .
 
-RUN npm run build \
+RUN pnpm run build \
     && find /app/dist -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" -o -name "*.json" -o -name "*.svg" -o -name "*.woff2" \) \
        -exec brotli --best --keep {} \;
 

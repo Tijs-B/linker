@@ -68,7 +68,7 @@ services:
   #   build:
   #     context: .
   #     target: frontend
-  #   command: npm run dev -- --port 8061 --host 0.0.0.0
+  #   command: pnpm run dev -- --port 8061 --host 0.0.0.0
   #   volumes:
   #     - ./frontend:/app
   #     - /app/node_modules/
