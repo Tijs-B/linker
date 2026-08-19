@@ -3,6 +3,7 @@ import type { LngLat, MapLayerMouseEvent, MapRef } from 'react-map-gl/maplibre';
 import Map, { GeolocateControl, NavigationControl, ScaleControl } from 'react-map-gl/maplibre';
 
 import CallSplitIcon from '@mui/icons-material/CallSplit';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import FlagIcon from '@mui/icons-material/Flag';
 import SatelliteIcon from '@mui/icons-material/Satellite';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
@@ -61,6 +62,7 @@ export default function MainMap({
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showSatellite, setShowSatellite] = useState(false);
   const [showZijwegen, setShowZijwegen] = useState(false);
+  const [showAutowegen, setShowAutowegen] = useState(false);
 
   const mapRef = useRef<MapRef>(null);
   const mapLoadedRef = useRef(false);
@@ -160,6 +162,7 @@ export default function MainMap({
   );
 
   const onToggleZijwegen = useCallback(() => setShowZijwegen((s) => !s), []);
+  const onToggleAutowegen = useCallback(() => setShowAutowegen((s) => !s), []);
 
   return (
     <>
@@ -185,6 +188,7 @@ export default function MainMap({
         <BackgroundLayers
           showHeatmap={showHeatmap}
           showZijwegen={showZijwegen}
+          showAutowegen={showAutowegen}
           showSatellite={showSatellite}
         />
 
@@ -243,6 +247,15 @@ export default function MainMap({
             <CallSplitIcon
               color={'primary'}
               sx={{ color: showZijwegen ? undefined : '#000', marginTop: '2px' }}
+            />
+          </IconButton>
+        </CustomOverlay>
+
+        <CustomOverlay>
+          <IconButton onClick={onToggleAutowegen}>
+            <DirectionsCarIcon
+              color={'primary'}
+              sx={{ color: showAutowegen ? undefined : '#000', marginTop: '2px' }}
             />
           </IconButton>
         </CustomOverlay>

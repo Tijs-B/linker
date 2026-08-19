@@ -19,11 +19,13 @@ interface BackgroundLayersProps {
   showHeatmap: boolean;
   showSatellite: boolean;
   showZijwegen: boolean;
+  showAutowegen: boolean;
 }
 
 export default function BackgroundLayers({
   showHeatmap,
   showZijwegen,
+  showAutowegen,
   showSatellite,
 }: BackgroundLayersProps) {
   const { data: tochten } = useGetTochtenQuery();
@@ -209,6 +211,28 @@ export default function BackgroundLayers({
           type="line"
           paint={tochtOutlinePaint}
           layout={{ visibility: showHeatmap || !showZijwegen ? 'none' : 'visible' }}
+        />
+      </Source>
+      <Source
+        type="geojson"
+        data={`https://kaart.tijsb.be/features/collections/public.autowegen_${new Date().getFullYear()}/items.json`}
+      >
+        <Layer
+          id="autowegen"
+          beforeId="zijwegen"
+          type="line"
+          paint={{
+            'line-width': showSatellite ? 2 : 3,
+            'line-color': showSatellite ? 'rgba(186,104,200,0.87)' : red[700],
+          }}
+          layout={{ visibility: showHeatmap || !showAutowegen ? 'none' : 'visible' }}
+        />
+        <Layer
+          id="autowegen-outline"
+          beforeId="tochten-outline"
+          type="line"
+          paint={tochtOutlinePaint}
+          layout={{ visibility: showHeatmap || !showAutowegen ? 'none' : 'visible' }}
         />
       </Source>
       <Source type="geojson" data={weidesLabelData}>
